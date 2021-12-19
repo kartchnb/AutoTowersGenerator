@@ -1,0 +1,8 @@
+{
+    "name": "Auto Towers Plugin",
+    "author": "Brad Kartchner",
+    "version": "0.1",
+    "api": "7.0",
+    "description": "Automates the generation of several parameterized calibration models.",
+    "catalog": "uranium"
+}
