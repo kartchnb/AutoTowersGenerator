@@ -1,8 +1,10 @@
 # AutoTowersPlugin
 This is a Cura plugin that automates the creation of 3D printer calibration towers.
 
-“I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand.”
+...
+"I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand."
 - Douglas Adams
+...
 
 This project stemmed from my own laziness and a love of automation.
 
@@ -32,6 +34,6 @@ A couple of things to note:
 
 - The plugin should be able to find the location of OpenSCAD on your system.  If, for some reason, this doesn't work, you can configure the location by changing the "OpenSCAD Path" value in the "Settings" menu.
 
-- I've done my best with this plugin, but I'm far from understanding everything about Cura and Python is still fairly new to me.  I heartily welcome suggestions for changes and improvements.  There are few things I excel at, but getting things wrong is one of them.
+- I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
 
 - Finally, please enjoy the 10 seconds you save printing your calibration tower!  
