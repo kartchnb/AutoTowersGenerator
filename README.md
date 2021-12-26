@@ -1,10 +1,8 @@
 # AutoTowersPlugin
 This is a Cura plugin that automates the creation of 3D printer calibration towers.
 
-...
 "I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand."
 - Douglas Adams
-...
 
 This project stemmed from my own laziness and a love of automation.
 
