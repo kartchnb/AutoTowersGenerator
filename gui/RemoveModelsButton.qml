@@ -10,11 +10,12 @@ Cura.SecondaryButton
     height: UM.Theme.getSize("action_button").height
     tooltip:
     {
-        var tipText = "Remove Calibration Model";
+        var tipText = "Remove AutoTower Model";
         return tipText
     }
     toolTipContentAlignment: Cura.ToolTip.ContentAlignment.AlignLeft
     onClicked: manager.removeButtonClicked()
+    iconSource: "AutoTowers Icon.svg"
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
 }
