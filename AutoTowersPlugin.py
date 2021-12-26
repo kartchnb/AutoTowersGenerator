@@ -3,7 +3,6 @@
 # Update dialogs to adjust for resizing
 # Implement speed tower (implemented script, dialog)
 # Save values between sessions
-# Is it possible to clear the model when the layer height is changed?
 # Clean up log messages
 # Clean up imports
 
