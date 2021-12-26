@@ -1,3 +1,9 @@
+# Generated STL files
+*.stl
+
+# Don't checkin my notes!
+my.notes
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
