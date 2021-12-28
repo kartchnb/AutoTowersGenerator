@@ -1,9 +1,8 @@
 # AutoTowersPlugin
-This is a Cura plugin that automates the creation of 3D printer calibration towers.
 
-"I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand." - Douglas Adams
+###"I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand." - Douglas Adams
 
-This project stemmed from my own laziness and a love of automation.
+This is a Cura plugin that automates the creation of 3D printer calibration towers.  It stems, ultimately, from my own laziness.
 
 There are instructions all over explaining how to generate temperature towers and 5axes even created the incredibly useful "Calibration Shapes" plugin, which does most of the work for you - one click to create the tower model, another few clicks to add a temperature change script.  Viola!
 
