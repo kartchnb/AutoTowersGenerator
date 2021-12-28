@@ -10,6 +10,7 @@ And, yet, it was still too much work for me.  I wondered if it would be possible
 
 So, with the goal of saving myself a good 10 seconds of work, I set out to learn how to write a Cura plugin to automate this entire process.  This plugin is the result.
 
+## Usage
 With this plugin, printing a temperature tower is as easy as:
   1) Click "Auto Towers" from the "Extensions" menu in Cura.
   2) Select the appropriate temperature tower for the material you're using (or create your own custom tower!)
@@ -20,7 +21,7 @@ It's a similar process to create a retraction tower or a fan tower!
 
 This plugin relies on OpenSCAD being installed in the default location (on Windows and Mac) or in the current path (on Linux) to work.  This is because your calibration tower is customized to meet the parameters you set and the layer height you are printing at.
 
-A couple of things to note:
+## A couple of things to note:
 
 - There is no need to add a post-processing script after creating the tower.  The post-processing is automatically done for you!  
 
