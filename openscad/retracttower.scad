@@ -52,6 +52,11 @@ Render_Quality_Value = 24;
 
 
 
+/* [Development Parameters] */
+Use_Preset_Viewpoint = false;
+
+
+
 module Generate()
 {
     // Add the base
@@ -300,6 +305,10 @@ Label_Depth = Wall_Thickness/2;
 // Generate the model
 color("white")
 Generate();
-$vpt=[0, 0, 35];
-$vpr=[90, 0, -60];
-$vpd=220;
+
+if (Use_Preset_Viewpoint)
+{
+    $vpt=[0, 0, 35];
+    $vpr=[90, 0, -60];
+    $vpd=220;
+}
