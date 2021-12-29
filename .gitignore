@@ -4,6 +4,9 @@
 # Don't checkin my notes!
 my.notes
 
+# Don't check in my personal test script
+test_cura.sh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

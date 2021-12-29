@@ -298,6 +298,7 @@ Generate();
 
 if (Use_Preset_Viewpoint)
 {
+    echo("Preset viewpoint");
     $vpt=[0, 0, 35];
     $vpr=[90, 0, -60];
     $vpd=220;
