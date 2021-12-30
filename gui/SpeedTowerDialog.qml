@@ -102,6 +102,7 @@ property int screenScaleFactor: 1
                 {
                     id: displayOnLcdInput
                     text: "Display details on LCD"
+                    checked: true
                 }
             }
         }

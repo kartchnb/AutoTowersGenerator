@@ -26,6 +26,8 @@ class TempTowerController(QObject):
             'endTemp' : 210,
             'tempChange' : -5,
             'materialLabel': 'ABS',
+            'towerDescription': '',
+            'displayOnLcd': True,
         },
 
         'PETG' : 
@@ -34,6 +36,8 @@ class TempTowerController(QObject):
             'endTemp' : 230,
             'tempChange' : -5,
             'materialLabel': 'PETG',
+            'towerDescription': '',
+            'displayOnLcd': True,
         },
 
         'PLA' : 
@@ -42,6 +46,8 @@ class TempTowerController(QObject):
             'endTemp' : 180,
             'tempChange' : -5,
             'materialLabel': 'PLA',
+            'towerDescription': '',
+            'displayOnLcd': True,
         },
 
         'PLA+' :
@@ -50,6 +56,8 @@ class TempTowerController(QObject):
             'endTemp' : 200,
             'tempChange' : -5,
             'materialLabel': 'PLA+',
+            'towerDescription': '',
+            'displayOnLcd': True,
         },
 
         'TPU' : 
@@ -58,6 +66,8 @@ class TempTowerController(QObject):
             'endTemp' : 170,
             'tempChange' : -5,
             'materialLabel': 'TPU',
+            'towerDescription': '',
+            'displayOnLcd': True,
         },
     }
 

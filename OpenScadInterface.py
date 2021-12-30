@@ -32,9 +32,9 @@ class OpenScadInterface:
         elif system == 'Windows':
             program_files_path = os.path.join(os.getenv('PROGRAMFILES'), 'OpenSCAD', 'openscad.exe')
             program_files_x86_path = os.path.join(os.getenv('PROGRAMFILES(X86)'), 'OpenSCAD', 'openscad.exe')
-            if os.path.is_file(program_files_path):
+            if os.path.isfile(program_files_path):
                 self.OpenScadPath = program_files_path
-            elif os.path.is_file(program_files_x86_path):
+            elif os.path.isfile(program_files_x86_path):
                 self.OpenScadPath = program_files_x86_path
             else:
                 Message('Failed to locate OpenSCAD installed in the Program Files directories\nPlease ensure OpenSCAD is installed correctly or change its path in the AutoTowers settings menu', title='AutoTowers').show()

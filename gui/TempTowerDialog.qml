@@ -103,6 +103,7 @@ UM.Dialog
                 {
                     id: displayOnLcdInput
                     text: "Display details on LCD"
+                    checked: true
                 }
             }
         }
