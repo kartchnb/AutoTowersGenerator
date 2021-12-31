@@ -37,7 +37,7 @@ class OpenScadInterface:
             elif os.path.isfile(program_files_x86_path):
                 self.OpenScadPath = program_files_x86_path
             else:
-                Message('Failed to locate OpenSCAD installed in the Program Files directories\nPlease ensure OpenSCAD is installed correctly or change its path in the AutoTowers settings menu', title='AutoTowers').show()
+                Message('Failed to locate OpenSCAD installed in the Program Files directories\nPlease ensure OpenSCAD is installed correctly or change its path in the AutoTowers settings menu', title='Unable to find OpenSCAD').show()
 
         # If none of the above apply, try a default that might work
         else:

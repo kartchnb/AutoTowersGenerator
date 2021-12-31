@@ -1,11 +1,7 @@
-# Generated STL files
-*.stl
-
-# Don't checkin my notes!
+# Don't checkin my development files
 my.notes
-
-# Don't check in my personal test script
-test_cura.sh
+*.sh
+generate_stls.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

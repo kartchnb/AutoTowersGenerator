@@ -39,6 +39,7 @@ class AutoTowersPlugin(QObject, Extension):
 
         self._preferences = CuraApplication.getInstance().getPreferences()
         self._preferences.addPreference(self._openScadPathPreferencePath, '')
+        self._preferences.setValue(self._openScadPathPreferencePath, '')
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
@@ -66,7 +67,7 @@ class AutoTowersPlugin(QObject, Extension):
 
         # Determine the command to run OpenSCAD
         self._openScadInterface = OpenScadInterface.OpenScadInterface()
-        storedOpenScadPath = self._preferences.getValue('AutoTowersPlugin/openScadPath')
+        storedOpenScadPath = self._preferences.getValue(self._openScadPathPreferencePath)
         if storedOpenScadPath:
             self._openScadInterface.OpenScadPath = storedOpenScadPath
 
@@ -238,7 +239,10 @@ class AutoTowersPlugin(QObject, Extension):
             parameter = parameter[:3]
 
             # Add the parameter and value to the filename
-            stlFilename += f'_{parameter}_{value}'
+            if isinstance(value, float):
+                stlFilename += f'_{parameter}_{value:.3f}'
+            else:
+                stlFilename += f'_{parameter}_{value}'
 
         # Finally, add a ".stl" extension
         stlFilename += '.stl'
@@ -312,7 +316,7 @@ class AutoTowersPlugin(QObject, Extension):
         ''' Listen for setting changes made after an Auto Tower is generated 
             if the layer height value is changed, the Auto Tower needs to be 
             removed and regenerated '''
-        if setting_key == 'layer_height' and property_name == 'value':
+        if setting_key == 'layer_height' and property_name == 'value' and self._autoTowerGenerated == True:
             self._removeAutoTower()
             Message('The Auto Tower has been removed because the layer height was changed', title='AutoTowerPlugin').show()
 

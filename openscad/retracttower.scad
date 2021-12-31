@@ -223,7 +223,6 @@ module Generate_ColumnLabel(label)
     letter_sweep_angle = (Column_Label_Font_Size / (2 * PI * letter_radius)) * 360;
     label_sweep_angle = len(label) * letter_sweep_angle + (len(label) - 1) * letter_sweep_angle * Column_Label_Letter_Spacing_Multiplier;
     start_angle = -label_sweep_angle/4;
-    echo(start_angle=start_angle);
 
     translate([Tower_Width/2 - Cube_Size/2, 0, Base_Height + Cube_Size/2])
     difference()

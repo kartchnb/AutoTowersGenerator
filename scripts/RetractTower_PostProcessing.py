@@ -99,7 +99,7 @@ def is_reset_extruder_line(line: str) -> bool:
     
 
 def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLayers, towerType):
-    Logger.log('d', f'Modifying for retraction {towerType}')
+    Logger.log('d', f'Post-processing for retraction {towerType} tower')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
@@ -107,8 +107,8 @@ def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLay
     if displayOnLcd: 
         Logger.log('d', 'Displaying status to the LCD')
    
-    extruder = Application.getInstance().getGlobalContainerStack().extruderList
-    relative_extrusion = bool(extruder[0].getProperty('relative_extrusion', 'value'))
+    extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
+    relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -137,7 +137,7 @@ def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLay
             if is_reset_extruder_line(line):
                 current_e = 0
                 
-            # If we have define a value
+            # If we have defined a value
             if currentValue>=0:
                 if is_retract_line(line):
                     searchF = re.search(r'F(\d*)', line)
@@ -148,33 +148,37 @@ def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLay
                     if searchE:
                         current_e=float(searchE.group(1))
                         if relative_extrusion:
+                            # Retracting filament (relative)
                             if current_e<0:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 speed F{int(currentValue)}'
+                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{-currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 retract E{currentValue:.3f}'
+                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
+                            # Extruding filament (relative)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 speed F{int(currentValue)}'
+                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 retract E{currentValue:.3f}'
+                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
                         else:
+                            # Retracting filament (absolute)
                             if save_e>current_e:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 speed F{int(currentValue)}'
+                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     current_e = save_e - currentValue
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 retract E{currentValue:.3f}'
+                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
+                            # Extruding filament (absolute)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 speed F{int(currentValue)}'
+                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
 
             if is_extrusion_line(line):
                 searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
@@ -186,13 +190,14 @@ def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLay
                 if (layerIndex==baseLayers):
                     currentValue = startValue
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
-                    lcd_gcode = f'M117 START {towerType} {startValue:.1f}/{valueChange:.1f}'
+                    lcd_gcode = f'Retract {towerType} starting at {startValue:.1f}'
                     lines.insert(lineIndex + 1, 'Start of the first section')
                 
                 # Change the current value   
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')
+                    lcd_gcode = f'New section {towerType} {currentValue:.1f}'
                     lines.insert(lineIndex + 1, 'Start of the next section')
 
                 # Add M117 to add message on LCD
