@@ -39,7 +39,6 @@ class AutoTowersPlugin(QObject, Extension):
 
         self._preferences = CuraApplication.getInstance().getPreferences()
         self._preferences.addPreference(self._openScadPathPreferencePath, '')
-        self._preferences.setValue(self._openScadPathPreferencePath, '')
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
