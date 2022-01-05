@@ -376,7 +376,6 @@ class AutoTowersPlugin(QObject, Extension):
             I know there should be a better way of doing this but I don't really have a handle on Qt yet '''
         self._openScadInterface.OpenScadPath = self._settingsDialog.property('openScadPath')
         self._preferences.setValue(self._openScadPathPreferencePath, self._openScadInterface.OpenScadPath)
-        self._preferences.setValue(self._openScadPathPreferencePath, 42)
 
 
 
