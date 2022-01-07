@@ -1,7 +1,5 @@
 # Don't checkin my development files
 my.notes
-*.sh
-generate_stls.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
