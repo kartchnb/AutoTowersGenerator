@@ -22,7 +22,7 @@ Section_Height = 8.001;
 
 
 
-/* [Advanced] */
+/* [Advanced Parameters] */
 // The font to use for tower text
 Font = "Arial:style=Bold";
 
@@ -52,130 +52,8 @@ Render_Quality_Value = 24;
 
 
 
-/* [Development Parameters] */
-Use_Preset_Viewpoint = false;
-
-
-
-module Generate()
-{
-    // Add the base
-    Generate_Base();
-
-    translate([0, 0, Base_Height])
-    difference()
-    {
-        // set the tower on top of the base
-        Generate_Tower();
-
-        // Create the tower label
-        Generate_TowerLabel(Tower_Label);
-
-        // Create the column label
-        Generate_TemperatureLabel(Temperature_Label);
-    }
-}
-
-
-
-module Generate_Base()
-{
-    translate([-Base_Size/2, -Base_Size/2, 0])
-        cube([Base_Size, Base_Size, Base_Height]);
-}
-
-
-
-module Generate_Tower()
-{
-    // Create each section
-    for (section = [0: Section_Count - 1])
-    {
-        // Determine the value for this section
-        value = Starting_Speed + (Speed_Change_Corrected * section);
-
-        // Determine the offset of the section
-        z_offset = section*Section_Height;
-
-        // Generate the section itself and move it into place
-        translate([0, 0, z_offset])
-            Generate_Section(str(value));
-    }
-}
-
-
-
-module Generate_Section(label)
-{
-    difference()
-    {
-        union()
-        {
-            // Create the main body of the section
-            translate([-Column_Size/2, -Column_Size/2, 0])
-                cube([Column_Size, Column_Size, Section_Height - Cap_Height]);
-
-            // Generate the cap on top of the section cube
-            translate([-Cap_Size/2, -Cap_Size/2, Section_Height - Cap_Height])
-                cube([Cap_Size, Cap_Size, Cap_Height]);
-        }
-
-        // Carve out an inset panel on the side of the column
-        translate([-Panel_Width/2, Column_Size/2 - Panel_Inset, (Section_Height - Cap_Height - Panel_Height)/2])
-            cube([Panel_Width, Panel_Inset + iota, Panel_Height]);
-
-        // Carve away the angled wall
-        translate([-Column_Size/2, -Column_Size/2, Section_Height - Cap_Height])
-        rotate([0, 0, 45])
-        rotate([0, -45, 0])
-        translate([-Column_Size, -Column_Size/3, -Column_Size*3])
-            cube([Column_Size, Column_Size/1.5, Column_Size*3]);
-    }
-
-    // Carve out the label for this section
-    Generate_SectionLabel(label);
-}
-
-
-
-module Generate_SectionLabel(label)
-{
-    translate([0, Column_Size/2 - Panel_Inset + Label_Depth, (Section_Height - Cap_Height)/2])
-    rotate([90, 0, 180])
-    translate([0, 0, -Label_Depth])
-    linear_extrude(Label_Depth)
-        text(text=label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
-}
-
-
-
-module Generate_TowerLabel(label)
-{
-    translate([Column_Size/2 - Label_Depth, 0, Wall_Thickness])
-    rotate([0, -90, 180])
-    linear_extrude(Label_Depth + iota)
-        text(text=label, font=Font, size=Tower_Label_Font_Size, halign="left", valign="center");
-}
-
-
-
-module Generate_TemperatureLabel(label)
-{
-    translate([Column_Size/4, -Column_Size/2 + Label_Depth, Wall_Thickness])
-    rotate([0, -90, 90])
-    linear_extrude(Label_Depth + iota)
-        text(text=label, font=Font, size=Temperature_Label_Font_Size, halign="left", valign="center");
-}
-
-
-
-// Global parameters
-iota = 0.001;
-$fn = $preview ? Preview_Quality_Value : Render_Quality_Value;
-
-
-
-// Calculated parameters
+/* [Calculated Parameters] */
+module dummy(){}; // Prevents the following parameters from showing up in the customizer
 
 // Ensure the value change has the correct sign
 Speed_Change_Corrected = Ending_Speed > Starting_Speed
@@ -214,13 +92,131 @@ Label_Depth = Wall_Thickness/2;
 
 
 
-// Generate the model
-color("white")
-Generate();
+/* [Misc Parameters] */
+Iota = 0.001;
+$fn = $preview ? Preview_Quality_Value : Render_Quality_Value;
 
-if (Use_Preset_Viewpoint)
+
+
+// Generate the model
+module Generate()
 {
-    $vpt=[0, 0, 35];
-    $vpr=[90, 0, -60];
-    $vpd=220;
+    // Add the base
+    Generate_Base();
+
+    translate([0, 0, Base_Height])
+    difference()
+    {
+        // set the tower on top of the base
+        Generate_Tower();
+
+        // Create the tower label
+        Generate_TowerLabel(Tower_Label);
+
+        // Create the column label
+        Generate_TemperatureLabel(Temperature_Label);
+    }
 }
+
+
+
+// Generate the base of the tower independantly of the tower sections
+module Generate_Base()
+{
+    translate([-Base_Size/2, -Base_Size/2, 0])
+        cube([Base_Size, Base_Size, Base_Height]);
+}
+
+
+
+// Generate the tower proper by iteritively generating a section for each retraction value
+module Generate_Tower()
+{
+    // Create each section
+    for (section = [0: Section_Count - 1])
+    {
+        // Determine the value for this section
+        value = Starting_Speed + (Speed_Change_Corrected * section);
+
+        // Determine the offset of the section
+        z_offset = section*Section_Height;
+
+        // Generate the section itself and move it into place
+        translate([0, 0, z_offset])
+            Generate_Section(str(value));
+    }
+}
+
+
+
+// Generate a single section of the tower with a given label
+module Generate_Section(label)
+{
+    difference()
+    {
+        union()
+        {
+            // Create the main body of the section
+            translate([-Column_Size/2, -Column_Size/2, 0])
+                cube([Column_Size, Column_Size, Section_Height - Cap_Height]);
+
+            // Generate the cap on top of the section cube
+            translate([-Cap_Size/2, -Cap_Size/2, Section_Height - Cap_Height])
+                cube([Cap_Size, Cap_Size, Cap_Height]);
+        }
+
+        // Carve out an inset panel on the side of the column
+        translate([-Panel_Width/2, Column_Size/2 - Panel_Inset, (Section_Height - Cap_Height - Panel_Height)/2])
+            cube([Panel_Width, Panel_Inset + Iota, Panel_Height]);
+
+        // Carve away the angled wall
+        translate([-Column_Size/2, -Column_Size/2, Section_Height - Cap_Height])
+        rotate([0, 0, 45])
+        rotate([0, -45, 0])
+        translate([-Column_Size, -Column_Size/3, -Column_Size*3])
+            cube([Column_Size, Column_Size/1.5, Column_Size*3]);
+    }
+
+    // Carve out the label for this section
+    Generate_SectionLabel(label);
+}
+
+
+
+// Generate the text that will be carved into the square section column
+module Generate_SectionLabel(label)
+{
+    translate([0, Column_Size/2 - Panel_Inset + Label_Depth, (Section_Height - Cap_Height)/2])
+    rotate([90, 0, 180])
+    translate([0, 0, -Label_Depth])
+    linear_extrude(Label_Depth)
+        text(text=label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
+}
+
+
+
+// Generate the text that will be carved up the side of the tower
+module Generate_TowerLabel(label)
+{
+    translate([Column_Size/2 - Label_Depth, 0, Wall_Thickness])
+    rotate([0, -90, 180])
+    linear_extrude(Label_Depth + Iota)
+        text(text=label, font=Font, size=Tower_Label_Font_Size, halign="left", valign="center");
+}
+
+
+
+// Generate the text that will be carved up the side of the tower indicating the temperature the speed tower
+// was printed at
+module Generate_TemperatureLabel(label)
+{
+    translate([Column_Size/4, -Column_Size/2 + Label_Depth, Wall_Thickness])
+    rotate([0, -90, 90])
+    linear_extrude(Label_Depth + Iota)
+        text(text=label, font=Font, size=Temperature_Label_Font_Size, halign="left", valign="center");
+}
+
+
+
+// Generate the model
+Generate();
