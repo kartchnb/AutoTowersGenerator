@@ -21,7 +21,6 @@ property int screenScaleFactor: 1
     property alias endSpeed: endSpeedInput.text
     property alias speedChange: speedChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
-    property alias displayOnLcd: displayOnLcdInput.checked
 
     // Common values
     property int textFieldWidth: 50
@@ -64,7 +63,7 @@ property int screenScaleFactor: 1
             {
                 id: startSpeedInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "8"
             }
 
@@ -74,7 +73,7 @@ property int screenScaleFactor: 1
             {
                 id: endSpeedInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "32"
             }
 
@@ -84,7 +83,7 @@ property int screenScaleFactor: 1
             {
                 id: speedChangeInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "#009"
+                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
                 text: "4"
             }
     
@@ -94,16 +93,6 @@ property int screenScaleFactor: 1
             {
                 id: towerDescriptionInput
                 text: ""
-            }
-
-            Column
-            {
-                CheckBox
-                {
-                    id: displayOnLcdInput
-                    text: "Display details on LCD"
-                    checked: true
-                }
             }
         }
     }

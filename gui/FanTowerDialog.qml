@@ -19,7 +19,6 @@ UM.Dialog
     property alias endPercent: endPercentInput.text
     property alias percentChange: percentChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
-    property alias displayOnLcd: displayOnLcdInput.checked
 
     // Common values
     property int textFieldWidth: 50
@@ -54,7 +53,7 @@ UM.Dialog
             {
                 id: startPercentInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "100"
             }
 
@@ -64,7 +63,7 @@ UM.Dialog
             {
                 id: endPercentInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "50"
             }
 
@@ -74,7 +73,7 @@ UM.Dialog
             {
                 id: percentChangeInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "#009"
+                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
                 text: "-10"
             }
 
@@ -85,16 +84,6 @@ UM.Dialog
                 id: towerDescriptionInput
                 text: ""
                 width: parent.width
-            }
-            
-            Column
-            {
-                CheckBox
-                {
-                    id: displayOnLcdInput
-                    text: "Display details on LCD"
-                    checked: true
-                }
             }
         }
     }

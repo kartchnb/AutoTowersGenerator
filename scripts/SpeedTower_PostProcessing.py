@@ -9,14 +9,12 @@ import re #To perform the search
 
 __version__ = '1.0'
 
-def execute(self, gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLayers, towerType):
+def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
     Logger.log('d', f'Modyfying for speed {towerType}')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
-    if displayOnLcd:
-        Logger.log('d', 'Displaying status to the LCD')
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -57,8 +55,7 @@ def execute(self, gcode, startValue, valueChange, displayOnLcd, sectionLayers, b
                         lcd_gcode = f'M117 Pressure Advance S{float(currentValue):.3f}'
                         
                     lines.insert(lineIndex + 1, comand)
-                    if displayOnLcd:               
-                        lines.insert(lineIndex + 2, lcd_gcode)
+                    lines.insert(lineIndex + 2, lcd_gcode)
 
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
                         Logger.log('d', f'New section at layer {layerIndex - 2}')
@@ -81,8 +78,7 @@ def execute(self, gcode, startValue, valueChange, displayOnLcd, sectionLayers, b
                             lcd_gcode = f'M117 Pressure Advance S{float(currentValue):.3f}'
                             
                         lines.insert(lineIndex + 1, comand)
-                        if displayOnLcd:               
-                            lines.insert(lineIndex + 2, lcd_gcode)                                              
+                        lines.insert(lineIndex + 2, lcd_gcode)                                              
         
         result = '\n'.join(lines)
         gcode[layerIndex] = result

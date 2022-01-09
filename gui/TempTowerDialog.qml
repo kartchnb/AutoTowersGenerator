@@ -20,7 +20,6 @@ UM.Dialog
     property alias tempChange: tempChangeInput.text
     property alias materialLabel: materialLabelInput.text
     property alias towerDescription: towerDescriptionInput.text
-    property alias displayOnLcd: displayOnLcdInput.checked
 
     // Common values
     property int textFieldWidth: 50
@@ -55,7 +54,7 @@ UM.Dialog
             {
                 id: startTempInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "220"
             }
 
@@ -65,7 +64,7 @@ UM.Dialog
             {
                 id: endTempInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "009"
+                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
                 text: "180"
             }
 
@@ -75,7 +74,7 @@ UM.Dialog
             {
                 id: tempChangeInput
                 Layout.preferredWidth: textFieldWidth
-                inputMask: "#009"
+                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
                 text: "-5"
             }
 
@@ -95,16 +94,6 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 text: ""
-            }
-
-            Column
-            {
-                CheckBox
-                {
-                    id: displayOnLcdInput
-                    text: "Display details on LCD"
-                    checked: true
-                }
             }
         }
     }

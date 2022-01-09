@@ -88,9 +88,8 @@ class FanTowerController(QObject):
         # Read the parameters from the dialog
         startPercent = int(self._dialog.property('startPercent'))
         percentChange = int(self._dialog.property('percentChange'))
-        displayOnLcd = bool(self._dialog.property('displayOnLcd'))
 
         # Call the post-processing script
-        gcode = FanTower_PostProcessing.execute(gcode, startPercent, percentChange, displayOnLcd, self._sectionLayers, self._baseLayers)
+        gcode = FanTower_PostProcessing.execute(gcode, startPercent, percentChange, self._sectionLayers, self._baseLayers)
 
         return gcode

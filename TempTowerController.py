@@ -159,9 +159,8 @@ class TempTowerController(QObject):
         # Read the parameters from the dialog
         startTemp = int(self._dialog.property('startTemp'))
         tempChange = int(self._dialog.property('tempChange'))
-        displayOnLcd = bool(self._dialog.property('displayOnLcd'))
 
         # Call the post-processing script
-        gcode = TempTower_PostProcessing.execute(gcode, startTemp, tempChange, displayOnLcd, self._sectionLayers, self._baseLayers)
+        gcode = TempTower_PostProcessing.execute(gcode, startTemp, tempChange, self._sectionLayers, self._baseLayers)
 
         return gcode

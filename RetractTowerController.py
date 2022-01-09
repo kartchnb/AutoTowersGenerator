@@ -125,9 +125,8 @@ class RetractTowerController(QObject):
         # Read the parameters from the dialog
         startValue = int(self._dialog.property('startValue'))
         valueChange = int(self._dialog.property('valueChange'))
-        displayOnLcd = bool(self._dialog.property('displayOnLcd'))
 
         # Call the post-processing script
-        gcode = RetractTower_PostProcessing.execute(gcode, startValue, valueChange, displayOnLcd, self._sectionLayers, self._baseLayers, self._towerType)
+        gcode = RetractTower_PostProcessing.execute(gcode, startValue, valueChange, self._sectionLayers, self._baseLayers, self._towerType)
 
         return gcode

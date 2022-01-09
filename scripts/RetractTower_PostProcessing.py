@@ -98,14 +98,12 @@ def is_reset_extruder_line(line: str) -> bool:
     return 'G92' in line and 'E0' in line
     
 
-def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLayers, towerType):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
     Logger.log('d', f'Post-processing for retraction {towerType} tower')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
-    if displayOnLcd: 
-        Logger.log('d', 'Displaying status to the LCD')
    
     extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
@@ -201,8 +199,7 @@ def execute(gcode, startValue, valueChange, displayOnLcd, sectionLayers, baseLay
                     lines.insert(lineIndex + 1, 'Start of the next section')
 
                 # Add M117 to add message on LCD
-                if displayOnLcd == True :
-                    lines.insert(lineIndex + 1, lcd_gcode)
+                lines.insert(lineIndex + 1, lcd_gcode)
                                             
         result = '\n'.join(lines)
         gcode[layerIndex] = result
