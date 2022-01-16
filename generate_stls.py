@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import math
 import os
 import subprocess
@@ -14,56 +16,90 @@ nominalSectionHeight_tempTower = 8.0
 # A full list of layerheights to generate for
 layerHeights = [0.1, 0.2, 0.3]
 
+# Fan tower presets
+fanTowerPresets = {
+    'default' :
+    {
+        'startValue' : 100,
+        'endValue' : 50,
+        'valueChange' : -10,
+        'columnLabel' : 'FAN',
+        'towerLabel' : '',
+    },
+}
+
+# Retract distance tower presets
+retractDistanceTowerPresets = {
+    'default' :
+    {
+        'startValue' : 10,
+        'endValue' : 40,
+        'valueChange' : 10,
+        'columnLabel' : 'SPD',
+        'towerLabel' : '',
+    },
+
+}
+
+# Retract speed tower presets
+retractSpeedTowerPresets = {
+    'default' :
+    {
+        'startValue' : 1,
+        'endValue' : 6,
+        'valueChange' : 1,
+        'columnLabel' : 'DIST',
+        'towerLabel' : '',
+    },
+
+}
+
+# Temperature tower presets
 # These values must mirror the _presets in TempTowerController.py
 tempTowerPresets = {
     'ABS' : 
     {
-        'startTemp' : 250,
-        'endTemp' : 210,
-        'tempChange' : -5,
-        'materialLabel': 'ABS',
-        'towerDescription': '',
-        'displayOnLcd': True,
+        'startValue' : 250,
+        'endValue' : 210,
+        'valueChange' : -5,
+        'columnLabel': 'ABS',
+        'towerLabel': '',
     },
 
     'PETG' : 
     {
-        'startTemp' : 260,
-        'endTemp' : 230,
-        'tempChange' : -5,
-        'materialLabel': 'PETG',
-        'towerDescription': '',
-        'displayOnLcd': True,
+        'startValue' : 260,
+        'endValue' : 230,
+        'valueChange' : -5,
+        'columnLabel': 'PETG',
+        'towerLabel': '',
     },
 
     'PLA' : 
     {
-        'startTemp' : 220,
-        'endTemp' : 180,
-        'tempChange' : -5,
-        'materialLabel': 'PLA',
-        'towerDescription': '',
-        'displayOnLcd': True,
+        'startValue' : 220,
+        'endValue' : 180,
+        'valueChange' : -5,
+        'columnLabel': 'PLA',
+        'towerLabel': '',
     },
 
     'PLA+' :
     {
-        'startTemp' : 230,
-        'endTemp' : 200,
-        'tempChange' : -5,
-        'materialLabel': 'PLA+',
-        'towerDescription': '',
-        'displayOnLcd': True,
+        'startValue' : 230,
+        'endValue' : 200,
+        'valueChange' : -5,
+        'columnLabel': 'PLA+',
+        'towerLabel': '',
     },
 
     'TPU' : 
     {
-        'startTemp' : 210,
-        'endTemp' : 170,
-        'tempChange' : -5,
-        'materialLabel': 'TPU',
-        'towerDescription': '',
-        'displayOnLcd': True,
+        'startValue' : 210,
+        'endValue' : 170,
+        'valueChange' : -5,
+        'columnLabel': 'TPU',
+        'towerLabel': '',
     },
 }
 
@@ -137,52 +173,52 @@ def calculateSectionHeight(nominalHeight, layerHeight):
 
 
 
-def generateFanTower(layerHeight):
+def generateFanTower(preset, layerHeight):
     baseHeight = calculateSectionHeight(nominalBaseHeight_fanTower, layerHeight)
     sectionHeight = calculateSectionHeight(nominalSectionHeight_fanTower, layerHeight)
 
     parameters = {}
-    parameters ['Starting_Value'] = 100
-    parameters ['Ending_Value'] = 50
-    parameters ['Value_Change'] = -10
+    parameters ['Starting_Value'] = preset['startValue']
+    parameters ['Ending_Value'] = preset['endValue']
+    parameters ['Value_Change'] = preset['valueChange']
     parameters ['Base_Height'] = baseHeight
     parameters ['Section_Height'] = sectionHeight
-    parameters ['Column_Label'] = 'FAN'
-    parameters ['Tower_Label'] = ''
+    parameters ['Column_Label'] = preset['columnLabel']
+    parameters ['Tower_Label'] = preset['towerLabel']
 
     generateStl('temptower.scad', parameters)
 
 
 
-def generateRetractDistanceTower(layerHeight):
+def generateRetractDistanceTower(preset, layerHeight):
     baseHeight = calculateSectionHeight(nominalBaseHeight_retractTower, layerHeight)
     sectionHeight = calculateSectionHeight(nominalSectionHeight_retractTower, layerHeight)
 
     parameters = {}
-    parameters ['Starting_Value'] = 1
-    parameters ['Ending_Value'] = 6
-    parameters ['Value_Change'] = 1
+    parameters ['Starting_Value'] = preset['startValue']
+    parameters ['Ending_Value'] = preset['endValue']
+    parameters ['Value_Change'] = preset['valueChange']
     parameters ['Base_Height'] = baseHeight
     parameters ['Section_Height'] = sectionHeight
-    parameters ['Tower_Label'] = ''
-    parameters ['Column_Label'] = 'DIST'
+    parameters ['Column_Label'] = preset['columnLabel']
+    parameters ['Tower_Label'] = preset['towerLabel']
 
     generateStl('retracttower.scad', parameters)
 
 
 
-def generateRetractSpeedTower(layerHeight):
+def generateRetractSpeedTower(preset, layerHeight):
     baseHeight = calculateSectionHeight(nominalBaseHeight_retractTower, layerHeight)
     sectionHeight = calculateSectionHeight(nominalSectionHeight_retractTower, layerHeight)
 
     parameters = {}
-    parameters ['Starting_Value'] = 10
-    parameters ['Ending_Value'] = 40
-    parameters ['Value_Change'] = 10
+    parameters ['Starting_Value'] = preset['startValue']
+    parameters ['Ending_Value'] = preset['endValue']
+    parameters ['Value_Change'] = preset['valueChange']
     parameters ['Base_Height'] = baseHeight
     parameters ['Section_Height'] = sectionHeight
-    parameters ['Tower_Label'] = ''
-    parameters ['Column_Label'] = 'SPD'
+    parameters ['Column_Label'] = preset['columnLabel']
+    parameters ['Tower_Label'] = preset['towerLabel']
 
     generateStl('retracttower.scad', parameters)
     
@@ -193,29 +229,31 @@ def generateTempTower(preset, layerHeight):
     sectionHeight = calculateSectionHeight(nominalSectionHeight_tempTower, layerHeight)
 
     parameters = {}
-    parameters ['Starting_Value'] = preset['startTemp']
-    parameters ['Ending_Value'] = preset['endTemp']
-    parameters ['Value_Change'] = preset['tempChange']
+    parameters ['Starting_Value'] = preset['startValue']
+    parameters ['Ending_Value'] = preset['endValue']
+    parameters ['Value_Change'] = preset['valueChange']
     parameters ['Base_Height'] = baseHeight
     parameters ['Section_Height'] = sectionHeight
-    parameters ['Column_Label'] = preset['materialLabel']
-    parameters ['Tower_Label'] = preset['towerDescription']
+    parameters ['Column_Label'] = preset['columnLabel']
+    parameters ['Tower_Label'] = preset['towerLabel']
 
     generateStl('temptower.scad', parameters)
 
 
 
-# Fan Towers
 for layerHeight in layerHeights:
-    generateFanTower(layerHeight)
+    # Fan towers
+    for presetName in fanTowerPresets:
+        generateFanTower(fanTowerPresets[presetName], layerHeight)
 
-# Retraction Towers
-for layerHeight in layerHeights:
-    generateRetractDistanceTower(layerHeight)
-    generateRetractSpeedTower(layerHeight)
+    # Retraction distance towers
+    for presetName in retractDistanceTowerPresets:
+        generateRetractDistanceTower(retractDistanceTowerPresets[presetName], layerHeight)
+    
+    # Retraction speed towers
+    for presetName in retractSpeedTowerPresets:
+        generateRetractSpeedTower(retractSpeedTowerPresets[presetName], layerHeight)
 
-# Temperature Towers
-for layerHeight in layerHeights:
+    # Temperature towers
     for presetName in tempTowerPresets:
-        preset = tempTowerPresets[presetName]
-        generateTempTower(preset, layerHeight)
+        generateTempTower(tempTowerPresets[presetName], layerHeight)

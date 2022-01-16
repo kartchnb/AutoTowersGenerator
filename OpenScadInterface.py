@@ -19,13 +19,12 @@ class OpenScadInterface:
         system = platform.system()
         Logger.log('d', f'Platform is reported as "{system}"')
 
-        # For Linux, OpenSCAD should be in the default path
-        if system == 'Linux':
-            self.OpenScadPath = 'openscad'
+        # Set a default OpenSCAD path (should work for Linux)
+        self.OpenScadPath = 'openscad'
 
-        # This path for macs was stolen from Thopiekar's OpenSCAD Integration plugin (https://thopiekar.eu/cura/cad/openscad)
-        # I have no way of verifying this, though...
-        elif system == 'Darwin':
+        # This path for Macintosh was borrowed from Thopiekar's OpenSCAD Integration plugin (https://thopiekar.eu/cura/cad/openscad)
+        # I have no way of verifying it works...
+        if system == 'Darwin':
             self.OpenScadPath = '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD'
 
         # For Windows, OpenSCAD should be installed in the Program Files folder
@@ -36,14 +35,8 @@ class OpenScadInterface:
                 self.OpenScadPath = program_files_path
             elif os.path.isfile(program_files_x86_path):
                 self.OpenScadPath = program_files_x86_path
-            else:
-                Message('Failed to locate OpenSCAD installed in the Program Files directories\nPlease ensure OpenSCAD is installed correctly or change its path in the AutoTowers settings menu', title='Unable to find OpenSCAD').show()
 
-        # If none of the above apply, try a default that might work
-        else:
-            self.OpenScadPath = 'openscad'
-
-        Logger.log('d', f'OpenSCAD path is set to "{self.OpenScadPath}"')
+        Logger.log('d', f'Default OpenSCAD path is set to "{self.OpenScadPath}"')
 
 
 
