@@ -29,8 +29,9 @@ from . import TempTowerController
 
 
 
-class AutoTowersPlugin(QObject, Extension):
-    _preferencePathPrefix = 'autotowersplugin/'
+class AutoTowersGenerator(QObject, Extension):
+    _pluginName = 'AutoTowersGenerator'
+    _preferencePathPrefix = 'autotowersgenerator/'
     _openScadPathPreferencePath = _preferencePathPrefix + 'openscadpath'
 
     def __init__(self):
@@ -94,7 +95,7 @@ class AutoTowersPlugin(QObject, Extension):
         self._removeAutoTower()
 
         # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and post-processing script have been removed', title='AutoTowersPlugin').show()
+        Message('The Auto Tower model and post-processing script have been removed', title=_pluginName).show()
 
 
 
@@ -279,7 +280,7 @@ class AutoTowersPlugin(QObject, Extension):
             # Make sure the STL file was generated
             if os.path.isfile(stlFilePath) == False:
                 Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
-                Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = 'AutoTowersPlugin').show()
+                Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = _pluginName).show()
                 self._waitDialog.hide()
                 return
 
@@ -307,7 +308,7 @@ class AutoTowersPlugin(QObject, Extension):
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
         self._removeAutoTower()
-        Message('The Auto Tower has been removed because the active machine was changed', title='AutoTowerPlugin').show()        
+        Message('The Auto Tower has been removed because the active machine was changed', title=_pluginName).show()        
 
 
 
@@ -317,7 +318,7 @@ class AutoTowersPlugin(QObject, Extension):
             removed and regenerated '''
         if setting_key == 'layer_height' and property_name == 'value' and self._autoTowerGenerated == True:
             self._removeAutoTower()
-            Message('The Auto Tower has been removed because the layer height was changed', title='AutoTowerPlugin').show()
+            Message('The Auto Tower has been removed because the layer height was changed', title=_pluginName).show()
 
     
 
@@ -388,4 +389,4 @@ class AutoTowersPlugin(QObject, Extension):
             # Delete this STL file
             os.remove(stlFile)
 
-        Message('All cached STL models have been deleted', title='AutoTowersPlugin').show()
+        Message('All cached STL models have been deleted', title=_pluginName).show()

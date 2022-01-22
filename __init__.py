@@ -1,7 +1,7 @@
-from . import AutoTowersPlugin
+from . import AutoTowersGenerator
 
 def getMetaData():
     return {}
 
 def register(app):
-    return { 'extension' : AutoTowersPlugin.AutoTowersPlugin() }
+    return { 'extension' : AutoTowersGenerator.AutoTowersGenerator() }

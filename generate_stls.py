@@ -105,7 +105,7 @@ tempTowerPresets = {
 
 
 
-# This method should mirror the _generateStlFilename member method in AutoTowersPlugin.py
+# This method should mirror the _generateStlFilename member method in AutoTowersGenerator.py
 def generateStlFilename(openScadFilename, openScadParameters):
     # Start by stripping the ".scad" extension from the OpenSCAD filename
     stlFilename = openScadFilename.replace('.scad', '')
@@ -132,7 +132,7 @@ def generateStlFilename(openScadFilename, openScadParameters):
 
 
 # this method combines a stripped-down version of the _modelCallback member 
-# method in AutoTowersPlugin.py and GenerateStl from OpenScadInterface.py
+# method in AutoTowersGenerator.py and GenerateStl from OpenScadInterface.py
 def generateStl(openScadFilename, parameters):
     # Compile the STL file name
     inputFilePath = os.path.join('openscad', openScadFilename)
