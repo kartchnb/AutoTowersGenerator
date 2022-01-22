@@ -95,7 +95,7 @@ class AutoTowersGenerator(QObject, Extension):
         self._removeAutoTower()
 
         # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and post-processing script have been removed', title=_pluginName).show()
+        Message('The Auto Tower model and post-processing script have been removed', title=self._pluginName).show()
 
 
 
@@ -308,7 +308,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
         self._removeAutoTower()
-        Message('The Auto Tower has been removed because the active machine was changed', title=_pluginName).show()        
+        Message('The Auto Tower has been removed because the active machine was changed', title=self._pluginName).show()        
 
 
 
@@ -318,7 +318,7 @@ class AutoTowersGenerator(QObject, Extension):
             removed and regenerated '''
         if setting_key == 'layer_height' and property_name == 'value' and self._autoTowerGenerated == True:
             self._removeAutoTower()
-            Message('The Auto Tower has been removed because the layer height was changed', title=_pluginName).show()
+            Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()
 
     
 
@@ -389,4 +389,4 @@ class AutoTowersGenerator(QObject, Extension):
             # Delete this STL file
             os.remove(stlFile)
 
-        Message('All cached STL models have been deleted', title=_pluginName).show()
+        Message('All cached STL models have been deleted', title=self._pluginName).show()
