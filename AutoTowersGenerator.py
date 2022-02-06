@@ -31,8 +31,8 @@ from . import TempTowerController
 
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
-    _preferencePathPrefix = 'autotowersgenerator/'
-    _openScadPathPreferencePath = _preferencePathPrefix + 'openscadpath'
+    _preferencePathPrefix = 'autotowersgenerator'
+    _openScadPathPreferencePath = os.path.join(_preferencePathPrefix, 'openscadpath')
 
     def __init__(self):
         QObject.__init__(self)
