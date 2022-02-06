@@ -8,8 +8,8 @@ UM.Dialog
 {
     id: dialog
 
-    minimumWidth: screenScaleFactor * 390;
-    minimumHeight: screenScaleFactor * 200;
+    minimumWidth: screenScaleFactor * 435;
+    minimumHeight: screenScaleFactor * 235;
     width: minimumWidth
     height: minimumHeight
     title: "Retraction Tower (Distance)"

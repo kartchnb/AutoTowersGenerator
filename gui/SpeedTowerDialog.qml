@@ -8,9 +8,8 @@ UM.Dialog
 {
     id: dialog
 
-property int screenScaleFactor: 1
-    minimumWidth: screenScaleFactor * 410;
-    minimumHeight: screenScaleFactor * 240;
+    minimumWidth: screenScaleFactor * 455;
+    minimumHeight: screenScaleFactor * 280;
     width: minimumWidth
     height: minimumHeight
     title: "Speed Tower"

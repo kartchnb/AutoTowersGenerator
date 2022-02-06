@@ -8,8 +8,8 @@ UM.Dialog
 {
     id: dialog
 
-    minimumWidth: screenScaleFactor * 280;
-    minimumHeight: screenScaleFactor * 120;
+    minimumWidth: screenScaleFactor * 330;
+    minimumHeight: screenScaleFactor * 175;
     width: minimumWidth
     height: minimumHeight
 

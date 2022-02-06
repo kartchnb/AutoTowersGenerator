@@ -8,8 +8,8 @@ UM.Dialog
 {
     id: dialog
 
-    minimumWidth: screenScaleFactor * 390;
-    minimumHeight: screenScaleFactor * 210;
+    minimumWidth: screenScaleFactor * 455;
+    minimumHeight: screenScaleFactor * 280;
     width: minimumWidth
     height: minimumHeight
     title: "Temperature Tower"

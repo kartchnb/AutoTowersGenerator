@@ -7,7 +7,6 @@ UM.Dialog
 {
     id: dialog
 
-property int screenScaleFactor: 1
     minimumWidth: screenScaleFactor * 322;
     minimumHeight: screenScaleFactor * 112;
     width: minimumWidth
