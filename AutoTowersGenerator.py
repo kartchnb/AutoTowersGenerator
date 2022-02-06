@@ -126,7 +126,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _pluginPath(self):
         ''' Returns the path to the plugin directory '''
         if self._cachedPluginPath is None:
-            self._cachedPluginPath = PluginRegistry.getInstance().getPluginPath(self.getPluginId());
+            self._cachedPluginPath = PluginRegistry.getInstance().getPluginPath(self.getPluginId())
         return self._cachedPluginPath
 
 

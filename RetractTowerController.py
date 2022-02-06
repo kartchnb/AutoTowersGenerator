@@ -88,7 +88,7 @@ class RetractTowerController(QObject):
         layerHeight = Application.getInstance().getGlobalContainerStack().getProperty('layer_height', 'value')
 
         # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight); # Round up
+        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up
         baseHeight = self._baseLayers * layerHeight
 
         # Correct the section height to ensure an integer number of layers per section
