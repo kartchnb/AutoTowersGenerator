@@ -1,8 +1,13 @@
-# Don't checkin my development files
+# Don't check-in my development files
 my.notes
+test_gui.sh
+test_cura.sh
 
-# Don't checking generated STL files
+# Don't check-in generated STL files
 *.stl
+
+# Don't check-in Gimp XCF files
+*.xcf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

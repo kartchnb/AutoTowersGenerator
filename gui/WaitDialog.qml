@@ -1,5 +1,5 @@
-import QtQuick 2.10
-import QtQuick.Controls 1.2
+import QtQuick 2.11
+import QtQuick.Controls 2.11
 
 import UM 1.2 as UM
 
