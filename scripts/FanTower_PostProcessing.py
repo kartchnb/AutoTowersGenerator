@@ -30,12 +30,12 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
                 lineIndex = lines.index(line)
                 currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
                 lines[lineIndex] = f'M106 S{currentFanValue} ; Resuming fan speed of {currentPercent}% after bridge'
-                afterbridge == False
+                afterbridge = False
                 lines.insert(lineIndex + 1, f'M117 Fan Speed: {currentPercent}%')
 
             if line.startswith('M107') and (layerIndex-baseLayers)>0:
                 Logger.log('d', f'Just completed a bridge at layer {layerIndex - 2}')
-                afterbridge == True
+                afterbridge = True
                 lineIndex = lines.index(line)
 
             if line.startswith(";LAYER:"):

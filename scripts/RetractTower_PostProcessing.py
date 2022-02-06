@@ -120,6 +120,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     lcd_gcode = f'M117 {towerType} ({startValue:.1f}/{valueChange:.1f}'
     
     current_e = 0
+    current_f = 0
 
     for layer in gcode:
         layerIndex = gcode.index(layer)
