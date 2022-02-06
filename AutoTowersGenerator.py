@@ -9,6 +9,7 @@
 import glob
 import os
 import threading
+import pathlib
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 
@@ -33,6 +34,7 @@ class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
     _preferencePathPrefix = 'autotowersgenerator'
     _openScadPathPreferencePath = os.path.join(_preferencePathPrefix, 'openscadpath')
+    _stlCacheLimitPreferencePath = os.path.join(_preferencePathPrefix, 'stlCacheLimit')
 
     def __init__(self):
         QObject.__init__(self)
@@ -40,6 +42,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         self._preferences = CuraApplication.getInstance().getPreferences()
         self._preferences.addPreference(self._openScadPathPreferencePath, '')
+        self._preferences.addPreference(self._stlCacheLimitPreferencePath, 10)
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
@@ -284,6 +287,13 @@ class AutoTowersGenerator(QObject, Extension):
                 self._waitDialog.hide()
                 return
 
+            # While we're here, keep the STL cache at the requested size
+            self._cullCachedStls()
+
+        # If the a cached STL file for this tower exists, move it to the top of the cache by updating its time stamp
+        else:
+            pathlib.Path(stlFilePath).touch(exist_ok=True)
+
         # Import the STL file into the scene
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, False)
         CuraApplication.getInstance().processEvents()
@@ -367,6 +377,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _displaySettingsDialog(self):
         ''' Display the settings dialog '''
         self._settingsDialog.setProperty('openScadPath', self._openScadInterface.OpenScadPath)
+        self._settingsDialog.setProperty('stlCacheLimit', self._preferences.getValue(self._stlCacheLimitPreferencePath))
         self._settingsDialog.show()
 
 
@@ -377,6 +388,7 @@ class AutoTowersGenerator(QObject, Extension):
             I know there should be a better way of doing this but I don't really have a handle on Qt yet '''
         self._openScadInterface.OpenScadPath = self._settingsDialog.property('openScadPath')
         self._preferences.setValue(self._openScadPathPreferencePath, self._openScadInterface.OpenScadPath)
+        self._preferences.setValue(self._stlCacheLimitPreferencePath, self._settingsDialog.property('stlCacheLimit'))
 
 
 
@@ -390,3 +402,14 @@ class AutoTowersGenerator(QObject, Extension):
             os.remove(stlFile)
 
         Message('All cached STL models have been deleted', title=self._pluginName).show()
+
+
+
+    def _cullCachedStls(self):
+        stlCacheLimit = int(self._preferences.getValue(self._stlCacheLimitPreferencePath))
+        stlFiles = glob.glob(os.path.join(self._stlPath, '*.stl'))
+        while len(stlFiles) > stlCacheLimit:
+            oldestStl = min(stlFiles, key=os.path.getctime)
+            Logger.log('d', f'Culling oldest cached STL "{oldestStl}"')
+            os.remove(oldestStl)
+            stlFiles.remove(oldestStl)

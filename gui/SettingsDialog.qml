@@ -15,6 +15,7 @@ UM.Dialog
 
     // Create aliases to allow easy access to each of the parameters
     property alias openScadPath : openscadCommandInput.text
+    property alias stlCacheLimit: stlCacheLimit.text
 
     GridLayout
     {
@@ -28,6 +29,15 @@ UM.Dialog
         {
             id: openscadCommandInput
             text: ""
+            width: 300
+        }
+
+        Label { text: "STL cache limit" }
+
+        TextField
+        {
+            id: stlCacheLimit
+            text: "10"
             width: 300
         }
 
