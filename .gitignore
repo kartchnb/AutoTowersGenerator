@@ -1,6 +1,9 @@
 # Don't checkin my development files
 my.notes
 
+# Don't checking generated STL files
+*.stl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
