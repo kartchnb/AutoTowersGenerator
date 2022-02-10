@@ -33,8 +33,8 @@ from . import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
     _preferencePathPrefix = 'autotowersgenerator'
-    _openScadPathPreferencePath = os.path.join(_preferencePathPrefix, 'openscadpath')
-    _stlCacheLimitPreferencePath = os.path.join(_preferencePathPrefix, 'stlCacheLimit')
+    _openScadPathPreferencePath = f'{_preferencePathPrefix}/openscadpath'
+    _stlCacheLimitPreferencePath = f'{_preferencePathPrefix}/stlCacheLimit'
 
     def __init__(self):
         QObject.__init__(self)
@@ -283,7 +283,7 @@ class AutoTowersGenerator(QObject, Extension):
             # Make sure the STL file was generated
             if os.path.isfile(stlFilePath) == False:
                 Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
-                Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = _pluginName).show()
+                Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = self._pluginName).show()
                 self._waitDialog.hide()
                 return
 
