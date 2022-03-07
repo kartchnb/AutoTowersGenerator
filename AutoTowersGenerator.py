@@ -1,11 +1,3 @@
-# TODO:
-# Add openscad checking for Windows
-# Update dialogs to adjust for resizing
-# Implement speed tower (implemented script, dialog)
-# Save values between sessions
-# Clean up log messages
-# Clean up imports
-
 import glob
 import os
 import threading

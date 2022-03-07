@@ -45,9 +45,9 @@ class FanTowerController(QObject):
         ''' This method is called by the dialog when the "Generate" button is clicked '''
 
         # Read the parameters directly from the dialog
-        startPercent = int(self._dialog.property('startPercent'))
-        endPercent = int(self._dialog.property('endPercent'))
-        percentChange = int(self._dialog.property('percentChange'))
+        startPercent = float(self._dialog.property('startPercent'))
+        endPercent = float(self._dialog.property('endPercent'))
+        percentChange = float(self._dialog.property('percentChange'))
         towerDescription = self._dialog.property('towerDescription')
 
         # Query the current layer height
@@ -86,8 +86,8 @@ class FanTowerController(QObject):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Read the parameters from the dialog
-        startPercent = int(self._dialog.property('startPercent'))
-        percentChange = int(self._dialog.property('percentChange'))
+        startPercent = float(self._dialog.property('startPercent'))
+        percentChange = float(self._dialog.property('percentChange'))
 
         # Call the post-processing script
         gcode = FanTower_PostProcessing.execute(gcode, startPercent, percentChange, self._sectionLayers, self._baseLayers)

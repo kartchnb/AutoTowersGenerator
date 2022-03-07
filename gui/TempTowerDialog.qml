@@ -54,7 +54,7 @@ UM.Dialog
             {
                 id: startTempInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "220"
             }
 
@@ -64,7 +64,7 @@ UM.Dialog
             {
                 id: endTempInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "180"
             }
 
@@ -74,7 +74,7 @@ UM.Dialog
             {
                 id: tempChangeInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "-5"
             }
 

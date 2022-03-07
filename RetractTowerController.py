@@ -79,9 +79,9 @@ class RetractTowerController(QObject):
     @pyqtSlot()
     def dialogAccepted(self):
         # Read the parameters directly from the dialog
-        startValue = int(self._dialog.property('startValue'))
-        endValue = int(self._dialog.property('endValue'))
-        valueChange = int(self._dialog.property('valueChange'))
+        startValue = float(self._dialog.property('startValue'))
+        endValue = float(self._dialog.property('endValue'))
+        valueChange = float(self._dialog.property('valueChange'))
         towerDescription = self._dialog.property('towerDescription')
 
         # Query the current layer height
@@ -123,8 +123,8 @@ class RetractTowerController(QObject):
     # provided as part of 5axes' CalibrationShapes plugin
     def postProcess(self, gcode):
         # Read the parameters from the dialog
-        startValue = int(self._dialog.property('startValue'))
-        valueChange = int(self._dialog.property('valueChange'))
+        startValue = float(self._dialog.property('startValue'))
+        valueChange = float(self._dialog.property('valueChange'))
 
         # Call the post-processing script
         gcode = RetractTower_PostProcessing.execute(gcode, startValue, valueChange, self._sectionLayers, self._baseLayers, self._towerType)

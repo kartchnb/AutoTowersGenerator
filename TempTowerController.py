@@ -116,9 +116,9 @@ class TempTowerController(QObject):
     @pyqtSlot()
     def dialogAccepted(self):
         # Read the parameters directly from the dialog
-        startTemp = int(self._dialog.property('startTemp'))
-        endTemp = int(self._dialog.property('endTemp'))
-        tempChange = int(self._dialog.property('tempChange'))
+        startTemp = float(self._dialog.property('startTemp'))
+        endTemp = float(self._dialog.property('endTemp'))
+        tempChange = float(self._dialog.property('tempChange'))
         materialLabel = self._dialog.property('materialLabel')
         towerDescription = self._dialog.property('towerDescription')
 
@@ -157,8 +157,8 @@ class TempTowerController(QObject):
     # This function is called by the main script when it's time to post-process the tower model
     def postProcess(self, gcode):
         # Read the parameters from the dialog
-        startTemp = int(self._dialog.property('startTemp'))
-        tempChange = int(self._dialog.property('tempChange'))
+        startTemp = float(self._dialog.property('startTemp'))
+        tempChange = float(self._dialog.property('tempChange'))
 
         # Call the post-processing script
         gcode = TempTower_PostProcessing.execute(gcode, startTemp, tempChange, self._sectionLayers, self._baseLayers)

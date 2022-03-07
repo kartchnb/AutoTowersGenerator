@@ -53,7 +53,7 @@ UM.Dialog
             {
                 id: startPercentInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "100"
             }
 
@@ -63,7 +63,7 @@ UM.Dialog
             {
                 id: endPercentInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "50"
             }
 
@@ -73,7 +73,7 @@ UM.Dialog
             {
                 id: percentChangeInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "-10"
             }
 

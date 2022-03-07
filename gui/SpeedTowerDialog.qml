@@ -62,7 +62,7 @@ UM.Dialog
             {
                 id: startSpeedInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "8"
             }
 
@@ -72,7 +72,7 @@ UM.Dialog
             {
                 id: endSpeedInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "32"
             }
 
@@ -82,7 +82,7 @@ UM.Dialog
             {
                 id: speedChangeInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "4"
             }
     

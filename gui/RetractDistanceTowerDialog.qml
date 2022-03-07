@@ -53,7 +53,7 @@ UM.Dialog
             {
                 id: startValueInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 
@@ -63,7 +63,7 @@ UM.Dialog
             {
                 id: endValueInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "6"
             }
 
@@ -73,7 +73,7 @@ UM.Dialog
             {
                 id: valueChangeInput
                 Layout.preferredWidth: textFieldWidth
-                validator : RegExpValidator { regExp : /[+-]?[0-9]+(\.[0-9]+)?/ }
+                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 
