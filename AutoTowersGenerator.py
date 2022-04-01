@@ -268,15 +268,12 @@ class AutoTowersGenerator(QObject, Extension):
         # If the needed STL file does not exist in the cache, generate it
         if os.path.isfile(stlFilePath) == False:
             # Since it can take a while to generate the STL file, do it in a separate thread and allow the GUI to remain responsive
-            Logger.log('d', f'Starting OpenSCAD job')
-            Logger.log('d', f'openScadFilePath = {openScadFilePath}')
-            Logger.log('d', f'openScadParameters = {openScadParameters}')
-            Logger.log('d', f'stlFilePaht = {stlFilePath}')
+            Logger.log('d', f'Running OpenSCAD in the background')
             job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
             job.run()
             while (job.isRunning()):
                 CuraApplication.getInstance().processEvents()
-            Logger.log('d', f'OpenSCAD job finished')
+            Logger.log('d', f'OpenSCAD finished')
 
             # Make sure the STL file was generated
             if os.path.isfile(stlFilePath) == False:
