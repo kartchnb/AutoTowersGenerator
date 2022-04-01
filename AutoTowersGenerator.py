@@ -15,6 +15,7 @@ from UM.PluginRegistry import PluginRegistry
 
 from . import MeshImporter
 from . import OpenScadInterface
+from . import OpenScadJob
 
 from . import FanTowerController
 from . import RetractTowerController
@@ -85,7 +86,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     @pyqtSlot()
     def removeButtonClicked(self):
-        ''' Called when the remove button is clicked to remove the generated Auto Tower'''
+        ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
         self._removeAutoTower()
 
@@ -267,10 +268,15 @@ class AutoTowersGenerator(QObject, Extension):
         # If the needed STL file does not exist in the cache, generate it
         if os.path.isfile(stlFilePath) == False:
             # Since it can take a while to generate the STL file, do it in a separate thread and allow the GUI to remain responsive
-            openScadThread = threading.Thread(target = lambda: self._openScadInterface.GenerateStl(openScadFilePath, openScadParameters, stlFilePath))
-            openScadThread.start()
-            while (openScadThread.isAlive()):
+            Logger.log('d', f'Starting OpenSCAD job')
+            Logger.log('d', f'openScadFilePath = {openScadFilePath}')
+            Logger.log('d', f'openScadParameters = {openScadParameters}')
+            Logger.log('d', f'stlFilePaht = {stlFilePath}')
+            job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
+            job.run()
+            while (job.isRunning()):
                 CuraApplication.getInstance().processEvents()
+            Logger.log('d', f'OpenSCAD job finished')
 
             # Make sure the STL file was generated
             if os.path.isfile(stlFilePath) == False:
@@ -321,14 +327,6 @@ class AutoTowersGenerator(QObject, Extension):
         if setting_key == 'layer_height' and property_name == 'value' and self._autoTowerGenerated == True:
             self._removeAutoTower()
             Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()
-
-    
-
-    def _generateStlFromOpenScad(self, inputFilePath, parameters, outputFilePath):
-        ''' This method does the actual work of generating an STL file from an OpenSCAD file
-            It only exists so it can be called in a separate thread and not block the GUI '''
-
-        self._openScadInterface.GenerateStl(inputFilePath, parameters, outputFilePath)
 
 
 
