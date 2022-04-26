@@ -1,7 +1,5 @@
-import glob
 import os
-import threading
-import pathlib
+import tempfile
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 
@@ -26,16 +24,10 @@ from . import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
     _preferencePathPrefix = 'autotowersgenerator'
-    _openScadPathPreferencePath = f'{_preferencePathPrefix}/openscadpath'
-    _stlCacheLimitPreferencePath = f'{_preferencePathPrefix}/stlCacheLimit'
 
     def __init__(self):
         QObject.__init__(self)
         Extension.__init__(self)
-
-        self._preferences = CuraApplication.getInstance().getPreferences()
-        self._preferences.addPreference(self._openScadPathPreferencePath, '')
-        self._preferences.addPreference(self._stlCacheLimitPreferencePath, 10)
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
@@ -50,8 +42,6 @@ class AutoTowersGenerator(QObject, Extension):
         self.addMenuItem('Temp Tower (PLA+)', lambda: self._tempTowerController.generate('PLA+'))
         self.addMenuItem('Temp Tower (TPU)', lambda: self._tempTowerController.generate('TPU'))
         self.addMenuItem('Temp Tower (Custom)', lambda: self._tempTowerController.generate(None))
-        self.addMenuItem('   ', lambda: None)
-        self.addMenuItem('Settings', self._displaySettingsDialog)
 
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
         self._postProcessingCallback = None
@@ -61,11 +51,8 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerGenerated = False
         self._autoTowerOperation = None
 
-        # Determine the command to run OpenSCAD
+        # Initialize the OpenSCAD interface object
         self._openScadInterface = OpenScadInterface.OpenScadInterface()
-        storedOpenScadPath = self._preferences.getValue(self._openScadPathPreferencePath)
-        if storedOpenScadPath:
-            self._openScadInterface.OpenScadPath = storedOpenScadPath
 
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
@@ -110,7 +97,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Stop listening for machine and layer height changes
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onSettingChanged)
+        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
 
 
 
@@ -124,10 +111,13 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _temporaryDirectory = None
     @property
     def _stlPath(self):
-        ''' Returns the path to the directory use to store cached STL models '''
-        return os.path.join(self._pluginPath, 'stl')
+        ''' Returns the path to the directory where STL models are generated '''
+        if self._temporaryDirectory is None:
+            self._temporaryDirectory = tempfile.TemporaryDirectory()
+        return self._temporaryDirectory.name
 
 
 
@@ -264,15 +254,19 @@ class AutoTowersGenerator(QObject, Extension):
         stlFilename = self._generateStlFilename(openScadFilename, openScadParameters)
         stlFilePath = os.path.join(self._stlPath, stlFilename)
 
-        # Since generating an STL from OpenSCAD can take quite a while, the generated STL files are cached
-        # If the needed STL file does not exist in the cache, generate it
+        # If the needed STL file does not already exist, generate it from scratch
         if os.path.isfile(stlFilePath) == False:
-            # Since it can take a while to generate the STL file, do it in a separate thread and allow the GUI to remain responsive
+            # Since it can take a while to generate the STL file, do it in a separate thread to allow the GUI to remain responsive
             Logger.log('d', f'Running OpenSCAD in the background')
+            
+            # Start the generation process
             job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
             job.run()
+
+            # Wait for OpenSCAD to finish
+            # This should probably be done by having a function called when the job finishes...
             while (job.isRunning()):
-                CuraApplication.getInstance().processEvents()
+                pass
             Logger.log('d', f'OpenSCAD finished')
 
             # Make sure the STL file was generated
@@ -281,13 +275,6 @@ class AutoTowersGenerator(QObject, Extension):
                 Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = self._pluginName).show()
                 self._waitDialog.hide()
                 return
-
-            # While we're here, keep the STL cache at the requested size
-            self._cullCachedStls()
-
-        # If the a cached STL file for this tower exists, move it to the top of the cache by updating its time stamp
-        else:
-            pathlib.Path(stlFilePath).touch(exist_ok=True)
 
         # Import the STL file into the scene
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, False)
@@ -300,11 +287,11 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerGenerated = True
         self.autoTowerGeneratedChanged.emit()
 
-        # Listen for machine and layer height changes
+        # If the machine or applicable print settings are changed, the tower will automatically be removed from the scene
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
-        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onSettingChanged)
+        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
 
-        # No more need to wait!
+        # The dialog is no longer needed
         self._waitDialog.hide()
 
 
@@ -317,7 +304,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _onSettingChanged(self, setting_key, property_name):
+    def _onPrintSettingChanged(self, setting_key, property_name):
         ''' Listen for setting changes made after an Auto Tower is generated 
             if the layer height value is changed, the Auto Tower needs to be 
             removed and regenerated '''
@@ -358,45 +345,3 @@ class AutoTowersGenerator(QObject, Extension):
 
                         else:
                             Logger.log('e', 'G-code has already been post-processed')
-
-
-
-    def _displaySettingsDialog(self):
-        ''' Display the settings dialog '''
-        self._settingsDialog.setProperty('openScadPath', self._openScadInterface.OpenScadPath)
-        self._settingsDialog.setProperty('stlCacheLimit', self._preferences.getValue(self._stlCacheLimitPreferencePath))
-        self._settingsDialog.show()
-
-
-
-    @pyqtSlot()
-    def settingsDialogAccepted(self):
-        ''' This callback is called when the settings dialog is accepted so that the OpenSCAD command gets updated
-            I know there should be a better way of doing this but I don't really have a handle on Qt yet '''
-        self._openScadInterface.OpenScadPath = self._settingsDialog.property('openScadPath')
-        self._preferences.setValue(self._openScadPathPreferencePath, self._openScadInterface.OpenScadPath)
-        self._preferences.setValue(self._stlCacheLimitPreferencePath, self._settingsDialog.property('stlCacheLimit'))
-
-
-
-    @pyqtSlot()
-    def clearCachedStls(self):
-        ''' Delete the cached STL models '''
-        # Iterate over each STL file in the STL cache directory
-        stlFiles = glob.glob(os.path.join(self._stlPath, '*.stl'))
-        for stlFile in stlFiles:
-            # Delete this STL file
-            os.remove(stlFile)
-
-        Message('All cached STL models have been deleted', title=self._pluginName).show()
-
-
-
-    def _cullCachedStls(self):
-        stlCacheLimit = int(self._preferences.getValue(self._stlCacheLimitPreferencePath))
-        stlFiles = glob.glob(os.path.join(self._stlPath, '*.stl'))
-        while len(stlFiles) > stlCacheLimit:
-            oldestStl = min(stlFiles, key=os.path.getctime)
-            Logger.log('d', f'Culling oldest cached STL "{oldestStl}"')
-            os.remove(oldestStl)
-            stlFiles.remove(oldestStl)

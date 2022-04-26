@@ -29,20 +29,29 @@ class OpenScadInterface:
 
         # For Windows, OpenSCAD should be installed in the Program Files folder
         elif system == 'Windows':
-            program_files_path = os.path.join(os.getenv('PROGRAMFILES'), 'OpenSCAD', 'openscad.exe')
-            program_files_x86_path = os.path.join(os.getenv('PROGRAMFILES(X86)'), 'OpenSCAD', 'openscad.exe')
+            program_files_path = f'"{os.path.join(os.getenv("PROGRAMFILES"), "OpenSCAD", "openscad.exe")}"'
+            program_files_x86_path = f'"{os.path.join(os.getenv("PROGRAMFILES(X86)"), "OpenSCAD", "openscad.exe")}"' # This is just in case - OpenSCAD should never be installed here
             if os.path.isfile(program_files_path):
                 self.OpenScadPath = program_files_path
             elif os.path.isfile(program_files_x86_path):
                 self.OpenScadPath = program_files_x86_path
 
-        Logger.log('d', f'Default OpenSCAD path is set to "{self.OpenScadPath}"')
+        Logger.log('d', f'Default OpenSCAD path is set to {self.OpenScadPath}')
 
 
 
     def GenerateStl(self, inputFilePath, parameters, outputFilePath):
+
+        # Execute the command
+        command = self.GenerateOpenScadCommand(inputFilePath, parameters, outputFilePath)
+        Logger.log('d', f'Executing command: [{command}]')
+        subprocess.run(command)
+
+
+
+    def  GenerateOpenScadCommand(self, inputFilePath, parameters, outputFilePath):
         # Start the command array with the OpenSCAD command
-        command = [self.OpenScadPath]
+        command = [ f'{self.OpenScadPath}' ]
 
         # Tell OpenSCAD to automatically generate an STL file
         command.append(f'-o{outputFilePath}')
@@ -61,5 +70,4 @@ class OpenScadInterface:
         # Finally, specify the OpenSCAD source file
         command.append(inputFilePath)
 
-        # Execute the command
-        subprocess.run(command)
+        return command

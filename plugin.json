@@ -1,7 +1,7 @@
 {
     "name": "Auto Towers Generator",
     "author": "Brad Kartchner",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "api": "7.7.0",
     "description": "Automates the generation of several parameterized calibration models.",
     "catalog": "uranium"
