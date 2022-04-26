@@ -27,9 +27,7 @@ This plugin relies on OpenSCAD being installed in the default location (on Windo
 
 - The tower is generated based on your current layer height.  If the layer height is changed after a tower is created, it will automatically be removed from the scene.  It's easy to recreate it, though!
 
-- I love OpenSCAD, but it's a bit slow.  It can take a few minutes to create a tower for a particular combination of parameters and layer height.  However, once a tower has been created, the model is cached so it will be much faster the next time (assuming the same combination of parameters and layer height).  To save disk space, older models will be removed from the cache automatically. If you ever decide you need to clear out this cache, you can do that from the "Settings" menu by clicking "Clear STL Cache" button.
-
-- The plugin should be able to find the location of OpenSCAD on your system.  If, for some reason, this doesn't work, you can configure the location by changing the "OpenSCAD Path" value in the "Settings" menu.
+- On Windows, OpenSCAD must be installed in the default location in your Program Files directory.  Any other location will probably fail.
 
 - I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
 
