@@ -8,7 +8,7 @@ There are instructions all over explaining how to generate temperature towers an
 
 And, yet, it was still too much work for me.  I wondered if it would be possible to automate the process even further.
 
-So, with the goal of saving myself a good 10 seconds of work, I set out to learn how to write a Cura plugin to automate this entire process.  This plugin is the result.
+So, I set out to learn how to write a Cura plugin to automate this entire process.  This plugin is the result.
 
 ## Usage
 With this plugin, printing a temperature tower is as easy as:
@@ -31,4 +31,4 @@ This plugin relies on OpenSCAD being installed in the default location (on Windo
 
 - I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
 
-- Finally, please enjoy the 10 seconds you save printing your calibration tower!  Use them profitably.
+- Finally, share and enjoy!
