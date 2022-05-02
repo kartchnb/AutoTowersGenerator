@@ -7,12 +7,12 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
+    title: "Temperature Tower"
 
-    minimumWidth: screenScaleFactor * 455;
-    minimumHeight: screenScaleFactor * 280;
+    minimumWidth: screenScaleFactor * 455
+    minimumHeight: screenScaleFactor * 300
     width: minimumWidth
     height: minimumHeight
-    title: "Temperature Tower"
 
     // Create aliases to allow easy access to each of the parameters
     property alias startTemp: startTempInput.text
@@ -21,78 +21,85 @@ UM.Dialog
     property alias materialLabel: materialLabelInput.text
     property alias towerDescription: towerDescriptionInput.text
 
-    // Common values
-    property int textFieldWidth: 50
-
-    Row
+    RowLayout
     {
-        spacing: 10
+        anchors.fill: parent
+        spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
-            id: sidebar
-            width: 100
-            height: dialog.height
-            color: "#00017b"
+            Layout.preferredWidth: icon.width
+            Layout.fillHeight: true
+            color: '#00017b'
+
             Image
             {
+                id: icon
                 source: "temptower_icon.png"
-                anchors.horizontalCenter: sidebar.horizontalCenter
-                anchors.verticalCenter: sidebar.verticalCenter
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         GridLayout
         {
-            id: gridLayout
-
             columns: 2
+            rowSpacing: UM.Theme.getSize("default_lining").height
+            columnSpacing: UM.Theme.getSize("default_margin").width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            Label { text: "Starting Temperature" }
-
+            Label
+            {
+                text: "Starting Temperature"
+            }
             TextField
             {
                 id: startTempInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "220"
             }
 
-            Label { text: "Ending Temperature" }
-
+            Label
+            {
+                text: "Ending Temperature"
+            }
             TextField
             {
                 id: endTempInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "180"
             }
 
-            Label { text: "Temperature Change" }
-
+            Label
+            {
+                text: "Temperature Change"
+            }
             TextField
             {
                 id: tempChangeInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "-5"
             }
 
-            Label { text: "Material Label" }
-
+            Label
+            {
+                text: "Material Label"
+            }
             TextField
             {
                 id: materialLabelInput
-                Layout.preferredWidth: textFieldWidth
                 inputMask: "Xxxx"
                 text: "PLA"
             }
-    
-            Label { text: "Tower Description" }
 
+            Label
+            {
+                text: "Tower Description"
+            }
             TextField
             {
                 id: towerDescriptionInput
+                Layout.fillWidth: true
                 text: ""
             }
         }

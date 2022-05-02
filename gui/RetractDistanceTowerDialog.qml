@@ -7,12 +7,12 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
+    title: "Retraction Tower (Distance)"
 
     minimumWidth: screenScaleFactor * 435;
-    minimumHeight: screenScaleFactor * 235;
+    minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
-    title: "Retraction Tower (Distance)"
 
     // Create aliases to allow easy access to each of the parameters
     property alias startValue: startValueInput.text
@@ -20,68 +20,74 @@ UM.Dialog
     property alias valueChange: valueChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
 
-    // Common values
-    property int textFieldWidth: 50
-
-    Row
+    RowLayout
     {
-        spacing: 10
+        anchors.fill: parent
+        spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
-            id: sidebar
-            width: 100
-            height: dialog.height
-            color: "#00017b"
+            Layout.preferredWidth: icon.width
+            Layout.fillHeight: true
+            color: '#00017b'
+
             Image
             {
+                id: icon
                 source: "retracttower_icon.png"
-                anchors.horizontalCenter: sidebar.horizontalCenter
-                anchors.verticalCenter: sidebar.verticalCenter
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         GridLayout
         {
-            id: gridLayout
-
             columns: 2
+            rowSpacing: UM.Theme.getSize("default_lining").height
+            columnSpacing: UM.Theme.getSize("default_margin").width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            Label { text: "Starting Distance" }
-
+            Label 
+            { 
+                text: "Starting Distance" 
+            }
             TextField
             {
                 id: startValueInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 
-            Label { text: "Ending Distance" }
-
+            Label 
+            { 
+                text: "Ending Distance" 
+            }
             TextField
             {
                 id: endValueInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "6"
             }
 
-            Label { text: "Distance Change" }
-
+            Label 
+            { 
+                text: "Distance Change" 
+            }
             TextField
             {
                 id: valueChangeInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 
-            Label { text: "Tower Description" }
-
+            Label 
+            { 
+                text: "Tower Description" 
+            }
             TextField
             {
                 id: towerDescriptionInput
+                Layout.fillWidth: true
                 text: ""
             }
         }

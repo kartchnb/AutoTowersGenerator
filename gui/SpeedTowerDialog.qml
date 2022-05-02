@@ -7,12 +7,12 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
+    title: "Speed Tower"
 
-    minimumWidth: screenScaleFactor * 455;
-    minimumHeight: screenScaleFactor * 280;
+    minimumWidth: screenScaleFactor * 425;
+    minimumHeight: screenScaleFactor * 300;
     width: minimumWidth
     height: minimumHeight
-    title: "Speed Tower"
 
     // Create aliases to allow easy access to each of the parameters
     property alias speedType: speedTypeInput.currentText
@@ -21,76 +21,84 @@ UM.Dialog
     property alias speedChange: speedChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
 
-    // Common values
-    property int textFieldWidth: 50
-
-    Row
+    RowLayout
     {
-        spacing: 10
+        anchors.fill: parent
+        spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
-            id: sidebar
-            width: 100
-            height: dialog.height
-            color: "#00017b"
+            Layout.preferredWidth: icon.width
+            Layout.fillHeight: true
+            color: '#00017b'
+
             Image
             {
-                source: "temptower_icon.png"
-                anchors.horizontalCenter: sidebar.horizontalCenter
-                anchors.verticalCenter: sidebar.verticalCenter
+                id: icon
+                source: "speedtower_icon.png"
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         GridLayout
         {
-            id: gridLayout
-
             columns: 2
+            rowSpacing: UM.Theme.getSize("default_lining").height
+            columnSpacing: UM.Theme.getSize("default_margin").width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            Label { text: "Speed Type to Control" }
-
+            Label 
+            { 
+                text: "Speed Type to Control" 
+            }
             ComboBox 
             {
                 id: speedTypeInput
                 model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
             }
 
-            Label { text: "Starting Speed" }
-
+            Label 
+            { 
+                text: "Starting Speed" 
+            }
             TextField
             {
                 id: startSpeedInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "8"
             }
 
-            Label { text: "Ending Speed" }
-
+            Label 
+            { 
+                text: "Ending Speed" 
+            }
             TextField
             {
                 id: endSpeedInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "32"
             }
 
-            Label { text: "Speed Change" }
-
+            Label 
+            { 
+                text: "Speed Change" 
+            }
             TextField
             {
                 id: speedChangeInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "4"
             }
     
-            Label { text: "Tower Description" }
-
+            Label 
+            { 
+                text: "Tower Description" 
+            }
             TextField
             {
                 id: towerDescriptionInput
+                Layout.fillWidth: true
                 text: ""
             }
         }

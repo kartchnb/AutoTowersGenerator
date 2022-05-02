@@ -7,12 +7,12 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
+    title: "Fan Tower"
 
     minimumWidth: screenScaleFactor * 445;
-    minimumHeight: screenScaleFactor * 235;
+    minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
-    title: "Fan Tower"
 
     // Create aliases to allow easy access to each of the parameters
     property alias startPercent: startPercentInput.text
@@ -20,70 +20,75 @@ UM.Dialog
     property alias percentChange: percentChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
 
-    // Common values
-    property int textFieldWidth: 50
-
-    Row
+    RowLayout
     {
-        spacing: 10
+        anchors.fill: parent
+        spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
-            id: sidebar
-            width: 100
-            height: dialog.height
+            Layout.preferredWidth: icon.width
+            Layout.fillHeight: true
             color: "#00017b"
+
             Image
             {
-                source: "temptower_icon.png"
-                anchors.horizontalCenter: sidebar.horizontalCenter
-                anchors.verticalCenter: sidebar.verticalCenter
+                id: icon
+                source: "fantower_icon.png"
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         GridLayout
         {
-            id: gridLayout
-
             columns: 2
+            rowSpacing: UM.Theme.getSize("default_lining").height
+            columnSpacing: UM.Theme.getSize("default_margin").width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            Label { text: "Starting Fan Percent" }
-
+            Label 
+            { 
+                text: "Starting Fan Percent" 
+            }
             TextField
             {
                 id: startPercentInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "100"
             }
 
-            Label { text: "Ending Fan Percent" }
-
+            Label 
+            { 
+                text: "Ending Fan Percent" 
+            }
             TextField
             {
                 id: endPercentInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
                 text: "50"
             }
 
-            Label { text: "Temperature Change" }
-
+            Label 
+            { 
+                text: "Fan Speed Change" 
+            }
             TextField
             {
                 id: percentChangeInput
-                Layout.preferredWidth: textFieldWidth
                 validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "-10"
             }
 
-            Label { text: "Tower Description" }
-
+            Label 
+            { 
+                text: "Tower Description" 
+            }
             TextField
             {
                 id: towerDescriptionInput
+                Layout.fillWidth: true
                 text: ""
-                width: parent.width
             }
         }
     }
