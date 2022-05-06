@@ -20,6 +20,9 @@ UM.Dialog
     property alias valueChange: valueChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
 
+    // Define the width of the text input text boxes
+    property int numberInputWidth: screenScaleFactor * 100
+
     RowLayout
     {
         anchors.fill: parent
@@ -54,7 +57,8 @@ UM.Dialog
             TextField
             {
                 id: startValueInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 
@@ -65,7 +69,8 @@ UM.Dialog
             TextField
             {
                 id: endValueInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "6"
             }
 
@@ -76,7 +81,8 @@ UM.Dialog
             TextField
             {
                 id: valueChangeInput
-                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "1"
             }
 

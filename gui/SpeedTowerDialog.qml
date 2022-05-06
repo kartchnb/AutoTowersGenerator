@@ -21,6 +21,9 @@ UM.Dialog
     property alias speedChange: speedChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
 
+    // Define the width of the text input text boxes
+    property int numberInputWidth: screenScaleFactor * 100
+
     RowLayout
     {
         anchors.fill: parent
@@ -47,6 +50,7 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             Label 
             { 
@@ -65,7 +69,8 @@ UM.Dialog
             TextField
             {
                 id: startSpeedInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "8"
             }
 
@@ -76,7 +81,8 @@ UM.Dialog
             TextField
             {
                 id: endSpeedInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "32"
             }
 
@@ -87,7 +93,8 @@ UM.Dialog
             TextField
             {
                 id: speedChangeInput
-                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "4"
             }
     

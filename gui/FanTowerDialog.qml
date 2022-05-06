@@ -15,10 +15,11 @@ UM.Dialog
     height: minimumHeight
 
     // Create aliases to allow easy access to each of the parameters
-    property alias startPercent: startPercentInput.text
-    property alias endPercent: endPercentInput.text
     property alias percentChange: percentChangeInput.text
     property alias towerDescription: towerDescriptionInput.text
+
+    // Define the width of the text input text boxes
+    property int numberInputWidth: screenScaleFactor * 100
 
     RowLayout
     {
@@ -46,6 +47,7 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             Label 
             { 
@@ -54,8 +56,9 @@ UM.Dialog
             TextField
             {
                 id: startPercentInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
-                text: "100"
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
+                text: ""
             }
 
             Label 
@@ -65,8 +68,9 @@ UM.Dialog
             TextField
             {
                 id: endPercentInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
-                text: "50"
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
+                text: ""
             }
 
             Label 
@@ -76,8 +80,9 @@ UM.Dialog
             TextField
             {
                 id: percentChangeInput
-                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "-10"
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: ""
             }
 
             Label 

@@ -21,6 +21,9 @@ UM.Dialog
     property alias materialLabel: materialLabelInput.text
     property alias towerDescription: towerDescriptionInput.text
 
+    // Define the width of the text input text boxes
+    property int numberInputWidth: screenScaleFactor * 100
+
     RowLayout
     {
         anchors.fill: parent
@@ -47,6 +50,7 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             Label
             {
@@ -55,7 +59,8 @@ UM.Dialog
             TextField
             {
                 id: startTempInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "220"
             }
 
@@ -66,7 +71,8 @@ UM.Dialog
             TextField
             {
                 id: endTempInput
-                validator : RegExpValidator { regExp : /[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: "180"
             }
 
@@ -77,7 +83,8 @@ UM.Dialog
             TextField
             {
                 id: tempChangeInput
-                validator : RegExpValidator { regExp : /[+-]?[0-9]*(\.[0-9]+)?/ }
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: "-5"
             }
 
@@ -88,6 +95,7 @@ UM.Dialog
             TextField
             {
                 id: materialLabelInput
+                Layout.preferredWidth: numberInputWidth
                 inputMask: "Xxxx"
                 text: "PLA"
             }
