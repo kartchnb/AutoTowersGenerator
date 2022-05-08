@@ -1,7 +1,7 @@
 import os
 import math
 
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal
 
 from cura.CuraApplication import CuraApplication
 
@@ -22,52 +22,47 @@ class TempTowerController(QObject):
     _presets = {
         'ABS' : 
         {
-            'startTemp' : 250,
-            'endTemp' : 210,
-            'tempChange' : -5,
+            'startTemp' : '250',
+            'endTemp' : '210',
+            'tempChange' : '-5',
             'materialLabel': 'ABS',
             'towerDescription': '',
-            'displayOnLcd': True,
         },
 
         'PETG' : 
         {
-            'startTemp' : 260,
-            'endTemp' : 230,
-            'tempChange' : -5,
+            'startTemp' : '260',
+            'endTemp' : '230',
+            'tempChange' : '-5',
             'materialLabel': 'PETG',
             'towerDescription': '',
-            'displayOnLcd': True,
         },
 
         'PLA' : 
         {
-            'startTemp' : 220,
-            'endTemp' : 180,
-            'tempChange' : -5,
+            'startTemp' : '220',
+            'endTemp' : '180',
+            'tempChange' : '-5',
             'materialLabel': 'PLA',
             'towerDescription': '',
-            'displayOnLcd': True,
         },
 
         'PLA+' :
         {
-            'startTemp' : 230,
-            'endTemp' : 200,
-            'tempChange' : -5,
+            'startTemp' : '230',
+            'endTemp' : '200',
+            'tempChange' : '-5',
             'materialLabel': 'PLA+',
             'towerDescription': '',
-            'displayOnLcd': True,
         },
 
         'TPU' : 
         {
-            'startTemp' : 210,
-            'endTemp' : 170,
-            'tempChange' : -5,
+            'startTemp' : '210',
+            'endTemp' : '170',
+            'tempChange' : '-5',
             'materialLabel': 'TPU',
             'towerDescription': '',
-            'displayOnLcd': True,
         },
     }
 
@@ -82,11 +77,83 @@ class TempTowerController(QObject):
         qml_file_path = os.path.join(pluginPath, 'gui', 'TempTowerDialog.qml')
         self._dialog = CuraApplication.getInstance().createQmlComponent(qml_file_path, {'manager': self})
 
-        # Set up initial setting values
-        self.loadPreset(self._presets['PLA'])
-
         self._baseLayers = 0
         self._sectionLayers = 0
+
+
+
+    # The starting temperature value for the tower
+    _startTemperatureStr = '220'
+
+    startTemperatureStrChanged = pyqtSignal()
+    
+    def setStartTemperatureStr(self, value):
+        self._startTemperatureStr = value
+        self.startTemperatureStrChanged.emit()
+
+    @pyqtProperty(str, notify=startTemperatureStrChanged, fset=setStartTemperatureStr)
+    def startTemperatureStr(self) -> str:
+        return self._startTemperatureStr
+
+
+
+    # The ending temperature value for the tower
+    _endTemperatureStr = '180'
+
+    endTemperatureStrChanged = pyqtSignal()
+    
+    def setEndTemperatureStr(self, value):
+        self._endTemperatureStr = value
+        self.endTemperatureStrChanged.emit()
+
+    @pyqtProperty(str, notify=endTemperatureStrChanged, fset=setEndTemperatureStr)
+    def endTemperatureStr(self) -> str:
+        return self._endTemperatureStr
+
+
+
+    # The amount to change the temperature between tower sections
+    _temperatureChangeStr = '-5'
+
+    temperatureChangeStrChanged = pyqtSignal()
+    
+    def setTemperatureChangeStr(self, value):
+        self._temperatureChangeStr = value
+        self.temperatureChangeStrChanged.emit()
+
+    @pyqtProperty(str, notify=temperatureChangeStrChanged, fset=setTemperatureChangeStr)
+    def temperatureChangeStr(self) -> str:
+        return self._temperatureChangeStr
+
+
+
+    # The material label to add to the tower
+    _materialLabelStr = ''
+
+    materialLabelStrChanged = pyqtSignal()
+    
+    def setMaterialLabelStr(self, value):
+        self._materialLabelStr = value
+        self.materialLabelStrChanged.emit()
+
+    @pyqtProperty(str, notify=materialLabelStrChanged, fset=setMaterialLabelStr)
+    def materialLabelStr(self) -> str:
+        return self._materialLabelStr
+
+
+
+    # The description to carve up the side of the tower
+    _towerDescriptionStr = ''
+
+    towerDescriptionStrChanged = pyqtSignal()
+    
+    def setTowerDescriptionStr(self, value):
+        self._towerDescriptionStr = value
+        self.towerDescriptionStrChanged.emit()
+
+    @pyqtProperty(str, notify=towerDescriptionStrChanged, fset=setTowerDescriptionStr)
+    def towerDescriptionStr(self) -> str:
+        return self._towerDescriptionStr
 
 
 
@@ -95,33 +162,28 @@ class TempTowerController(QObject):
             # If the preset name is valid, load it and generate the temperature tower without showing the dialog
             preset = self._presets[presetName]
             self.loadPreset(preset)
-            self.dialogAccepted()
         except KeyError:
-            # If the preset name isn't defined, show the dialog to let the user configure the tower
-            self._dialog.show()
+            # If the preset name isn't defined, ignore the error and allow the user to customize the tower
+            pass
+
+        self._dialog.show()
 
 
 
     # Load values from a preset
     @pyqtSlot()
     def loadPreset(self, preset):
-        # Assign the value of each parameter in the preset
-        for parameter in preset.keys():
-            value = preset[parameter]
-            self._dialog.setProperty(parameter, value)
+        self.setStartTemperatureStr(preset['startTemp'])
+        self.setEndTemperatureStr(preset['endTemp'])
+        self.setTemperatureChangeStr(preset['tempChange'])
+        self.setMaterialLabelStr(preset['materialLabel'])
+        self.setTowerDescriptionStr(preset['towerDescription'])
 
 
 
     # This function is called when the "Generate" button on the temp tower settings dialog is clicked
     @pyqtSlot()
     def dialogAccepted(self):
-        # Read the parameters directly from the dialog
-        startTemp = float(self._dialog.property('startTemp'))
-        endTemp = float(self._dialog.property('endTemp'))
-        tempChange = float(self._dialog.property('tempChange'))
-        materialLabel = self._dialog.property('materialLabel')
-        towerDescription = self._dialog.property('towerDescription')
-
         # Query the current layer height
         layerHeight = Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")
 
@@ -133,17 +195,24 @@ class TempTowerController(QObject):
         self._sectionLayers = math.ceil(self._nominalSectionHeight / layerHeight) # Round up
         sectionHeight = self._sectionLayers * layerHeight
 
+        # Determine the parameters for the tower
+        startTemperature = float(self.startTemperatureStr)
+        endTemperature = float(self.endTemperatureStr)
+        temperatureChange = float(self.temperatureChangeStr)
+        materialLabel = self.materialLabelStr
+        towerDescription = self.towerDescriptionStr
+
         # Ensure the change amount has the correct sign
-        if endTemp >= startTemp:
-            tempChange = abs(tempChange)
+        if endTemperature >= startTemperature:
+            temperatureChange = abs(temperatureChange)
         else:
-            tempChange = -abs(tempChange)
+            temperatureChange = -abs(temperatureChange)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Starting_Value'] = startTemp
-        openScadParameters ['Ending_Value'] = endTemp
-        openScadParameters ['Value_Change'] = tempChange
+        openScadParameters ['Starting_Value'] = startTemperature
+        openScadParameters ['Ending_Value'] = endTemperature
+        openScadParameters ['Value_Change'] = temperatureChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Column_Label'] = materialLabel
@@ -157,10 +226,10 @@ class TempTowerController(QObject):
     # This function is called by the main script when it's time to post-process the tower model
     def postProcess(self, gcode):
         # Read the parameters from the dialog
-        startTemp = float(self._dialog.property('startTemp'))
-        tempChange = float(self._dialog.property('tempChange'))
+        startTemperature = float(self.startTemperatureStr)
+        temperatureChange = float(self.temperatureChangeStr)
 
         # Call the post-processing script
-        gcode = TempTower_PostProcessing.execute(gcode, startTemp, tempChange, self._sectionLayers, self._baseLayers)
+        gcode = TempTower_PostProcessing.execute(gcode, startTemperature, temperatureChange, self._sectionLayers, self._baseLayers)
 
         return gcode

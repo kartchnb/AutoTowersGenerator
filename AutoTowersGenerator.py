@@ -16,7 +16,8 @@ from . import OpenScadInterface
 from . import OpenScadJob
 
 from . import FanTowerController
-from . import RetractTowerController
+from . import RetractDistanceTowerController
+from . import RetractSpeedTowerController
 from . import TempTowerController
 
 
@@ -33,8 +34,8 @@ class AutoTowersGenerator(QObject, Extension):
         self.setMenuName('Auto Towers')
         self.addMenuItem('Fan Tower', lambda: self._fanTowerController.generate())
         self.addMenuItem('', lambda: None)
-        self.addMenuItem('Retraction Tower (Distance)', lambda: self._retractionTowerController.generate('distance'))
-        self.addMenuItem('Retraction Tower (Speed)', lambda: self._retractionTowerController.generate('speed'))
+        self.addMenuItem('Retraction Tower (Distance)', lambda: self._retractionDistanceTowerController.generate())
+        self.addMenuItem('Retraction Tower (Speed)', lambda: self._retractionSpeedTowerController.generate())
         self.addMenuItem(' ', lambda: None)
         self.addMenuItem('Temp Tower (ABS)', lambda: self._tempTowerController.generate('ABS'))
         self.addMenuItem('Temp Tower (PETG)', lambda: self._tempTowerController.generate('PETG'))
@@ -78,7 +79,7 @@ class AutoTowersGenerator(QObject, Extension):
         self._removeAutoTower()
 
         # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and post-processing script have been removed', title=self._pluginName).show()
+        Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
 
 
 
@@ -96,8 +97,17 @@ class AutoTowersGenerator(QObject, Extension):
         self._postProcessingCallback = None
 
         # Stop listening for machine and layer height changes
-        CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        try:
+            CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
+        except:
+            # Not sure how to handle this yet
+            pass
+
+        try:
+            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        except:
+            # Not sure how to handle this yet
+            pass
 
 
 
@@ -184,13 +194,23 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _cachedRetractionTowerController = None
+    _cachedRetractionDistanceTowerController = None
     @property
-    def _retractionTowerController(self):
-        ''' Returns the object used to create a Retraction Tower (both speed and distance) '''
-        if self._cachedRetractionTowerController is None:
-            self._cachedRetractionTowerController = RetractTowerController.RetractTowerController(self._pluginPath, self._modelCallback)
-        return self._cachedRetractionTowerController
+    def _retractionDistanceTowerController(self):
+        ''' Returns the object used to create a Retraction Distance Tower '''
+        if self._cachedRetractionDistanceTowerController is None:
+            self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._pluginPath, self._modelCallback)
+        return self._cachedRetractionDistanceTowerController
+
+
+
+    _cachedRetractionSpeedTowerController = None
+    @property
+    def _retractionSpeedTowerController(self):
+        ''' Returns the object used to create a Retraction Speed Tower '''
+        if self._cachedRetractionSpeedTowerController is None:
+            self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._pluginPath, self._modelCallback)
+        return self._cachedRetractionSpeedTowerController
 
 
 

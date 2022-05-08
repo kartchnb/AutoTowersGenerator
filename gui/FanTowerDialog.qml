@@ -14,10 +14,6 @@ UM.Dialog
     width: minimumWidth
     height: minimumHeight
 
-    // Create aliases to allow easy access to each of the parameters
-    property alias percentChange: percentChangeInput.text
-    property alias towerDescription: towerDescriptionInput.text
-
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
 
@@ -58,7 +54,8 @@ UM.Dialog
                 id: startPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.startPercentStr
+                onTextChanged: manager.startPercentStr = text
             }
 
             Label 
@@ -70,7 +67,8 @@ UM.Dialog
                 id: endPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.endPercentStr
+                onTextChanged: manager.endPercentStr = text
             }
 
             Label 
@@ -82,7 +80,8 @@ UM.Dialog
                 id: percentChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.percentChangeStr
+                onTextChanged: manager.percentChangeStr = text
             }
 
             Label 
@@ -93,7 +92,8 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerDescriptionStr
+                onTextChanged: manager.towerDescriptionStr = text
             }
         }
     }

@@ -1,7 +1,7 @@
 import os
 import math
 
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal
 
 from cura.CuraApplication import CuraApplication
 
@@ -35,6 +35,66 @@ class FanTowerController(QObject):
 
 
 
+    # The starting percentage value for the tower
+    _startPercentStr = '100'
+
+    startPercentStrChanged = pyqtSignal()
+    
+    def setStartPercentStr(self, value):
+        self._startPercentStr = value
+        self.startPercentStrChanged.emit()
+
+    @pyqtProperty(str, notify=startPercentStrChanged, fset=setStartPercentStr)
+    def startPercentStr(self) -> str:
+        return self._startPercentStr
+
+
+
+    # The ending percentage value for the tower
+    _endPercentStr = '0'
+
+    endPercentStrChanged = pyqtSignal()
+    
+    def setEndPercentStr(self, value):
+        self._endPercentStr = value
+        self.endPercentStrChanged.emit()
+
+    @pyqtProperty(str, notify=endPercentStrChanged, fset=setEndPercentStr)
+    def endPercentStr(self) -> str:
+        return self._endPercentStr
+
+
+
+    # The amount to change the percentage between tower sections
+    _percentChangeStr = '-10'
+
+    percentChangeStrChanged = pyqtSignal()
+    
+    def setPercentChangeStr(self, value):
+        self._percentChangeStr = value
+        self.percentChangeStrChanged.emit()
+
+    @pyqtProperty(str, notify=percentChangeStrChanged, fset=setPercentChangeStr)
+    def percentChangeStr(self) -> str:
+        return self._percentChangeStr
+
+
+
+    # The description to carve up the side of the tower
+    _towerDescriptionStr = ''
+
+    towerDescriptionStrChanged = pyqtSignal()
+    
+    def setTowerDescriptionStr(self, value):
+        self._towerDescriptionStr = value
+        self.towerDescriptionStrChanged.emit()
+
+    @pyqtProperty(str, notify=towerDescriptionStrChanged, fset=setTowerDescriptionStr)
+    def towerDescriptionStr(self) -> str:
+        return self._towerDescriptionStr
+
+
+
     def generate(self):
         self._dialog.show()
 
@@ -45,10 +105,10 @@ class FanTowerController(QObject):
         ''' This method is called by the dialog when the "Generate" button is clicked '''
 
         # Read the parameters directly from the dialog
-        startPercent = float(self._dialog.property('startPercent'))
-        endPercent = float(self._dialog.property('endPercent'))
-        percentChange = float(self._dialog.property('percentChange'))
-        towerDescription = self._dialog.property('towerDescription')
+        startPercent = float(self.startPercentStr)
+        endPercent = float(self.endPercentStr)
+        percentChange = float(self.percentChangeStr)
+        towerDescription = self.towerDescriptionStr
 
         # Query the current layer height
         layerHeight = Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")

@@ -7,12 +7,17 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower (Distance)"
+    title: "Fan Tower"
 
-    minimumWidth: screenScaleFactor * 435;
+property int screenScaleFactor: 1 // test_gui.sh
+    minimumWidth: screenScaleFactor * 445;
     minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
+
+    // Create aliases to allow easy access to each of the parameters
+    property alias percentChange: percentChangeInput.text
+    property alias towerDescription: towerDescriptionInput.text
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
@@ -26,12 +31,12 @@ UM.Dialog
         {
             Layout.preferredWidth: icon.width
             Layout.fillHeight: true
-            color: '#00017b'
+            color: "#00017b"
 
             Image
             {
                 id: icon
-                source: "retracttower_icon.png"
+                source: "fantower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -43,44 +48,42 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             Label 
             { 
-                text: "Starting Distance" 
+                text: "Starting Fan Percent" 
             }
             TextField
             {
-                id: startValueInput
+                id: startPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startDistanceStr
-                onTextChanged: manager.startDistanceStr = text
+                text: ""
             }
 
             Label 
             { 
-                text: "Ending Distance" 
+                text: "Ending Fan Percent" 
             }
             TextField
             {
-                id: endValueInput
+                id: endPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endDistanceStr
-                onTextChanged: manager.endDistanceStr = text
+                text: ""
             }
 
             Label 
             { 
-                text: "Distance Change" 
+                text: "Fan Speed Change" 
             }
             TextField
             {
-                id: valueChangeInput
+                id: percentChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.distanceChangeStr
-                onTextChanged: manager.distanceChangeStr = text
+                text: ""
             }
 
             Label 
@@ -91,8 +94,7 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: manager.towerDescriptionStr = text
+                text: ""
             }
         }
     }
@@ -101,7 +103,7 @@ UM.Dialog
     {
         id: generateButton
         text: "Generate"
-        onClicked: dialog.accept()
+onClicked: close() // test_gui.sh
     }
 
     onAccepted:

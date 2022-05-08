@@ -14,13 +14,6 @@ UM.Dialog
     width: minimumWidth
     height: minimumHeight
 
-    // Create aliases to allow easy access to each of the parameters
-    property alias startTemp: startTempInput.text
-    property alias endTemp: endTempInput.text
-    property alias tempChange: tempChangeInput.text
-    property alias materialLabel: materialLabelInput.text
-    property alias towerDescription: towerDescriptionInput.text
-
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
 
@@ -61,7 +54,8 @@ UM.Dialog
                 id: startTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "220"
+                text: manager.startTemperatureStr
+                onTextChanged: manager.startTemperatureStr = text
             }
 
             Label
@@ -73,7 +67,8 @@ UM.Dialog
                 id: endTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "180"
+                text: manager.endTemperatureStr
+                onTextChanged: manager.endTemperatureStr = text
             }
 
             Label
@@ -85,7 +80,8 @@ UM.Dialog
                 id: tempChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "-5"
+                text: manager.temperatureChangeStr
+                onTextChanged: manager.temperatureChangeStr = text
             }
 
             Label
@@ -97,7 +93,8 @@ UM.Dialog
                 id: materialLabelInput
                 Layout.preferredWidth: numberInputWidth
                 inputMask: "Xxxx"
-                text: "PLA"
+                text: manager.materialLabelStr
+                onTextChanged: manager.materialLabelStr = text
             }
 
             Label
@@ -108,7 +105,8 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerDescriptionStr
+                onTextChanged: manager.towerDescriptionStr = text
             }
         }
     }

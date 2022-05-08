@@ -14,12 +14,6 @@ UM.Dialog
     width: minimumWidth
     height: minimumHeight
 
-    // Create aliases to allow easy access to each of the parameters
-    property alias startValue: startValueInput.text
-    property alias endValue: endValueInput.text
-    property alias valueChange: valueChangeInput.text
-    property alias towerDescription: towerDescriptionInput.text
-
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
 
@@ -60,7 +54,8 @@ UM.Dialog
                 id: startValueInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "10"
+                text: manager.startSpeedStr
+                onTextChanged: manager.startSpeedStr = text
             }
 
             Label 
@@ -72,7 +67,8 @@ UM.Dialog
                 id: endValueInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "40"
+                text: manager.endSpeedStr
+                onTextChanged: manager.endSpeedStr = text
             }
 
             Label 
@@ -84,7 +80,8 @@ UM.Dialog
                 id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "10"
+                text: manager.speedChangeStr
+                onTextChanged: manager.speedChangeStr = text
             }
 
             Label 
@@ -95,7 +92,8 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerDescriptionStr
+                onTextChanged: manager.towerDescriptionStr = text
             }
         }
     }

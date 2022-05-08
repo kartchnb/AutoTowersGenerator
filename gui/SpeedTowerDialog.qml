@@ -1,3 +1,4 @@
+// This dialog is a placeholder for when I get around to incorporating a speed tower
 import QtQuick 2.11
 import QtQuick.Controls 2.11
 import QtQuick.Layouts 1.11
@@ -13,13 +14,6 @@ UM.Dialog
     minimumHeight: screenScaleFactor * 300;
     width: minimumWidth
     height: minimumHeight
-
-    // Create aliases to allow easy access to each of the parameters
-    property alias speedType: speedTypeInput.currentText
-    property alias startSpeed: startSpeedInput.text
-    property alias endSpeed: endSpeedInput.text
-    property alias speedChange: speedChangeInput.text
-    property alias towerDescription: towerDescriptionInput.text
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
