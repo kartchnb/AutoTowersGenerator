@@ -55,7 +55,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startSpeedStr
-                onTextChanged: manager.startSpeedStr = text
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
             Label 
@@ -68,7 +68,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endSpeedStr
-                onTextChanged: manager.endSpeedStr = text
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
             Label 
@@ -81,7 +81,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.speedChangeStr
-                onTextChanged: manager.speedChangeStr = text
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
 
             Label 
@@ -93,7 +93,7 @@ UM.Dialog
                 id: towerDescriptionInput
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
-                onTextChanged: manager.towerDescriptionStr = text
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

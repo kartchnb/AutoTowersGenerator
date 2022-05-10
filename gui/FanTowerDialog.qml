@@ -55,7 +55,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startPercentStr
-                onTextChanged: manager.startPercentStr = text
+                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
             }
 
             Label 
@@ -68,7 +68,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endPercentStr
-                onTextChanged: manager.endPercentStr = text
+                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
             }
 
             Label 
@@ -81,7 +81,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.percentChangeStr
-                onTextChanged: manager.percentChangeStr = text
+                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
             }
 
             Label 
@@ -93,7 +93,7 @@ UM.Dialog
                 id: towerDescriptionInput
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
-                onTextChanged: manager.towerDescriptionStr = text
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

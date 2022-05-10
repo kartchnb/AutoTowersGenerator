@@ -55,7 +55,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startTemperatureStr
-                onTextChanged: manager.startTemperatureStr = text
+                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
             }
 
             Label
@@ -68,7 +68,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endTemperatureStr
-                onTextChanged: manager.endTemperatureStr = text
+                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
             }
 
             Label
@@ -81,7 +81,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.temperatureChangeStr
-                onTextChanged: manager.temperatureChangeStr = text
+                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
             }
 
             Label
@@ -94,7 +94,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 inputMask: "Xxxx"
                 text: manager.materialLabelStr
-                onTextChanged: manager.materialLabelStr = text
+                onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
             }
 
             Label
@@ -106,7 +106,7 @@ UM.Dialog
                 id: towerDescriptionInput
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
-                onTextChanged: manager.towerDescriptionStr = text
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

@@ -54,7 +54,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startDistanceStr
-                onTextChanged: manager.startDistanceStr = text
+                onTextChanged: if (manager.startDistanceStr != text) manager.startDistanceStr = text
             }
 
             Label 
@@ -67,7 +67,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endDistanceStr
-                onTextChanged: manager.endDistanceStr = text
+                onTextChanged: if (manager.endDistanceStr != text) manager.endDistanceStr = text
             }
 
             Label 
@@ -80,7 +80,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.distanceChangeStr
-                onTextChanged: manager.distanceChangeStr = text
+                onTextChanged: if (manager.distanceChangeStr != text) manager.distanceChangeStr = text
             }
 
             Label 
@@ -92,7 +92,7 @@ UM.Dialog
                 id: towerDescriptionInput
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
-                onTextChanged: manager.towerDescriptionStr = text
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }
