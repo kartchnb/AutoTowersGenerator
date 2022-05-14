@@ -1,3 +1,4 @@
+import hashlib
 import os
 import tempfile
 
@@ -52,6 +53,13 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerGenerated = False
         self._autoTowerOperation = None
 
+        # Keep track of the layer height that an AutoTower has been generated for
+        self._generatedLayerHeight = 0
+        self._currentLayerHeight = 0
+
+        # Keep track of the current support enabled setting
+        self._currentSupportEnabled = False
+
         # Initialize the OpenSCAD interface object
         self._openScadInterface = OpenScadInterface.OpenScadInterface()
 
@@ -68,6 +76,7 @@ class AutoTowersGenerator(QObject, Extension):
     @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
     def autoTowerGenerated(self):
         ''' Used to show or hide the button for removing the generated Auto Tower '''
+
         return self._autoTowerGenerated
 
 
@@ -115,6 +124,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _pluginPath(self):
         ''' Returns the path to the plugin directory '''
+
         if self._cachedPluginPath is None:
             self._cachedPluginPath = PluginRegistry.getInstance().getPluginPath(self.getPluginId())
         return self._cachedPluginPath
@@ -125,6 +135,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _stlPath(self):
         ''' Returns the path to the directory where STL models are generated '''
+
         if self._temporaryDirectory is None:
             self._temporaryDirectory = tempfile.TemporaryDirectory()
         return self._temporaryDirectory.name
@@ -134,6 +145,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _openScadPath(self):
         ''' Returns the path to the OpenSCAD source models'''
+
         return os.path.join(self._pluginPath, 'openscad')
 
 
@@ -141,6 +153,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _guiPath(self):
         ''' Returns the path to the GUI files directory '''
+
         return os.path.join(self._pluginPath, 'gui')
 
 
@@ -149,6 +162,7 @@ class AutoTowersGenerator(QObject, Extension):
             The QML file is assumed to be in the GUI directory 
             
             Returns a dialog object, with this object assigned as the "manager" '''
+
         qml_file_path = os.path.join(self._guiPath, qml_filename)
         dialog = Application.getInstance().createQmlComponent(qml_file_path, {'manager': self})
         return dialog
@@ -158,6 +172,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _removeModelsButton(self):
         ''' Returns the button used to remove the Auto Tower from the scene '''
+
         if self._cachedRemoveModelsButton is None:
             self._cachedRemoveModelsButton = self._createDialog('RemoveModelsButton.qml')
         return self._cachedRemoveModelsButton
@@ -168,6 +183,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _settingsDialog(self):
         ''' Returns the settings dialog '''
+
         if self._cachedSettingsDialog is None:
             self._cachedSettingsDialog = self._createDialog('SettingsDialog.qml')
         return self._cachedSettingsDialog
@@ -177,7 +193,8 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedWaitDialog = None
     @property
     def _waitDialog(self):
-        ''' Returns the dialog used to tell the user that generating a model may take a LOOOOONG time '''
+        ''' Returns the dialog used to tell the user that generating a model may take a long time '''
+
         if self._cachedWaitDialog is None:
             self._cachedWaitDialog = self._createDialog('WaitDialog.qml')
         return self._cachedWaitDialog
@@ -188,6 +205,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _fanTowerController(self):
         ''' Returns the object used to create a Fan Tower '''
+
         if self._cachedFanTowerController is None:
             self._cachedFanTowerController = FanTowerController.FanTowerController(self._pluginPath, self._modelCallback)
         return self._cachedFanTowerController
@@ -198,6 +216,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _retractionDistanceTowerController(self):
         ''' Returns the object used to create a Retraction Distance Tower '''
+
         if self._cachedRetractionDistanceTowerController is None:
             self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._pluginPath, self._modelCallback)
         return self._cachedRetractionDistanceTowerController
@@ -208,6 +227,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _retractionSpeedTowerController(self):
         ''' Returns the object used to create a Retraction Speed Tower '''
+
         if self._cachedRetractionSpeedTowerController is None:
             self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._pluginPath, self._modelCallback)
         return self._cachedRetractionSpeedTowerController
@@ -218,6 +238,7 @@ class AutoTowersGenerator(QObject, Extension):
     @property
     def _tempTowerController(self):
         ''' Returns the object used to create a Temperature Tower '''
+
         if self._cachedTempTowerController is None:
             self._cachedTempTowerController = TempTowerController.TempTowerController(self._pluginPath, self._modelCallback)
         return self._cachedTempTowerController
@@ -226,39 +247,35 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _createRemoveButton(self):
         ''' Adds a button to Cura's window to remove the Auto Tower '''
+
         CuraApplication.getInstance().addAdditionalComponent('saveButton', self._removeModelsButton)
 
 
 
     def _generateStlFilename(self, openScadFilename, openScadParameters):
-        ''' Generates a unique STL filename from an OpenSCAD source file name and the parameters used to generate the STL model '''
+        ''' Generates a (hopefully) unique STL filename from an OpenSCAD source file name and the parameters used to generate the STL model '''
 
-        # Start by stripping the ".scad" extension from the OpenSCAD filename
-        stlFilename = openScadFilename.replace('.scad', '')
-
-        # Append each parameter and its value to the file name
-        for parameter in openScadParameters:
-            # Retrieve the parameter value
-            value = openScadParameters[parameter]
-
-            # Limit the parameter name to just the first 3 characters
-            parameter = parameter[:3]
-
-            # Add the parameter and value to the filename
-            if isinstance(value, float):
-                stlFilename += f'_{parameter}_{value:.3f}'
-            else:
-                stlFilename += f'_{parameter}_{value}'
-
-        # Finally, add a ".stl" extension
-        stlFilename += '.stl'
-
+        # Combine the OpenSCAD file name and the parameters into a single string and then generate a hash for it
+        # This is a bit of overkill, but has a reasonably good chance of generating a unique filename that isn't too long
+        parameterValues = [str(value) for value in list(openScadParameters.values())]
+        stringToHash = openScadFilename + ' '.join(parameterValues)
+        hashedString = hashlib.sha256(stringToHash.encode()).hexdigest()
+        
+        # The STL filename is the hashed string with a .stl extension
+        stlFilename = f'{hashedString}.stl'
         return stlFilename
 
 
 
     def _modelCallback(self, openScadFilename, openScadParameters, _postProcessingCallback):
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
+
+        # Record the current layer height
+        self._generatedLayerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
+        self._currentLayerHeight = self._generatedLayerHeight
+
+        # Record the current state of the support enabled setting
+        self._currentSupportEnabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
 
         # This could take up to a couple of minutes...
         self._waitDialog.show()
@@ -292,7 +309,8 @@ class AutoTowersGenerator(QObject, Extension):
             # Make sure the STL file was generated
             if os.path.isfile(stlFilePath) == False:
                 Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
-                Message(f'Failed to run OpenSCAD - Make sure the OpenSCAD path is set correctly\nPath is "{self._openScadInterface.OpenScadPath}"', title = self._pluginName).show()
+                errorMessage = self._openScadInterface.errorMessage
+                Message(f'OpenSCAD Failed\nEnsure OpenSCAD is installed correctly\n(Error message: "{errorMessage}")', title = self._pluginName).show()
                 self._waitDialog.hide()
                 return
 
@@ -314,23 +332,42 @@ class AutoTowersGenerator(QObject, Extension):
         # The dialog is no longer needed
         self._waitDialog.hide()
 
+        # Display a warning if supports are enabled
+        
+        if self._currentSupportEnabled == True:
+            Message('The "Generate Support" option is selected. For best results, deselect this before printing').show()
+
 
 
     def _onMachineChanged(self):
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
+
         self._removeAutoTower()
         Message('The Auto Tower has been removed because the active machine was changed', title=self._pluginName).show()        
 
 
 
     def _onPrintSettingChanged(self, setting_key, property_name):
-        ''' Listen for setting changes made after an Auto Tower is generated 
-            if the layer height value is changed, the Auto Tower needs to be 
-            removed and regenerated '''
-        if setting_key == 'layer_height' and property_name == 'value' and self._autoTowerGenerated == True:
-            self._removeAutoTower()
-            Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()
+        ''' Listen for setting changes made after an Auto Tower is generated '''
+
+        # This check is redundant and probably not needed
+        if self._autoTowerGenerated == True:
+
+            # Warn the user if the layer height changes
+            if setting_key == 'layer_height' and property_name == 'value':
+                layerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
+                if layerHeight != self._generatedLayerHeight and layerHeight != self._currentLayerHeight:
+                    self._currentLayerHeight = self._generatedLayerHeight
+                    Message('The layer height has changed. For best results, regenerate the Auto Tower').show()
+
+            # Warn the user if supports are enabled
+            if setting_key == 'support_enable' and property_name == 'value':
+                support_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
+                if support_enabled == True and self._currentSupportEnabled != True:
+                    Message('The "Generate Support" option has been selected. For best results, deselect this before printing').show()
+                self._currentSupportEnabled = support_enabled
+                
 
 
 

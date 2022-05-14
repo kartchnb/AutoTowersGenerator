@@ -14,8 +14,7 @@ class OpenScadInterface:
 
 
     def __init__(self):
-        # Determine the default path of the OpenSCAD command
-
+        # Determine the Operating system being used
         system = platform.system()
         Logger.log('d', f'Platform is reported as "{system}"')
 
@@ -36,20 +35,28 @@ class OpenScadInterface:
             elif os.path.isfile(program_files_x86_path):
                 self.OpenScadPath = program_files_x86_path
 
-        Logger.log('d', f'Default OpenSCAD path is set to {self.OpenScadPath}')
+        Logger.log('d', f'OpenSCAD path is set to {self.OpenScadPath}')
+
+        self.errorMessage = ''
 
 
 
     def GenerateStl(self, inputFilePath, parameters, outputFilePath):
-
-        # Execute the command
+        '''Execute an OpenSCAD file with the given parameters to generate a model'''
+        # Build the OpenSCAD command
         command = self.GenerateOpenScadCommand(inputFilePath, parameters, outputFilePath)
-        Logger.log('d', f'Executing command: [{command}]')
-        subprocess.run(command)
+        command_single_line = ' '.join(command)
+        Logger.log('d', f'Executing command: {command_single_line}')
+
+        # Execute the OpenSCAD command and capture the error output
+        # Output in stderr does not necessarily indicate an error - OpenSCAD seems to routinely output to stderr
+        self.errorMessage = subprocess.run(command, capture_output=True, text=True).stderr.strip()
 
 
 
     def  GenerateOpenScadCommand(self, inputFilePath, parameters, outputFilePath):
+        '''Generate an OpenSCAD command from an input file path, parameters, and output file path'''
+
         # Start the command array with the OpenSCAD command
         command = [ f'{self.OpenScadPath}' ]
 
@@ -63,7 +70,7 @@ class OpenScadInterface:
 
             # If the value is a string, add escaped quotes around it
             if type(value) == str:
-                value = f'\"{value}\"'
+                value = f'"{value}"'
 
             command.append(f'-D{parameter}={value}')
 
