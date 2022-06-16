@@ -2,6 +2,7 @@
 my.notes
 test_gui.sh
 test_cura.sh
+settings.json
 
 # Don't check-in generated STL files
 *.stl

@@ -15,7 +15,7 @@ Cura.SecondaryButton
     }
     toolTipContentAlignment: Cura.ToolTip.ContentAlignment.AlignLeft
     onClicked: manager.removeButtonClicked()
-    iconSource: "AutoTowers Icon.png"
+    iconSource: "remove_tower_icon.png"
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
 }

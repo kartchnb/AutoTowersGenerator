@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import tempfile
 
@@ -25,7 +26,8 @@ from . import TempTowerController
 
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
-    _preferencePathPrefix = 'autotowersgenerator'
+
+
 
     def __init__(self):
         QObject.__init__(self)
@@ -44,6 +46,14 @@ class AutoTowersGenerator(QObject, Extension):
         self.addMenuItem('Temp Tower (PLA+)', lambda: self._tempTowerController.generate('PLA+'))
         self.addMenuItem('Temp Tower (TPU)', lambda: self._tempTowerController.generate('TPU'))
         self.addMenuItem('Temp Tower (Custom)', lambda: self._tempTowerController.generate(None))
+        self.addMenuItem('  ', lambda: None)
+        self.addMenuItem('Settings', lambda: self._settingsDialog.show())
+
+        # Create a temporary folder
+        self._temporaryFolder = tempfile.TemporaryDirectory()
+
+        # Initialize the OpenSCAD interface object
+        self._openScadInterface = OpenScadInterface.OpenScadInterface()
 
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
         self._postProcessingCallback = None
@@ -60,63 +70,12 @@ class AutoTowersGenerator(QObject, Extension):
         # Keep track of the current support enabled setting
         self._currentSupportEnabled = False
 
-        # Initialize the OpenSCAD interface object
-        self._openScadInterface = OpenScadInterface.OpenScadInterface()
-
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
         CuraApplication.getInstance().mainWindowChanged.connect(self._createRemoveButton)
 
         # Connect our post-processing capabilities to be called when printing starts
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcess)
-
-
-
-    autoTowerGeneratedChanged = pyqtSignal()
-    @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
-    def autoTowerGenerated(self):
-        ''' Used to show or hide the button for removing the generated Auto Tower '''
-
-        return self._autoTowerGenerated
-
-
-
-    @pyqtSlot()
-    def removeButtonClicked(self):
-        ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
-
-        self._removeAutoTower()
-
-        # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
-
-
-
-    def _removeAutoTower(self):
-        ''' Removes the generated Auto Tower and post-processing callbacks '''
-
-        # Indicate that there is no longer an Auto Tower in the scene
-        self._autoTowerGenerated = False
-        self.autoTowerGeneratedChanged.emit()
-
-        # Remove the Auto Tower itself
-        self._autoTowerOperation.undo()
-
-        # Remove the post-processing callback
-        self._postProcessingCallback = None
-
-        # Stop listening for machine and layer height changes
-        try:
-            CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        except:
-            # Not sure how to handle this yet
-            pass
-
-        try:
-            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        except:
-            # Not sure how to handle this yet
-            pass
 
 
 
@@ -131,19 +90,16 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _temporaryDirectory = None
     @property
     def _stlPath(self):
         ''' Returns the path to the directory where STL models are generated '''
 
-        if self._temporaryDirectory is None:
-            self._temporaryDirectory = tempfile.TemporaryDirectory()
-        return self._temporaryDirectory.name
+        return self._temporaryFolder.name
 
 
 
     @property
-    def _openScadPath(self):
+    def _openScadSourcePath(self):
         ''' Returns the path to the OpenSCAD source models'''
 
         return os.path.join(self._pluginPath, 'openscad')
@@ -157,15 +113,11 @@ class AutoTowersGenerator(QObject, Extension):
         return os.path.join(self._pluginPath, 'gui')
 
 
-    def _createDialog(self, qml_filename):
-        ''' Creates a dialog object from a QML file name 
-            The QML file is assumed to be in the GUI directory 
-            
-            Returns a dialog object, with this object assigned as the "manager" '''
 
-        qml_file_path = os.path.join(self._guiPath, qml_filename)
-        dialog = Application.getInstance().createQmlComponent(qml_file_path, {'manager': self})
-        return dialog
+    @property
+    def _settingsFilePath(self):
+        ''' Returns the path of the settings file '''
+        return os.path.join(self._pluginPath, 'settings.json')
 
 
     _cachedRemoveModelsButton = None
@@ -245,6 +197,106 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _settingsTable = None
+    @property
+    def _settings(self):
+        ''' Provides lazy initialization of plugin settings '''
+
+        if self._settingsTable == None:
+            try:
+                # Load settings from the settings file, if it exists
+                with open(self._settingsFilePath, 'r') as settingsFile:
+                    self._settingsTable = json.load(settingsFile)
+            except:
+                # Initialize settings with default values
+                self._settingsTable = {
+                    'openscad path': '',
+                }
+
+        return self._settingsTable
+
+
+
+    # The path to the OpenSCAD program
+    openScadPathChanged = pyqtSignal()
+    
+    def setOpenScadPath(self, value):
+        self._settings['openscad path'] = value
+        self.openScadPathChanged.emit()
+
+    @pyqtProperty(str, notify=openScadPathChanged, fset=setOpenScadPath)
+    def openScadPath(self) -> str:
+        return self._settings['openscad path']
+
+
+
+    autoTowerGeneratedChanged = pyqtSignal()
+    @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
+    def autoTowerGenerated(self):
+        ''' Used to show or hide the button for removing the generated Auto Tower '''
+
+        return self._autoTowerGenerated
+
+
+
+    @pyqtSlot()
+    def removeButtonClicked(self):
+        ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
+
+        self._removeAutoTower()
+
+        # Notify the user that the Auto Tower has been removed
+        Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
+
+
+
+    @pyqtSlot()
+    def saveSettings(self):
+        with open(self._settingsFilePath, 'w') as settingsFile:
+            json.dump(self._settings, settingsFile)
+        Logger.log('d', f'Saved settings to "{self._settingsFilePath}"')
+
+
+
+    def _removeAutoTower(self):
+        ''' Removes the generated Auto Tower and post-processing callbacks '''
+
+        # Indicate that there is no longer an Auto Tower in the scene
+        self._autoTowerGenerated = False
+        self.autoTowerGeneratedChanged.emit()
+
+        # Remove the Auto Tower itself
+        self._autoTowerOperation.undo()
+
+        # Remove the post-processing callback
+        self._postProcessingCallback = None
+
+        # Stop listening for machine and layer height changes
+        try:
+            CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
+        except:
+            # Not sure how to handle this yet
+            pass
+
+        try:
+            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        except:
+            # Not sure how to handle this yet
+            pass
+
+
+    def _createDialog(self, qml_filename):
+        ''' Creates a dialog object from a QML file name 
+            The QML file is assumed to be in the GUI directory 
+            
+            Returns a dialog object, with this object assigned as the "manager" '''
+
+        qml_file_path = os.path.join(self._guiPath, qml_filename)
+        dialog = Application.getInstance().createQmlComponent(qml_file_path, {'manager': self})
+        return dialog
+
+
+
     def _createRemoveButton(self):
         ''' Adds a button to Cura's window to remove the Auto Tower '''
 
@@ -287,7 +339,7 @@ class AutoTowersGenerator(QObject, Extension):
         CuraApplication.getInstance().processEvents()
         
         # Compile the STL file name
-        openScadFilePath = os.path.join(self._openScadPath, openScadFilename)
+        openScadFilePath = os.path.join(self._openScadSourcePath, openScadFilename)
         stlFilename = self._generateStlFilename(openScadFilename, openScadParameters)
         stlFilePath = os.path.join(self._stlPath, stlFilename)
 
@@ -297,7 +349,7 @@ class AutoTowersGenerator(QObject, Extension):
             Logger.log('d', f'Running OpenSCAD in the background')
             
             # Start the generation process
-            job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
+            job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath, self.openScadPath)
             job.run()
 
             # Wait for OpenSCAD to finish
@@ -310,7 +362,7 @@ class AutoTowersGenerator(QObject, Extension):
             if os.path.isfile(stlFilePath) == False:
                 Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
                 errorMessage = self._openScadInterface.errorMessage
-                Message(f'OpenSCAD Failed\nEnsure OpenSCAD is installed correctly\n(Error message: "{errorMessage}")', title = self._pluginName).show()
+                Message(f'OpenSCAD Failed with message:\n{errorMessage})', title = self._pluginName).show()
                 self._waitDialog.hide()
                 return
 
