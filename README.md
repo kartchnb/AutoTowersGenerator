@@ -27,7 +27,7 @@ This plugin relies on OpenSCAD being installed in the default location (on Windo
 
 - The tower is generated based on your current layer height.  If the layer height is changed after a tower is created, it will automatically be removed from the scene.  It's easy to recreate it, though!
 
-- On Windows, OpenSCAD must be installed in the default location in your Program Files directory.  Any other location will probably fail.
+- The plugin attempts to automatically locate your OpenSCAD executable. If it fails to find it, try specifying the full path in the settings item under the AutoTowersGenerator plugin. 
 
 - I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
 
