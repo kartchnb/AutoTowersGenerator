@@ -1,6 +1,7 @@
 import glob
 import os
 import platform
+from shutil import which
 import subprocess
 
 from UM.Logger import Logger
@@ -26,7 +27,6 @@ class OpenScadInterface:
         # Build the OpenSCAD command
         command = self.GenerateOpenScadCommand(inputFilePath, parameters, outputFilePath, openScadPath)
         command_single_line = ' '.join(command)
-        Logger.log('d', f'Executing command: {command_single_line}')
 
         # Execute the OpenSCAD command and capture the error output
         # Output in stderr does not necessarily indicate an error - OpenSCAD seems to routinely output to stderr
@@ -67,21 +67,27 @@ class OpenScadInterface:
         return command
 
 
-    _defaultOpenScadPath = None
+    _defaultOpenScadPath = ''
 
     @property
     def DefaultOpenScadPath(self):
-        if self._defaultOpenScadPath == None:
+        if self._defaultOpenScadPath == '':
             # Determine the Operating system being used
             system = platform.system()
             Logger.log('d', f'Platform is reported as "{system}"')
 
-            # Set a default OpenSCAD path (should work for Linux)
-            self._defaultOpenScadPath = 'openscad'
+            # On Linux, check for openscad in the current path
+            if system.lower() == "linux":
+                # If the 'which' command can find the openscad path, use the path directly
+                command = ['which', 'openscad']
+                which_result = subprocess.run(command, capture_output=True, text=True).stdout.strip()
+                Logger.log('d', f'which_result = "{which_result}"')
+                if which_result != '':
+                    self._defaultOpenScadPath = which_result
 
             # This path for Macintosh was borrowed from Thopiekar's OpenSCAD Integration plugin (https://thopiekar.eu/cura/cad/openscad)
             # I have no way of verifying it works...
-            if system == 'Darwin':
+            if system.lower() == 'darwin':
                 self._defaultOpenScadPath = '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD'
 
             # For Windows, OpenSCAD should be installed in the Program Files folder
@@ -92,5 +98,5 @@ class OpenScadInterface:
                     self._defaultOpenScadPath = program_files_path
                 elif os.path.isfile(program_files_x86_path):
                     self._defaultOpenScadPath = program_files_x86_path        
-
+                
         return self._defaultOpenScadPath

@@ -66,7 +66,7 @@ class FanTowerController(QObject):
 
 
     # The amount to change the percentage between tower sections
-    _percentChangeStr = '-10'
+    _percentChangeStr = '-20'
 
     percentChangeStrChanged = pyqtSignal()
     

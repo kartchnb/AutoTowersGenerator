@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import platform
 import tempfile
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
@@ -35,17 +36,17 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
-        self.addMenuItem('Fan Tower', lambda: self._fanTowerController.generate())
+        self.addMenuItem('Fan Tower', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
         self.addMenuItem('', lambda: None)
-        self.addMenuItem('Retraction Tower (Distance)', lambda: self._retractionDistanceTowerController.generate())
-        self.addMenuItem('Retraction Tower (Speed)', lambda: self._retractionSpeedTowerController.generate())
+        self.addMenuItem('Retraction Tower (Distance)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionDistanceTowerController.generate()))
+        self.addMenuItem('Retraction Tower (Speed)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionSpeedTowerController.generate()))
         self.addMenuItem(' ', lambda: None)
-        self.addMenuItem('Temp Tower (ABS)', lambda: self._tempTowerController.generate('ABS'))
-        self.addMenuItem('Temp Tower (PETG)', lambda: self._tempTowerController.generate('PETG'))
-        self.addMenuItem('Temp Tower (PLA)', lambda: self._tempTowerController.generate('PLA'))
-        self.addMenuItem('Temp Tower (PLA+)', lambda: self._tempTowerController.generate('PLA+'))
-        self.addMenuItem('Temp Tower (TPU)', lambda: self._tempTowerController.generate('TPU'))
-        self.addMenuItem('Temp Tower (Custom)', lambda: self._tempTowerController.generate(None))
+        self.addMenuItem('Temp Tower (ABS)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('ABS')))
+        self.addMenuItem('Temp Tower (PETG)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PETG')))
+        self.addMenuItem('Temp Tower (PLA)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PLA')))
+        self.addMenuItem('Temp Tower (PLA+)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PLA+')))
+        self.addMenuItem('Temp Tower (TPU)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('TPU')))
+        self.addMenuItem('Temp Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate(None)))
         self.addMenuItem('  ', lambda: None)
         self.addMenuItem('Settings', lambda: self._settingsDialog.show())
 
@@ -220,13 +221,31 @@ class AutoTowersGenerator(QObject, Extension):
     # The path to the OpenSCAD program
     openScadPathChanged = pyqtSignal()
     
+
+
+    # Called to set the OpenSCAD path
     def setOpenScadPath(self, value):
+        # Ensure the path ends with the openscad executable
+        if value != '':
+            if platform.system().lower() == 'windows':
+                if value.lower().endswith('openscad') == False and value.lower().endswith('openscad.exe') == False:
+                    value = os.path.join(value, 'openscad.exe')
+            else:
+                if value.lower().endswith('openscad') == False:
+                    value = os.path.join(value, 'openscad')
+
         self._settings['openscad path'] = value
         self.openScadPathChanged.emit()
 
+
+
+    # Returns the OpenSCAD path
     @pyqtProperty(str, notify=openScadPathChanged, fset=setOpenScadPath)
     def openScadPath(self) -> str:
-        return self._settings['openscad path']
+        if self._settings['openscad path'] != '':
+            return self._settings['openscad path']
+        else:
+            return self._openScadInterface.DefaultOpenScadPath
 
 
 
@@ -243,6 +262,7 @@ class AutoTowersGenerator(QObject, Extension):
     def removeButtonClicked(self):
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
+        # Remove the tower
         self._removeAutoTower()
 
         # Notify the user that the Auto Tower has been removed
@@ -252,9 +272,26 @@ class AutoTowersGenerator(QObject, Extension):
 
     @pyqtSlot()
     def saveSettings(self):
+        ''' Saves plugin settings to a json file so they persist between sessions '''
+
         with open(self._settingsFilePath, 'w') as settingsFile:
             json.dump(self._settings, settingsFile)
-        Logger.log('d', f'Saved settings to "{self._settingsFilePath}"')
+
+
+
+    def _executeIfOpenScadPathIsValid(self, function):
+        ''' Executes the specified function if the OpenSCAD path is valid
+            This should be used to protect any function that relies on OpenSCAD '''
+
+        # If the OpenSCAD path is not valid, prompt the user to set it
+        if self.openScadPath == '':
+            Message('The OpenSCAD path was unable to be determined. Please configure it manually and try again.').show()
+            self._settingsDialog.show()
+
+        # If the OpenSCAD path is valid, execute the function
+        else:
+            function()
+
 
 
 
@@ -287,8 +324,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _createDialog(self, qml_filename):
         ''' Creates a dialog object from a QML file name 
-            The QML file is assumed to be in the GUI directory 
-            
+            The QML file is assumed to be in the GUI directory             
             Returns a dialog object, with this object assigned as the "manager" '''
 
         qml_file_path = os.path.join(self._guiPath, qml_filename)
@@ -308,7 +344,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Generates a (hopefully) unique STL filename from an OpenSCAD source file name and the parameters used to generate the STL model '''
 
         # Combine the OpenSCAD file name and the parameters into a single string and then generate a hash for it
-        # This is a bit of overkill, but has a reasonably good chance of generating a unique filename that isn't too long
+        # This is a bit of overkill...
         parameterValues = [str(value) for value in list(openScadParameters.values())]
         stringToHash = openScadFilename + ' '.join(parameterValues)
         hashedString = hashlib.sha256(stringToHash.encode()).hexdigest()
