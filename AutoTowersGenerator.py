@@ -344,13 +344,16 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Generates a (hopefully) unique STL filename from an OpenSCAD source file name and the parameters used to generate the STL model '''
 
         # Combine the OpenSCAD file name and the parameters into a single string and then generate a hash for it
-        # This is a bit of overkill...
+        # 64 bits is a bit of overkill, so it's cut down to make a smaller file name with a larger chance of name clashes
         parameterValues = [str(value) for value in list(openScadParameters.values())]
         stringToHash = openScadFilename + ' '.join(parameterValues)
         hashedString = hashlib.sha256(stringToHash.encode()).hexdigest()
+        hashedInt = int(hashedString, 16)
+        halfHashedInt = hashedInt >> 128
+        halfHashedString = f'{halfHashedInt:x}'
         
         # The STL filename is the hashed string with a .stl extension
-        stlFilename = f'{hashedString}.stl'
+        stlFilename = f'{halfHashedString}.stl'
         return stlFilename
 
 

@@ -22,16 +22,15 @@ class OpenScadInterface:
     def GenerateStl(self, inputFilePath, parameters, outputFilePath, openScadPath = ''):
         '''Execute an OpenSCAD file with the given parameters to generate a model'''
 
-        Logger.log('d', f'OpenSCAD path is set to "{openScadPath}"')
-
         # Build the OpenSCAD command
         command = self.GenerateOpenScadCommand(inputFilePath, parameters, outputFilePath, openScadPath)
-        command_single_line = ' '.join(command)
+        command_single_line = ' '.join(command).replace(r'"', r'\"')
+        Logger.log('d', f'Executing OpenSCAD command: {command_single_line}')
 
         # Execute the OpenSCAD command and capture the error output
         # Output in stderr does not necessarily indicate an error - OpenSCAD seems to routinely output to stderr
         try:
-            self.errorMessage = subprocess.run(command, capture_output=True, text=True).stderr.strip()
+            self.errorMessage = subprocess.run(command_single_line, capture_output=True, text=True, shell=True).stderr.strip()
         except FileNotFoundError:
             self.errorMessage = f'OpenSCAD not found at path "{openScadPath}"'
 
@@ -48,23 +47,24 @@ class OpenScadInterface:
         command = [ f'{openScadPath}' ]
 
         # Tell OpenSCAD to automatically generate an STL file
-        command.append(f'-o{outputFilePath}')
+        command.append(f'-o {outputFilePath}')
 
         # Add each variable setting parameter
         for parameter in parameters:
             # Retrieve the parameter value
             value = parameters[parameter]
 
-            # If the value is a string, add escaped quotes around it
+            # If the value is a string, add quotes around it
             if type(value) == str:
                 value = f'"{value}"'
 
-            command.append(f'-D{parameter}={value}')
+            command.append(f'-D {parameter}={value}')
 
         # Finally, specify the OpenSCAD source file
         command.append(inputFilePath)
 
         return command
+
 
 
     _defaultOpenScadPath = ''
