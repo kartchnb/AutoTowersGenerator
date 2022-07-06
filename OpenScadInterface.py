@@ -24,13 +24,12 @@ class OpenScadInterface:
 
         # Build the OpenSCAD command
         command = self.GenerateOpenScadCommand(inputFilePath, parameters, outputFilePath, openScadPath)
-        command_single_line = ' '.join(command).replace(r'"', r'\"')
-        Logger.log('d', f'Executing OpenSCAD command: {command_single_line}')
+        Logger.log('d', f'Executing OpenSCAD command: {command}')
 
         # Execute the OpenSCAD command and capture the error output
         # Output in stderr does not necessarily indicate an error - OpenSCAD seems to routinely output to stderr
         try:
-            self.errorMessage = subprocess.run(command_single_line, capture_output=True, text=True, shell=True).stderr.strip()
+            self.errorMessage = subprocess.run(command, capture_output=True, text=True, shell=True).stderr.strip()
         except FileNotFoundError:
             self.errorMessage = f'OpenSCAD not found at path "{openScadPath}"'
 
@@ -44,10 +43,10 @@ class OpenScadInterface:
             openScadPath = self.DefaultOpenScadPath
 
         # Start the command array with the OpenSCAD command
-        command = [ f'{openScadPath}' ]
+        command = f'"{openScadPath}"'
 
         # Tell OpenSCAD to automatically generate an STL file
-        command.append(f'-o {outputFilePath}')
+        command += f' -o {outputFilePath}'
 
         # Add each variable setting parameter
         for parameter in parameters:
@@ -56,12 +55,12 @@ class OpenScadInterface:
 
             # If the value is a string, add quotes around it
             if type(value) == str:
-                value = f'"{value}"'
+                value = f'\\"{value}\\"'
 
-            command.append(f'-D {parameter}={value}')
+            command += f' -D {parameter}={value}'
 
         # Finally, specify the OpenSCAD source file
-        command.append(inputFilePath)
+        command += f' "{inputFilePath}"'
 
         return command
 
@@ -74,14 +73,12 @@ class OpenScadInterface:
         if self._defaultOpenScadPath == '':
             # Determine the Operating system being used
             system = platform.system()
-            Logger.log('d', f'Platform is reported as "{system}"')
 
             # On Linux, check for openscad in the current path
             if system.lower() == "linux":
                 # If the 'which' command can find the openscad path, use the path directly
-                command = ['which', 'openscad']
-                which_result = subprocess.run(command, capture_output=True, text=True).stdout.strip()
-                Logger.log('d', f'which_result = "{which_result}"')
+                command = 'which openscad'
+                which_result = subprocess.run(command, capture_output=True, text=True, shell=True).stdout.strip()
                 if which_result != '':
                     self._defaultOpenScadPath = which_result
 
@@ -92,11 +89,8 @@ class OpenScadInterface:
 
             # For Windows, OpenSCAD should be installed in the Program Files folder
             elif system == 'Windows':
-                program_files_path = f'"{os.path.join(os.getenv("PROGRAMFILES"), "OpenSCAD", "openscad.exe")}"'
-                program_files_x86_path = f'"{os.path.join(os.getenv("PROGRAMFILES(X86)"), "OpenSCAD", "openscad.exe")}"' # This is just in case - OpenSCAD should never be installed here
+                program_files_path = f'{os.path.join(os.getenv("PROGRAMFILES"), "OpenSCAD", "openscad.exe")}'
                 if os.path.isfile(program_files_path):
                     self._defaultOpenScadPath = program_files_path
-                elif os.path.isfile(program_files_x86_path):
-                    self._defaultOpenScadPath = program_files_x86_path        
                 
         return self._defaultOpenScadPath
