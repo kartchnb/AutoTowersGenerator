@@ -19,7 +19,7 @@ With this plugin, printing a temperature tower is as easy as:
   
 It's a similar process to create a retraction tower or a fan tower!
 
-This plugin relies on OpenSCAD being installed in the default location (on Windows and Mac) or in the current path (on Linux) to work.  This is because your calibration tower is customized to meet the parameters you set and the layer height you are printing at.
+This plugin relies on OpenSCAD being installed to work.  This is because your calibration tower is customized to meet the parameters you set and the layer height you are printing at.
 
 ## A couple of things to note:
 
