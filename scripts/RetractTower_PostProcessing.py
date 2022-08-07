@@ -151,33 +151,33 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                             if current_e<0:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{-currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Retract distance: {currentValue:.3f}mm'
                             # Extruding filament (relative)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Retract distance: {currentValue:.3f}mm'
                         else:
                             # Retracting filament (absolute)
                             if save_e>current_e:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Retract speed: {int(currentValue)}mm/s'
                                 else:
                                     current_e = save_e - currentValue
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'Retract distance: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Retract distance: {currentValue:.3f}mm'
                             # Extruding filament (absolute)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'Retract speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Retract speed: {int(currentValue)}mm/s'
 
             if is_extrusion_line(line):
                 searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
@@ -189,14 +189,14 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                 if (layerIndex==baseLayers):
                     currentValue = startValue
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
-                    lcd_gcode = f'Retract {towerType} starting at {startValue:.1f}'
+                    lcd_gcode = f'M117 Retract {towerType} starting at {startValue:.1f}'
                     lines.insert(lineIndex + 1, 'Start of the first section')
                 
                 # Change the current value   
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')
-                    lcd_gcode = f'New section {towerType} {currentValue:.1f}'
+                    lcd_gcode = f'M117 New section {towerType} {currentValue:.1f}'
                     lines.insert(lineIndex + 1, 'Start of the next section')
 
                 # Add M117 to add message on LCD
