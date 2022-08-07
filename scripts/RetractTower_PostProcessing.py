@@ -117,7 +117,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     currentValue = -1
     save_e = -1
 
-    lcd_gcode = f'M117 {towerType} ({startValue:.1f}/{valueChange:.1f}'
+    lcd_gcode = f'M117 {towerType} ({startValue:.1f}/{valueChange:.1f})'
     
     current_e = 0
     current_f = 0
@@ -190,14 +190,14 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                     currentValue = startValue
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
                     lcd_gcode = f'M117 Retract {towerType} starting at {startValue:.1f}'
-                    lines.insert(lineIndex + 1, 'Start of the first section')
+                    lines.insert(lineIndex + 1, '; Start of the first section')
                 
                 # Change the current value   
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')
                     lcd_gcode = f'M117 New section {towerType} {currentValue:.1f}'
-                    lines.insert(lineIndex + 1, 'Start of the next section')
+                    lines.insert(lineIndex + 1, '; Start of the next section')
 
                 # Add M117 to add message on LCD
                 lines.insert(lineIndex + 1, lcd_gcode)

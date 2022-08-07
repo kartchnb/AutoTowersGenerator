@@ -151,6 +151,6 @@ class RetractDistanceTowerController(QObject):
         distanceChange = float(self.distanceChangeStr)
 
         # Call the post-processing script
-        gcode = RetractTower_PostProcessing.execute(gcode, startDistance, distanceChange, self._sectionLayers, self._baseLayers, 'speed')
+        gcode = RetractTower_PostProcessing.execute(gcode, startDistance, distanceChange, self._sectionLayers, self._baseLayers, 'distance')
 
         return gcode
