@@ -31,7 +31,7 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
                 currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
                 lines[lineIndex] = f'M106 S{currentFanValue} ; Resuming fan speed of {currentPercent}% after bridge'
                 afterbridge = False
-                lines.insert(lineIndex + 1, f'M117 Fan Speed: {currentPercent}%')
+                lines.insert(lineIndex + 1, f'M117 Speed: {currentPercent}%')
 
             if line.startswith('M107') and (layerIndex-baseLayers)>0:
                 Logger.log('d', f'Just completed a bridge at layer {layerIndex - 2}')
@@ -45,14 +45,14 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
                     Logger.log('d', f'Start of first section at layer {layerIndex - 2} - setting fan speed to {currentPercent}%')
                     currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
                     lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; Setting fan speed to {currentPercent}% for the first section')
-                    lines.insert(lineIndex + 2, f'M117 Fan Speed: {currentPercent}%')
+                    lines.insert(lineIndex + 2, f'M117 Speed: {currentPercent}%')
 
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentPercent += percentChange
                     Logger.log('d', f'Start of new section at layer {layerIndex - 2} - setting fan speed to {currentPercent}%')
                     currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
                     lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; Setting fan speed to {currentPercent}% for the next section')
-                    lines.insert(lineIndex + 2, f'M117 Fan Speed: {currentPercent}%')
+                    lines.insert(lineIndex + 2, f'M117 Speed: {currentPercent}%')
 
 
         result = '\n'.join(lines)

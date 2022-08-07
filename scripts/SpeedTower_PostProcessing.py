@@ -40,7 +40,7 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
                     Logger.log('d', f'Start of first section layer {layerIndex  - 2}')
                     if  (towerType == 'acceleration'):
                         comand = f'M204 S{int(currentValue)} ; Setting acceleration to {int(currentValue)}'
-                        lcd_gcode = f'M117 Acceleration S{int(currentValue)}'
+                        lcd_gcode = f'M117 Accel S{int(currentValue)}'
                     if  (towerType=='jerk'):
                         comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; Setting jerk to {int(currentValue)}'
                         lcd_gcode = f'M117 Jerk X{int(currentValue)} Y{int(currentValue)}'
@@ -49,10 +49,10 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
                         lcd_gcode = f'M117 Junction J{float(currentValue):.3f}'
                     if  (towerType=='Marlin linear'):
                         comand = f'M900 K{float(currentValue):.3f} ; Setting Marlin linear to {int(currentValue)}'
-                        lcd_gcode = f'M117 Linear Advance K{float(currentValue):.3f}'
+                        lcd_gcode = f'M117 L Advance K{float(currentValue):.3f}'
                     if  (towerType=='RepRap pressure'):
                         comand = f'M572 D0 S{float(currentValue):.3f} ; Setting RepRap pressure to {int(currentValue)}'
-                        lcd_gcode = f'M117 Pressure Advance S{float(currentValue):.3f}'
+                        lcd_gcode = f'M117 P Advance S{float(currentValue):.3f}'
                         
                     lines.insert(lineIndex + 1, comand)
                     lines.insert(lineIndex + 2, lcd_gcode)
@@ -63,7 +63,7 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
                 
                         if  (towerType == 'acceleration'):
                             comand = f'M204 S{int(currentValue)} ; Setting acceleration to {int(currentValue)}'
-                            lcd_gcode = f'M117 Acceleration S{int(currentValue)}'
+                            lcd_gcode = f'M117 Accel S{int(currentValue)}'
                         if  (towerType=='jerk'):
                             comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; Setting jerk to {int(currentValue)}'
                             lcd_gcode = f'M117 Jerk X{int(currentValue)} Y{int(currentValue)}'
@@ -72,10 +72,10 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
                             lcd_gcode = f'M117 Junction J{float(currentValue):.3f}'
                         if  (towerType=='Marlin linear'):
                             comand = f'M900 K{float(currentValue):.3f} ; Setting Marlin linear to {int(currentValue)}'
-                            lcd_gcode = f'M117 Linear Advance K{float(currentValue):.3f}'
+                            lcd_gcode = f'M117 L Advance K{float(currentValue):.3f}'
                         if  (towerType=='RepRap pressure'):
                             comand = f'M572 D0 S{float(currentValue):.3f} ; Setting RepRap pressure to {int(currentValue)}'
-                            lcd_gcode = f'M117 Pressure Advance S{float(currentValue):.3f}'
+                            lcd_gcode = f'M117 P Advance S{float(currentValue):.3f}'
                             
                         lines.insert(lineIndex + 1, comand)
                         lines.insert(lineIndex + 2, lcd_gcode)                                              

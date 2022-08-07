@@ -35,14 +35,14 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
                 if (layerIndex == baseLayers):
                     Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentTemp}')
                     lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; Setting temperature to {currentTemp} for first section')
-                    lines.insert(lineIndex + 2, f'M117 Hot end temp: {currentTemp}')
+                    lines.insert(lineIndex + 2, f'M117 Temp: {currentTemp}')
 
                 # If the end of a section has been reached, decrease the temperature
                 if ((layerIndex - baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
                     currentTemp += tempChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentTemp}')
                     lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; Setting temperature to {currentTemp} for next section')
-                    lines.insert(lineIndex + 2, f'M117 Hot end temp: {currentTemp}')
+                    lines.insert(lineIndex + 2, f'M117 Temp: {currentTemp}')
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result
