@@ -57,7 +57,7 @@ class OpenScadInterface:
             if type(value) == str:
                 value = f'\\"{value}\\"'
 
-            command += f' -D {parameter}={value}'
+            command += f' -D "{parameter}={value}"'
 
         # Finally, specify the OpenSCAD source file
         command += f' "{inputFilePath}"'
