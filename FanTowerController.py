@@ -146,8 +146,8 @@ class FanTowerController(QObject):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Read the parameters from the dialog
-        startPercent = float(self._dialog.property('startPercent'))
-        percentChange = float(self._dialog.property('percentChange'))
+        startPercent = float(self.startPercentStr)
+        percentChange = float(self.percentChangeStr)
 
         # Call the post-processing script
         gcode = FanTower_PostProcessing.execute(gcode, startPercent, percentChange, self._sectionLayers, self._baseLayers)
