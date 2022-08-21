@@ -153,33 +153,33 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                             if current_e<0:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{-currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
                             # Extruding filament (relative)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
                                 else:
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
                         else:
                             # Retracting filament (absolute)
                             if save_e>current_e:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
                                 else:
                                     current_e = save_e - currentValue
                                     lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist: {currentValue:.3f}mm'
+                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
                             # Extruding filament (absolute)
                             else:
                                 if  (towerType == 'speed'):
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed: {int(currentValue)}mm/s'
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
 
             if is_extrusion_line(line):
                 searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
