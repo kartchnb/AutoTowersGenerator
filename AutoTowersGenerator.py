@@ -4,7 +4,13 @@ import os
 import platform
 import tempfile
 
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
+# Import the correct version of PyQt
+try:
+    from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
+    PYQT_VERSION = 6
+except ImportError:
+    from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
+    PYQT_VERSION = 5
 
 from cura.CuraApplication import CuraApplication
 
@@ -111,7 +117,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _guiPath(self):
         ''' Returns the path to the GUI files directory '''
 
-        return os.path.join(self._pluginPath, 'gui')
+        return os.path.join(self._pluginPath, 'gui', f'qt{PYQT_VERSION}')
 
 
 
@@ -160,7 +166,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Returns the object used to create a Fan Tower '''
 
         if self._cachedFanTowerController is None:
-            self._cachedFanTowerController = FanTowerController.FanTowerController(self._pluginPath, self._modelCallback)
+            self._cachedFanTowerController = FanTowerController.FanTowerController(self._guiPath, self._modelCallback)
         return self._cachedFanTowerController
 
 
@@ -171,7 +177,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Returns the object used to create a Retraction Distance Tower '''
 
         if self._cachedRetractionDistanceTowerController is None:
-            self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._pluginPath, self._modelCallback)
+            self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._guiPath, self._modelCallback)
         return self._cachedRetractionDistanceTowerController
 
 
@@ -182,7 +188,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Returns the object used to create a Retraction Speed Tower '''
 
         if self._cachedRetractionSpeedTowerController is None:
-            self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._pluginPath, self._modelCallback)
+            self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._guiPath, self._modelCallback)
         return self._cachedRetractionSpeedTowerController
 
 
@@ -193,7 +199,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Returns the object used to create a Temperature Tower '''
 
         if self._cachedTempTowerController is None:
-            self._cachedTempTowerController = TempTowerController.TempTowerController(self._pluginPath, self._modelCallback)
+            self._cachedTempTowerController = TempTowerController.TempTowerController(self._guiPath, self._modelCallback)
         return self._cachedTempTowerController
 
 

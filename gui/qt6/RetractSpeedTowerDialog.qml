@@ -1,17 +1,16 @@
-// This dialog is a placeholder for when I get around to incorporating a speed tower
-import QtQuick 2.11
-import QtQuick.Controls 2.11
-import QtQuick.Layouts 1.11
+import QtQuick 6.0
+import QtQuick.Controls 6.0
+import QtQuick.Layouts 6.0
 
-import UM 1.2 as UM
+import UM 1.6 as UM
 
 UM.Dialog
 {
     id: dialog
-    title: "Speed Tower"
+    title: "Retraction Tower (Speed)"
 
-    minimumWidth: screenScaleFactor * 425;
-    minimumHeight: screenScaleFactor * 300;
+    minimumWidth: screenScaleFactor * 435;
+    minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
 
@@ -32,7 +31,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: "speedtower_icon.png"
+                source: "../retracttower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -48,24 +47,15 @@ UM.Dialog
 
             Label 
             { 
-                text: "Speed Type to Control" 
-            }
-            ComboBox 
-            {
-                id: speedTypeInput
-                model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
-            }
-
-            Label 
-            { 
                 text: "Starting Speed" 
             }
             TextField
             {
-                id: startSpeedInput
+                id: startValueInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "8"
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.startSpeedStr
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
             Label 
@@ -74,10 +64,11 @@ UM.Dialog
             }
             TextField
             {
-                id: endSpeedInput
+                id: endValueInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "32"
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.endSpeedStr
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
             Label 
@@ -86,12 +77,13 @@ UM.Dialog
             }
             TextField
             {
-                id: speedChangeInput
+                id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "4"
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.speedChangeStr
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
-    
+
             Label 
             { 
                 text: "Tower Description" 
@@ -100,7 +92,8 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerDescriptionStr
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

@@ -1,13 +1,13 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.11
-import QtQuick.Layouts 1.11
+import QtQuick 6.0
+import QtQuick.Controls 6.0
+import QtQuick.Layouts 6.0
 
-import UM 1.2 as UM
+import UM 1.6 as UM
 
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower (Speed)"
+    title: "Retraction Tower (Distance)"
 
     minimumWidth: screenScaleFactor * 435;
     minimumHeight: screenScaleFactor * 245;
@@ -31,7 +31,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: "retracttower_icon.png"
+                source: "../retracttower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -43,45 +43,44 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.alignment: Qt.AlignTop
 
             Label 
             { 
-                text: "Starting Speed" 
+                text: "Starting Distance" 
             }
             TextField
             {
                 id: startValueInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startSpeedStr
-                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.startDistanceStr
+                onTextChanged: if (manager.startDistanceStr != text) manager.startDistanceStr = text
             }
 
             Label 
             { 
-                text: "Ending Speed" 
+                text: "Ending Distance" 
             }
             TextField
             {
                 id: endValueInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endSpeedStr
-                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.endDistanceStr
+                onTextChanged: if (manager.endDistanceStr != text) manager.endDistanceStr = text
             }
 
             Label 
             { 
-                text: "Speed Change" 
+                text: "Distance Change" 
             }
             TextField
             {
                 id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.speedChangeStr
-                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.distanceChangeStr
+                onTextChanged: if (manager.distanceChangeStr != text) manager.distanceChangeStr = text
             }
 
             Label 

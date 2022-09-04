@@ -28,7 +28,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: "plugin_icon.png"
+                source: "../plugin_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         } 

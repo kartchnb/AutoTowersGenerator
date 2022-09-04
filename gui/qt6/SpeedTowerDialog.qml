@@ -1,16 +1,17 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.11
-import QtQuick.Layouts 1.11
+// This dialog is a placeholder for when I get around to incorporating a speed tower
+import QtQuick 6.0
+import QtQuick.Controls 6.0
+import QtQuick.Layouts 6.0
 
-import UM 1.2 as UM
+import UM 1.6 as UM
 
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower (Distance)"
+    title: "Speed Tower"
 
-    minimumWidth: screenScaleFactor * 435;
-    minimumHeight: screenScaleFactor * 245;
+    minimumWidth: screenScaleFactor * 425;
+    minimumHeight: screenScaleFactor * 300;
     width: minimumWidth
     height: minimumHeight
 
@@ -31,7 +32,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: "retracttower_icon.png"
+                source: "../speedtower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -43,46 +44,54 @@ UM.Dialog
             columnSpacing: UM.Theme.getSize("default_margin").width
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             Label 
             { 
-                text: "Starting Distance" 
+                text: "Speed Type to Control" 
             }
-            TextField
+            ComboBox 
             {
-                id: startValueInput
-                Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startDistanceStr
-                onTextChanged: if (manager.startDistanceStr != text) manager.startDistanceStr = text
-            }
-
-            Label 
-            { 
-                text: "Ending Distance" 
-            }
-            TextField
-            {
-                id: endValueInput
-                Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endDistanceStr
-                onTextChanged: if (manager.endDistanceStr != text) manager.endDistanceStr = text
+                id: speedTypeInput
+                model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
             }
 
             Label 
             { 
-                text: "Distance Change" 
+                text: "Starting Speed" 
             }
             TextField
             {
-                id: valueChangeInput
+                id: startSpeedInput
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.distanceChangeStr
-                onTextChanged: if (manager.distanceChangeStr != text) manager.distanceChangeStr = text
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: "8"
             }
 
+            Label 
+            { 
+                text: "Ending Speed" 
+            }
+            TextField
+            {
+                id: endSpeedInput
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
+                text: "32"
+            }
+
+            Label 
+            { 
+                text: "Speed Change" 
+            }
+            TextField
+            {
+                id: speedChangeInput
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: "4"
+            }
+    
             Label 
             { 
                 text: "Tower Description" 
@@ -91,8 +100,7 @@ UM.Dialog
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: ""
             }
         }
     }

@@ -1,15 +1,14 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.11
-import QtQuick.Layouts 1.11
+import QtQuick 6.0
+import QtQuick.Controls 6.0
+import QtQuick.Layouts 6.0
 
-import UM 1.2 as UM
+import UM 1.6 as UM
 
 UM.Dialog
 {
     id: dialog
     title: "AutoTowersGenerator Settings"
 
-property int screenScaleFactor: 1 // test_gui.sh
     minimumWidth: screenScaleFactor * 445;
     minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
@@ -29,7 +28,7 @@ property int screenScaleFactor: 1 // test_gui.sh
             Image
             {
                 id: icon
-                source: "plugin_icon.png"
+                source: "../plugin_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         } 
@@ -51,8 +50,21 @@ property int screenScaleFactor: 1 // test_gui.sh
             {
                 id: openScadPath
                 text: manager.openScadPath
-                onTextChanged: if (manager.openScadPath != text) manager.openScadPath = text
+                //onTextChanged: if (manager.openScadPath != text) manager.openScadPath = text
             }
         }
+    }
+
+    rightButtons: Button
+    {
+        id: generateButton
+        text: "OK"
+        onClicked: dialog.accept()
+    }
+
+    onAccepted:
+    {
+        manager.openScadPath = openScadPath.text
+        manager.saveSettings()
     }
 }

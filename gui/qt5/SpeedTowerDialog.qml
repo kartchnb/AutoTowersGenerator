@@ -1,3 +1,4 @@
+// This dialog is a placeholder for when I get around to incorporating a speed tower
 import QtQuick 2.11
 import QtQuick.Controls 2.11
 import QtQuick.Layouts 1.11
@@ -7,10 +8,10 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Temperature Tower"
+    title: "Speed Tower"
 
-    minimumWidth: screenScaleFactor * 455
-    minimumHeight: screenScaleFactor * 300
+    minimumWidth: screenScaleFactor * 425;
+    minimumHeight: screenScaleFactor * 300;
     width: minimumWidth
     height: minimumHeight
 
@@ -31,7 +32,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: "temptower_icon.png"
+                source: "../speedtower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -45,68 +46,61 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label
-            {
-                text: "Starting Temperature"
+            Label 
+            { 
+                text: "Speed Type to Control" 
             }
-            TextField
+            ComboBox 
             {
-                id: startTempInput
-                Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startTemperatureStr
-                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
+                id: speedTypeInput
+                model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
             }
 
-            Label
-            {
-                text: "Ending Temperature"
+            Label 
+            { 
+                text: "Starting Speed" 
             }
             TextField
             {
-                id: endTempInput
+                id: startSpeedInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endTemperatureStr
-                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
+                text: "8"
             }
 
-            Label
-            {
-                text: "Temperature Change"
+            Label 
+            { 
+                text: "Ending Speed" 
             }
             TextField
             {
-                id: tempChangeInput
+                id: endSpeedInput
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
+                text: "32"
+            }
+
+            Label 
+            { 
+                text: "Speed Change" 
+            }
+            TextField
+            {
+                id: speedChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.temperatureChangeStr
-                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
+                text: "4"
             }
-
-            Label
-            {
-                text: "Material Label"
-            }
-            TextField
-            {
-                id: materialLabelInput
-                Layout.preferredWidth: numberInputWidth
-                inputMask: "Xxxx"
-                text: manager.materialLabelStr
-                onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
-            }
-
-            Label
-            {
-                text: "Tower Description"
+    
+            Label 
+            { 
+                text: "Tower Description" 
             }
             TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: ""
             }
         }
     }

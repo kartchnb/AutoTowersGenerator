@@ -1,7 +1,11 @@
 import os
 import math
 
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal
+# Import the correct version of PyQt
+try:
+    from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
+except ImportError:
+    from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 
 from cura.CuraApplication import CuraApplication
 
@@ -21,15 +25,13 @@ class RetractSpeedTowerController(QObject):
 
 
 
-    def __init__(self, pluginPath, modelCallback):
+    def __init__(self, guiPath, modelCallback):
         QObject.__init__(self)
-
-        self._pluginPath = pluginPath
         
         self._modelCallback = modelCallback
 
         # Prepare the settings dialogs
-        qml_file_path = os.path.join(pluginPath, 'gui', 'RetractSpeedTowerDialog.qml')
+        qml_file_path = os.path.join(guiPath, 'RetractSpeedTowerDialog.qml')
         self._dialog = CuraApplication.getInstance().createQmlComponent(qml_file_path, {'manager': self})
 
         self._baseLayers = 0

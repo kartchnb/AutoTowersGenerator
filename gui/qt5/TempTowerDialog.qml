@@ -7,10 +7,10 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Fan Tower"
+    title: "Temperature Tower"
 
-    minimumWidth: screenScaleFactor * 445;
-    minimumHeight: screenScaleFactor * 245;
+    minimumWidth: screenScaleFactor * 455
+    minimumHeight: screenScaleFactor * 300
     width: minimumWidth
     height: minimumHeight
 
@@ -26,12 +26,12 @@ UM.Dialog
         {
             Layout.preferredWidth: icon.width
             Layout.fillHeight: true
-            color: "#00017b"
+            color: '#00017b'
 
             Image
             {
                 id: icon
-                source: "fantower_icon.png"
+                source: "../temptower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -45,48 +45,61 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label 
-            { 
-                text: "Starting Fan Percent" 
+            Label
+            {
+                text: "Starting Temperature"
             }
             TextField
             {
-                id: startPercentInput
+                id: startTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startPercentStr
-                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
+                text: manager.startTemperatureStr
+                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
             }
 
-            Label 
-            { 
-                text: "Ending Fan Percent" 
+            Label
+            {
+                text: "Ending Temperature"
             }
             TextField
             {
-                id: endPercentInput
+                id: endTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endPercentStr
-                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
+                text: manager.endTemperatureStr
+                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
             }
 
-            Label 
-            { 
-                text: "Fan Speed Change" 
+            Label
+            {
+                text: "Temperature Change"
             }
             TextField
             {
-                id: percentChangeInput
+                id: tempChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.percentChangeStr
-                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
+                text: manager.temperatureChangeStr
+                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
             }
 
-            Label 
-            { 
-                text: "Tower Description" 
+            Label
+            {
+                text: "Material Label"
+            }
+            TextField
+            {
+                id: materialLabelInput
+                Layout.preferredWidth: numberInputWidth
+                inputMask: "Xxxx"
+                text: manager.materialLabelStr
+                onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
+            }
+
+            Label
+            {
+                text: "Tower Description"
             }
             TextField
             {

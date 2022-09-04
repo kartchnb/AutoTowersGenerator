@@ -9,15 +9,10 @@ UM.Dialog
     id: dialog
     title: "Fan Tower"
 
-property int screenScaleFactor: 1 // test_gui.sh
     minimumWidth: screenScaleFactor * 445;
     minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
-
-    // Create aliases to allow easy access to each of the parameters
-    property alias percentChange: percentChangeInput.text
-    property alias towerDescription: towerDescriptionInput.text
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
@@ -36,7 +31,7 @@ property int screenScaleFactor: 1 // test_gui.sh
             Image
             {
                 id: icon
-                source: "fantower_icon.png"
+                source: "../fantower_icon.png"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -59,7 +54,8 @@ property int screenScaleFactor: 1 // test_gui.sh
                 id: startPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.startPercentStr
+                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
             }
 
             Label 
@@ -71,7 +67,8 @@ property int screenScaleFactor: 1 // test_gui.sh
                 id: endPercentInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.endPercentStr
+                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
             }
 
             Label 
@@ -83,7 +80,8 @@ property int screenScaleFactor: 1 // test_gui.sh
                 id: percentChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: ""
+                text: manager.percentChangeStr
+                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
             }
 
             Label 
@@ -94,7 +92,8 @@ property int screenScaleFactor: 1 // test_gui.sh
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerDescriptionStr
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }
@@ -103,7 +102,7 @@ property int screenScaleFactor: 1 // test_gui.sh
     {
         id: generateButton
         text: "Generate"
-onClicked: close() // test_gui.sh
+        onClicked: dialog.accept()
     }
 
     onAccepted:
