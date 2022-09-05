@@ -3,7 +3,7 @@
     "author": "Brad Kartchner",
     "version": "1.1.0",
     "api": 7,
-    "supported_sdk_versions": ["7.0.0", "7.1.0", "7.2.0", "7.3.0", "7.4.0", "7.5.0", "7.6.0", "7.7.0", "7.8.0", "7.9.0", "8.0.0"],
+    "supported_sdk_versions": ["7.9.0", "8.0.0"],
     "description": "Automates the generation of several parameterized calibration models.",
 	"i18n-catalog": "cura"
 }
