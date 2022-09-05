@@ -3,6 +3,7 @@ import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
+import Cura 1.7 as Cura
 
 UM.Dialog
 {
@@ -45,11 +46,11 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label 
+            UM.Label 
             { 
                 text: "Starting Speed" 
             }
-            TextField
+            Cura.TextField
             {
                 id: startValueInput
                 Layout.preferredWidth: numberInputWidth
@@ -58,11 +59,11 @@ UM.Dialog
                 onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Ending Speed" 
             }
-            TextField
+            Cura.TextField
             {
                 id: endValueInput
                 Layout.preferredWidth: numberInputWidth
@@ -71,11 +72,11 @@ UM.Dialog
                 onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Speed Change" 
             }
-            TextField
+            Cura.TextField
             {
                 id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
@@ -84,11 +85,11 @@ UM.Dialog
                 onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Tower Description" 
             }
-            TextField
+            Cura.TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true

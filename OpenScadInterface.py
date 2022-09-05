@@ -1,4 +1,3 @@
-import glob
 import os
 import platform
 from shutil import which
@@ -16,6 +15,9 @@ class OpenScadInterface:
 
     def __init__(self):
         self.errorMessage = ''
+
+        # Determine the Operating system being used
+        self._system = platform.system().lower()
 
 
 
@@ -42,11 +44,20 @@ class OpenScadInterface:
         if openScadPath == '':
             openScadPath = self.DefaultOpenScadPath
 
-        # Start the command array with the OpenSCAD command
-        command = f'"{openScadPath}"'
+        # Initialize the command line
+        command_line = ''
+
+        # If running on Linux, the AppImage messes with the LD_LIBRARY_PATH environmental variable
+        # In order for OpenScad to run correctly, this variable needs to be unset
+        # At least, on my machine...
+        if self._system == 'linux':
+            command_line += f'unset LD_LIBRARY_PATH; '
+
+        # Add the OpenSCAD command
+        command_line += f'"{openScadPath}"'
 
         # Tell OpenSCAD to automatically generate an STL file
-        command += f' -o {outputFilePath}'
+        command_line += f' -o {outputFilePath}'
 
         # Add each variable setting parameter
         for parameter in parameters:
@@ -57,12 +68,12 @@ class OpenScadInterface:
             if type(value) == str:
                 value = f'\\"{value}\\"'
 
-            command += f' -D "{parameter}={value}"'
+            command_line += f' -D "{parameter}={value}"'
 
         # Finally, specify the OpenSCAD source file
-        command += f' "{inputFilePath}"'
+        command_line += f' "{inputFilePath}"'
 
-        return command
+        return command_line
 
 
 
@@ -71,11 +82,8 @@ class OpenScadInterface:
     @property
     def DefaultOpenScadPath(self):
         if self._defaultOpenScadPath == '':
-            # Determine the Operating system being used
-            system = platform.system()
-
             # On Linux, check for openscad in the current path
-            if system.lower() == "linux":
+            if self._system == "linux":
                 # If the 'which' command can find the openscad path, use the path directly
                 command = 'which openscad'
                 which_result = subprocess.run(command, capture_output=True, text=True, shell=True).stdout.strip()
@@ -84,13 +92,17 @@ class OpenScadInterface:
 
             # This path for Macintosh was borrowed from Thopiekar's OpenSCAD Integration plugin (https://thopiekar.eu/cura/cad/openscad)
             # I have no way of verifying it works...
-            if system.lower() == 'darwin':
+            if self._system == 'darwin':
                 self._defaultOpenScadPath = '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD'
 
             # For Windows, OpenSCAD should be installed in the Program Files folder
-            elif system == 'Windows':
+            elif self._system == 'windows':
                 program_files_path = f'{os.path.join(os.getenv("PROGRAMFILES"), "OpenSCAD", "openscad.exe")}'
                 if os.path.isfile(program_files_path):
                     self._defaultOpenScadPath = program_files_path
+
+            # Cura shouldn't be running on any other platform, but try a sensible default
+            else:
+                self._defaultOpenScadPath = 'openscad'
                 
         return self._defaultOpenScadPath

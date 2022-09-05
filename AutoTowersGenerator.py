@@ -429,8 +429,7 @@ class AutoTowersGenerator(QObject, Extension):
         # The dialog is no longer needed
         self._waitDialog.hide()
 
-        # Display a warning if supports are enabled
-        
+        # Display a warning if supports are enabled        
         if self._currentSupportEnabled == True:
             Message('The "Generate Support" option is selected. For best results, deselect this before printing').show()
 
@@ -489,13 +488,13 @@ class AutoTowersGenerator(QObject, Extension):
                     if gcode:
 
                         # Proceed if the g-code has not already been post-processed
-                        if ';POSTPROCESSED' not in gcode[0]:
+                        if ';Post-processed by AutoTowersGenerator' not in gcode[0]:
 
                             # Call the callback to post-process the g-code
                             gcode = self._postProcessingCallback(gcode)
 
                             # Mark the g-code as having been post-processed
-                            gcode[0] += ';POSTPROCESSED\n'
+                            gcode[0] += ';Post-processed by AutoTowersGenerator\n'
 
                         else:
                             Logger.log('e', 'G-code has already been post-processed')

@@ -3,6 +3,7 @@ import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
+import Cura 1.7 as Cura
 
 UM.Dialog
 {
@@ -44,11 +45,11 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Label 
+            UM.Label 
             { 
                 text: "Starting Distance" 
             }
-            TextField
+            Cura.TextField
             {
                 id: startValueInput
                 Layout.preferredWidth: numberInputWidth
@@ -57,11 +58,11 @@ UM.Dialog
                 onTextChanged: if (manager.startDistanceStr != text) manager.startDistanceStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Ending Distance" 
             }
-            TextField
+            Cura.TextField
             {
                 id: endValueInput
                 Layout.preferredWidth: numberInputWidth
@@ -70,11 +71,11 @@ UM.Dialog
                 onTextChanged: if (manager.endDistanceStr != text) manager.endDistanceStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Distance Change" 
             }
-            TextField
+            Cura.TextField
             {
                 id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
@@ -83,11 +84,11 @@ UM.Dialog
                 onTextChanged: if (manager.distanceChangeStr != text) manager.distanceChangeStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Tower Description" 
             }
-            TextField
+            Cura.TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true

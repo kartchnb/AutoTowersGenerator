@@ -23,7 +23,7 @@ UM.Dialog
 
         Image
         {
-            source: "openscad.png"
+            source: "../openscad.png"
         }
         Label
         {

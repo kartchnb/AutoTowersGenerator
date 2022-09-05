@@ -6,10 +6,14 @@ from UM.Logger import Logger
 __version__ = '1.0'
 
 def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
+    Logger.log('d', 'Begin TempTower post-processing')
     Logger.log('d', f'Starting temperature = {startTemp}')
     Logger.log('d', f'Temperature change = {tempChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
+
+    # Document the settings in the g-code
+    gcode[0] += f';TempTower: start temp = {startTemp}, temp change = {tempChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -17,6 +21,7 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
     # Our code starts at index 2?
     baseLayers += 2
 
+    # Start at the selected starting temperature
     currentTemp = startTemp
 
     # Iterate over each layer in the g-code
@@ -26,7 +31,6 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
         # Iterate over each command line in the layer
         lines = layer.split('\n')
         for line in lines:
-
             # If this is the start of the current layer
             if line.startswith(';LAYER:'):
                 lineIndex = lines.index(line)
@@ -47,4 +51,6 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
         result = '\n'.join(lines)
         gcode[layerIndex] = result
 
+    Logger.log('d', 'End Temp Tower post-processing')
+    
     return gcode

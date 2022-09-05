@@ -9,12 +9,15 @@ import re #To perform the search
 
 __version__ = '1.0'
 
-def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
-    Logger.log('d', f'Modyfying for speed {towerType}')
-    Logger.log('d', f'Starting value = {startValue}')
-    Logger.log('d', f'Value change = {valueChange}')
+def execute(self, gcode, startSpeed, speedChange, sectionLayers, baseLayers, towerType):
+    Logger.log('d', f'Begin SpeedTower post-processing ({towerType})')
+    Logger.log('d', f'Starting speed = {startSpeed}')
+    Logger.log('d', f'Speed change = {speedChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
+
+    # Document the settings in the g-code
+    gcode[0] += f';SpeedTower ({towerType}): start speed = {startSpeed}, speed change = {speedChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -22,14 +25,16 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
     # Our code starts at index 2?
     baseLayers += 2
 
-    currentValue = startValue
+    currentValue = startSpeed
     comand=''
 
     idl=0
     
+    # Iterate over each layer in the g-code
     for layer in gcode:
         layerIndex = gcode.index(layer)
-        
+
+        # Iterate over each command line in the layer
         lines = layer.split('\n')
         for line in lines:                  
             
@@ -59,7 +64,7 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
 
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
                         Logger.log('d', f'New section at layer {layerIndex - 2}')
-                        currentValue += valueChange
+                        currentValue += speedChange
                 
                         if  (towerType == 'acceleration'):
                             comand = f'M204 S{int(currentValue)} ; Setting acceleration to {int(currentValue)}'
@@ -82,5 +87,7 @@ def execute(self, gcode, startValue, valueChange, sectionLayers, baseLayers, tow
         
         result = '\n'.join(lines)
         gcode[layerIndex] = result
+
+    Logger.log('d', f'End SpeedTower post-processing ({towerType})')
 
     return gcode

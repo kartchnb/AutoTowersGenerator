@@ -62,8 +62,8 @@ class TempTowerController(QObject):
 
         'TPU' : 
         {
-            'startTemp' : '210',
-            'endTemp' : '170',
+            'startTemp' : '240',
+            'endTemp' : '200',
             'tempChange' : '-5',
             'materialLabel': 'TPU',
             'towerDescription': '',

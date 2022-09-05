@@ -23,9 +23,9 @@ UM.Dialog
 
         Image
         {
-            source: "openscad.png"
+            source: "../openscad.png"
         }
-        Label
+        UM.Label
         {
             Layout.fillHeight: true
             Layout.fillWidth: true

@@ -3,6 +3,7 @@ import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
+import Cura 1.7 as Cura
 
 UM.Dialog
 {
@@ -45,11 +46,11 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label
+            UM.Label
             {
                 text: "Starting Temperature"
             }
-            TextField
+            Cura.TextField
             {
                 id: startTempInput
                 Layout.preferredWidth: numberInputWidth
@@ -58,11 +59,11 @@ UM.Dialog
                 onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
             }
 
-            Label
+            UM.Label
             {
                 text: "Ending Temperature"
             }
-            TextField
+            Cura.TextField
             {
                 id: endTempInput
                 Layout.preferredWidth: numberInputWidth
@@ -71,11 +72,11 @@ UM.Dialog
                 onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
             }
 
-            Label
+            UM.Label
             {
                 text: "Temperature Change"
             }
-            TextField
+            Cura.TextField
             {
                 id: tempChangeInput
                 Layout.preferredWidth: numberInputWidth
@@ -84,24 +85,24 @@ UM.Dialog
                 onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
             }
 
-            Label
+            UM.Label
             {
                 text: "Material Label"
             }
-            TextField
+            Cura.TextField
             {
-                id: materialLabelInput
+                id: labelInput
                 Layout.preferredWidth: numberInputWidth
-                inputMask: "Xxxx"
+                inputMask: "xxxx"
                 text: manager.materialLabelStr
                 onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
             }
 
-            Label
+            UM.Label
             {
                 text: "Tower Description"
             }
-            TextField
+            Cura.TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true

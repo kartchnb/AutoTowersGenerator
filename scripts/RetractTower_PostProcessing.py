@@ -99,14 +99,17 @@ def is_reset_extruder_line(line: str) -> bool:
     
 
 def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
-    Logger.log('d', f'Post-processing for retraction {towerType} tower')
+    Logger.log('d', f'Begin RetractTower post-processing ({towerType})')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     towerLabel = "speed" if towerType == "speed" else "dist"
-   
+
+    # Document the settings in the g-code
+    gcode[0] += f';RetractTower ({towerLabel}): start {towerLabel} = {startValue}, speed {towerLabel} = {valueChange}\n'
+
     extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
 
@@ -124,9 +127,11 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     current_e = 0
     current_f = 0
 
+    # Iterate over each layer in the g-code
     for layer in gcode:
         layerIndex = gcode.index(layer)
         
+        # Iterate over each command line in the layer
         lines = layer.split('\n')
         for line in lines:                  
             lineIndex = lines.index(line)
@@ -206,5 +211,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                             
         result = '\n'.join(lines)
         gcode[layerIndex] = result
+
+    Logger.log('d', f'End RetractTower post-processing ({towerType})')
 
     return gcode

@@ -39,12 +39,14 @@ def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> None:
     op = AddSceneNodeOperation(node, scene.getRoot())
     op.push()
 
-    extruder_nr=len(global_stack.extruders)
+    extruder_stack = application.getExtruderManager().getActiveExtruderStacks()
+
+    extruder_nr=len(extruder_stack)
     if ext_pos>0 and ext_pos<=extruder_nr :
-        default_extruder_position = str(ext_pos-1)
+        default_extruder_position = int(ext_pos-1)
     else :
-        default_extruder_position = application.getMachineManager().defaultExtruderPosition
-    default_extruder_id = global_stack.extruders[default_extruder_position].getId()
+        default_extruder_position = int(application.getMachineManager().defaultExtruderPosition)
+    default_extruder_id = extruder_stack[default_extruder_position].getId()
     node.callDecoration("setActiveExtruder", default_extruder_id)
 
     active_build_plate = application.getMultiBuildPlateModel().activeBuildPlate

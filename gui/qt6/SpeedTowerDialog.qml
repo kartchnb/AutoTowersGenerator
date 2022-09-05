@@ -4,6 +4,7 @@ import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
+import Cura 1.7 as Cura
 
 UM.Dialog
 {
@@ -46,7 +47,7 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label 
+            UM.Label 
             { 
                 text: "Speed Type to Control" 
             }
@@ -56,11 +57,11 @@ UM.Dialog
                 model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Starting Speed" 
             }
-            TextField
+            Cura.TextField
             {
                 id: startSpeedInput
                 Layout.preferredWidth: numberInputWidth
@@ -68,11 +69,11 @@ UM.Dialog
                 text: "8"
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Ending Speed" 
             }
-            TextField
+            Cura.TextField
             {
                 id: endSpeedInput
                 Layout.preferredWidth: numberInputWidth
@@ -80,11 +81,11 @@ UM.Dialog
                 text: "32"
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Speed Change" 
             }
-            TextField
+            Cura.TextField
             {
                 id: speedChangeInput
                 Layout.preferredWidth: numberInputWidth
@@ -92,11 +93,11 @@ UM.Dialog
                 text: "4"
             }
     
-            Label 
+            UM.Label 
             { 
                 text: "Tower Description" 
             }
-            TextField
+            Cura.TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true

@@ -1,8 +1,4 @@
-import QtQuick 2.11
-import QtQuick.Controls 2.11
-import QtQuick.Layouts 1.11
-
-import UM 1.5 as UM
+import UM 1.2 as UM
 import Cura 1.0 as Cura
 
 Cura.SecondaryButton
@@ -15,7 +11,7 @@ Cura.SecondaryButton
     }
     toolTipContentAlignment: UM.Enums.ContentAlignment.AlignLeft
     onClicked: manager.removeButtonClicked()
-    iconSource: "../remove_tower_icon.png"
+    iconSource: "../remove_tower_icon.svg"
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
 }

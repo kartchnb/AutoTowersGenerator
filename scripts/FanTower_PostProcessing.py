@@ -5,10 +5,14 @@ from UM.Logger import Logger
 __version__ = '1.0'
 
 def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
+    Logger.log('d', 'Begin FanTower post-processing')
     Logger.log('d', f'Start speed = {startPercent}%')
     Logger.log('d', f'Speed change = {percentChange}%')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
+
+    # Document the settings in the g-code
+    gcode[0] += f';FanTower: start fan % = {startPercent}, fan % change = {percentChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -16,13 +20,16 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
     # Our code starts at index 2?
     baseLayers += 2
 
+    # Start at the selected starting percentage
     currentPercent = startPercent
 
     afterbridge = False
 
+    # Iterate over each layer in the g-code
     for layer in gcode:
         layerIndex = gcode.index(layer)
 
+        # Iterate over each command line in the layer
         lines = layer.split('\n')
         for line in lines:
             if line.startswith('M106 S') and (layerIndex-baseLayers)>0 and afterbridge:
@@ -57,5 +64,7 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result
+
+    Logger.log('d', 'End FanTower post-processing')
 
     return gcode

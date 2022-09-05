@@ -3,6 +3,7 @@ import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
+import Cura 1.7 as Cura
 
 UM.Dialog
 {
@@ -13,6 +14,8 @@ UM.Dialog
     minimumHeight: screenScaleFactor * 245;
     width: minimumWidth
     height: minimumHeight
+
+    backgroundColor: UM.Theme.getColor("main_background")
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * 100
@@ -45,11 +48,11 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label 
+            UM.Label 
             { 
                 text: "Starting Fan Percent" 
             }
-            TextField
+            Cura.TextField
             {
                 id: startPercentInput
                 Layout.preferredWidth: numberInputWidth
@@ -58,11 +61,11 @@ UM.Dialog
                 onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Ending Fan Percent" 
             }
-            TextField
+            Cura.TextField
             {
                 id: endPercentInput
                 Layout.preferredWidth: numberInputWidth
@@ -71,11 +74,11 @@ UM.Dialog
                 onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Fan Speed Change" 
             }
-            TextField
+            Cura.TextField
             {
                 id: percentChangeInput
                 Layout.preferredWidth: numberInputWidth
@@ -84,11 +87,11 @@ UM.Dialog
                 onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
             }
 
-            Label 
+            UM.Label 
             { 
                 text: "Tower Description" 
             }
-            TextField
+            Cura.TextField
             {
                 id: towerDescriptionInput
                 Layout.fillWidth: true
