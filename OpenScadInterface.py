@@ -46,7 +46,6 @@ class OpenScadInterface:
         response = subprocess.run(command, capture_output=True, text=True, shell=True).stderr.strip()
         valid = 'OpenSCAD version' in response
 
-        Logger.log('d', f'OpenSCAD version request "{command}" returned "{response}", and valid is {valid}')
         return valid
 
 

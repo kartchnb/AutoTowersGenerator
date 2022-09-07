@@ -176,7 +176,7 @@ class FanTowerController(QObject):
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
         # Use the callback to load the preset STL file
-        self._loadStlCallback(stlFilePath, self._postProcess)
+        self._loadStlCallback(stlFilePath, self.postProcess)
 
 
 
