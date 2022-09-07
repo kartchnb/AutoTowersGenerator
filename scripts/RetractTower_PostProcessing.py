@@ -108,7 +108,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     towerLabel = "speed" if towerType == "speed" else "dist"
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';RetractTower ({towerLabel}): start {towerLabel} = {startValue}, speed {towerLabel} = {valueChange}\n'
+    gcode[0] = gcode[0] + f';RetractTower ({towerLabel}) start {towerLabel} = {startValue}, {towerLabel} change = {valueChange}\n'
 
     extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
@@ -144,7 +144,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                 current_e = 0
                 
             # If we have defined a value
-            if currentValue>=0:
+            if currentValue >= 0:
                 if is_retract_line(line):
                     searchF = re.search(r'F(\d*)', line)
                     if searchF:
@@ -157,34 +157,34 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                             # Retracting filament (relative)
                             if current_e<0:
                                 if  (towerType == 'speed'):
-                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
+                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator retracting filament at {currentValue} mm/s (relative)' # Speed value must be multiplied by 60 for the gcode
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s ; AutoTowersGenerator Added'
                                 else:
-                                    lines[lineIndex] = f'G1 F{int(current_f)} E{-currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
+                                    lines[lineIndex] = f'G1 F{int(current_f)} E{-currentValue:.5f} ; AutoTowersGenerator retracting {currentValue:.1f} mm of filament (relative)'
+                                    lcd_gcode = f'M117 Dist {currentValue:.1f}mm ; AutoTowersGenerator Added'
                             # Extruding filament (relative)
                             else:
                                 if  (towerType == 'speed'):
-                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
+                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator extruding filament at {currentValue} mm/s (relative)' # Speed value must be multiplied by 60 for the gcode
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s ; AutoTowersGenerator Added'
                                 else:
-                                    lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
+                                    lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; AutoTowersGenerator extruding {currentValue:.1f} mm of filament (relative)'
+                                    lcd_gcode = f'M117 Dist {currentValue:.1f}mm ; AutoTowersGenerator Added'
                         else:
                             # Retracting filament (absolute)
                             if save_e>current_e:
                                 if  (towerType == 'speed'):
-                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
+                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator retracting filament at {currentValue} mm/s (absolute)' # Speed value must be multiplied by 60 for the gcode
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s ; AutoTowersGenerator Added'
                                 else:
                                     current_e = save_e - currentValue
-                                    lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; Setting retraction distance to {currentValue}'
-                                    lcd_gcode = f'M117 Dist {currentValue:.3f}mm'
-                            # Extruding filament (absolute)
+                                    lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; AutoTowersGenerator retracting {currentValue:.1f} mm of filament (absolute)o'
+                                    lcd_gcode = f'M117 Dist {currentValue:.1f}mm ; AutoTowersGenerator Added'
+                            # Resetting the retraction
                             else:
                                 if  (towerType == 'speed'):
-                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; Setting retraction speed to {currentValue}' # Speed value must be multiplied by 60 for the gcode
-                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s'
+                                    lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator Setting retraction speed to {currentValue} mm/s' # Speed value must be multiplied by 60 for the gcode
+                                    lcd_gcode = f'M117 Speed {int(currentValue)}mm/s ; AutoTowersGenerator Added'
 
             if is_extrusion_line(line):
                 searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
@@ -197,14 +197,14 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                     currentValue = startValue
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
                     lcd_gcode = f'M117 Start {towerLabel} {startValue:.1f}'
-                    lines.insert(lineIndex + 1, '; Start of the first section')
+                    lines.insert(lineIndex + 1, '; AutoTowersGenerator Start of the first section')
                 
                 # Change the current value   
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')
-                    lcd_gcode = f'M117 New {towerLabel} {currentValue:.1f}'
-                    lines.insert(lineIndex + 1, '; Start of the next section')
+                    lcd_gcode = f'M117 New {towerLabel} {currentValue:.1f} ; AutoTowersGenerator Added'
+                    lines.insert(lineIndex + 1, '; AutoTowersGenerator Start of the next section')
 
                 # Add M117 to add message on LCD
                 lines.insert(lineIndex + 1, lcd_gcode)

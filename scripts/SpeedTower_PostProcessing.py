@@ -17,7 +17,7 @@ def execute(self, gcode, startSpeed, speedChange, sectionLayers, baseLayers, tow
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';SpeedTower ({towerType}): start speed = {startSpeed}, speed change = {speedChange}\n'
+    gcode[0] = gcode[0] + f';SpeedTower ({towerType}) start speed = {startSpeed}, speed change = {speedChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -44,20 +44,20 @@ def execute(self, gcode, startSpeed, speedChange, sectionLayers, baseLayers, tow
                 if (layerIndex == baseLayers):
                     Logger.log('d', f'Start of first section layer {layerIndex  - 2}')
                     if  (towerType == 'acceleration'):
-                        comand = f'M204 S{int(currentValue)} ; Setting acceleration to {int(currentValue)}'
-                        lcd_gcode = f'M117 Accel S{int(currentValue)}'
+                        comand = f'M204 S{int(currentValue)} ; AutoTowersGenerator Setting acceleration to {int(currentValue)}'
+                        lcd_gcode = f'M117 Accel S{int(currentValue)} ; AutoTowersGenerator Added'
                     if  (towerType=='jerk'):
-                        comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; Setting jerk to {int(currentValue)}'
-                        lcd_gcode = f'M117 Jerk X{int(currentValue)} Y{int(currentValue)}'
+                        comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; AutoTowersGenerator Setting jerk to {int(currentValue)}'
+                        lcd_gcode = f'M117 Jerk X{int(currentValue)} Y{int(currentValue)} ; AutoTowersGenerator Added'
                     if  (towerType=='junction'):
-                        comand = f'M205 J{float(currentValue):.3f} ; Setting junction to {int(currentValue)}'
-                        lcd_gcode = f'M117 Junction J{float(currentValue):.3f}'
+                        comand = f'M205 J{float(currentValue):.3f} ; AutoTowersGenerator Setting junction to {int(currentValue)}'
+                        lcd_gcode = f'M117 Junction J{float(currentValue):.3f} ; AutoTowersGenerator Added'
                     if  (towerType=='Marlin linear'):
-                        comand = f'M900 K{float(currentValue):.3f} ; Setting Marlin linear to {int(currentValue)}'
-                        lcd_gcode = f'M117 L Advance K{float(currentValue):.3f}'
+                        comand = f'M900 K{float(currentValue):.3f} ; AutoTowersGenerator Setting Marlin linear to {int(currentValue)}'
+                        lcd_gcode = f'M117 L Advance K{float(currentValue):.3f} ; AutoTowersGenerator Added'
                     if  (towerType=='RepRap pressure'):
-                        comand = f'M572 D0 S{float(currentValue):.3f} ; Setting RepRap pressure to {int(currentValue)}'
-                        lcd_gcode = f'M117 P Advance S{float(currentValue):.3f}'
+                        comand = f'M572 D0 S{float(currentValue):.3f} ; AutoTowersGenerator Setting RepRap pressure to {int(currentValue)}'
+                        lcd_gcode = f'M117 P Advance S{float(currentValue):.3f} ; AutoTowersGenerator Added'
                         
                     lines.insert(lineIndex + 1, comand)
                     lines.insert(lineIndex + 2, lcd_gcode)
@@ -67,19 +67,19 @@ def execute(self, gcode, startSpeed, speedChange, sectionLayers, baseLayers, tow
                         currentValue += speedChange
                 
                         if  (towerType == 'acceleration'):
-                            comand = f'M204 S{int(currentValue)} ; Setting acceleration to {int(currentValue)}'
+                            comand = f'M204 S{int(currentValue)} ; AutoTowersGenerator Setting acceleration to {int(currentValue)}'
                             lcd_gcode = f'M117 Accel S{int(currentValue)}'
                         if  (towerType=='jerk'):
-                            comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; Setting jerk to {int(currentValue)}'
+                            comand = f'M205 X{int(currentValue)} Y{int(currentValue)} ; AutoTowersGenerator Setting jerk to {int(currentValue)}'
                             lcd_gcode = f'M117 Jerk X{int(currentValue)} Y{int(currentValue)}'
                         if  (towerType=='junction'):
-                            comand = f'M205 J{float(currentValue):.3f} ; Setting junction to {int(currentValue)}'
+                            comand = f'M205 J{float(currentValue):.3f} ; AutoTowersGenerator Setting junction to {int(currentValue)}'
                             lcd_gcode = f'M117 Junction J{float(currentValue):.3f}'
                         if  (towerType=='Marlin linear'):
-                            comand = f'M900 K{float(currentValue):.3f} ; Setting Marlin linear to {int(currentValue)}'
+                            comand = f'M900 K{float(currentValue):.3f} ; AutoTowersGenerator Setting Marlin linear to {int(currentValue)}'
                             lcd_gcode = f'M117 L Advance K{float(currentValue):.3f}'
                         if  (towerType=='RepRap pressure'):
-                            comand = f'M572 D0 S{float(currentValue):.3f} ; Setting RepRap pressure to {int(currentValue)}'
+                            comand = f'M572 D0 S{float(currentValue):.3f} ; AutoTowersGenerator Setting RepRap pressure to {int(currentValue)}'
                             lcd_gcode = f'M117 P Advance S{float(currentValue):.3f}'
                             
                         lines.insert(lineIndex + 1, comand)

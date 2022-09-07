@@ -148,6 +148,9 @@ class AutoTowersGenerator(QObject, Extension):
     def _settingsDialog(self)->QObject:
         ''' Returns the settings dialog '''
 
+        # Make sure the settings are loaded
+        self._settings
+        
         if self._cachedSettingsDialog is None:
             self._cachedSettingsDialog = self._createDialog('SettingsDialog.qml')
         return self._cachedSettingsDialog
@@ -227,9 +230,13 @@ class AutoTowersGenerator(QObject, Extension):
                     self._settingsTable = json.load(settingsFile)
 
                 # Forward the OpenScad path to the OpenScadInterface object
-                self._openScadInterface.SetOpenScadPath(self._settingsTable['openscad path'])
+                openScadPath = self._settingsTable['openscad path']
+                Logger.log('d', f'Loaded openscad path = "{openScadPath}"')
+                self._openScadInterface.SetOpenScadPath(openScadPath)
+                Logger.log('d', f'Now openscad path = "{self._openScadInterface.OpenScadPath}"')
 
-            except:
+            except FileNotFoundError:
+                Logger.log('d', 'Settings file not found - initializing')
                 # Initialize settings with default values
                 self._settingsTable = {
                     'openscad path': self._openScadInterface.OpenScadPath,
@@ -256,16 +263,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     # Called to set the OpenSCAD path
     def setOpenScadPath(self, value)->None:
-        ''' Ensures an openscad path provided by the user is properly formatted '''
-
-        # Ensure the path ends with the openscad executable file name
-        if value != '':
-            if platform.system().lower() == 'windows':
-                if value.lower().endswith('openscad') == False and value.lower().endswith('openscad.exe') == False:
-                    value = os.path.join(value, 'openscad.exe')
-            else:
-                if value.lower().endswith('openscad') == False:
-                    value = os.path.join(value, 'openscad')
+        ''' The OpenScad path is really stored in the OpenScadInterface object '''
 
         # Forward the OpenScad path to the OpenScadInterface object
         self._openScadInterface.SetOpenScadPath(value)

@@ -12,7 +12,7 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';FanTower: start fan % = {startPercent}, fan % change = {percentChange}\n'
+    gcode[0] = gcode[0] + f';FanTower start fan % = {startPercent}, fan % change = {percentChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -36,7 +36,7 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
                 Logger.log('d', f'Resuming fan speed of {currentPercent}% after bridge at layer {layerIndex - 2}')
                 lineIndex = lines.index(line)
                 currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
-                lines[lineIndex] = f'M106 S{currentFanValue} ; Resuming fan speed of {currentPercent}% after bridge'
+                lines[lineIndex] = f'M106 S{currentFanValue} ; AutoTowersGenerator Resuming fan speed of {currentPercent}% after bridge'
                 afterbridge = False
                 lines.insert(lineIndex + 1, f'M117 Speed {currentPercent}%')
 
@@ -51,15 +51,15 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
                 if (layerIndex==baseLayers):
                     Logger.log('d', f'Start of first section at layer {layerIndex - 2} - setting fan speed to {currentPercent}%')
                     currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
-                    lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; Setting fan speed to {currentPercent}% for the first section')
-                    lines.insert(lineIndex + 2, f'M117 Speed {currentPercent}%')
+                    lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; AutoTowersGenerator Setting fan speed to {currentPercent}% for the first section')
+                    lines.insert(lineIndex + 2, f'M117 Speed {currentPercent}% ; AutoTowersGenerator Added')
 
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
                     currentPercent += percentChange
                     Logger.log('d', f'Start of new section at layer {layerIndex - 2} - setting fan speed to {currentPercent}%')
                     currentFanValue = int((currentPercent * 255)/100)  #  100% = 255 pour ventilateur
-                    lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; Setting fan speed to {currentPercent}% for the next section')
-                    lines.insert(lineIndex + 2, f'M117 Speed {currentPercent}%')
+                    lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; AutoTowersGenerator Setting fan speed to {currentPercent}% for the next section')
+                    lines.insert(lineIndex + 2, f'M117 Speed {currentPercent}% ; AutoTowersGenerator Added')
 
 
         result = '\n'.join(lines)

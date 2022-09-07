@@ -27,49 +27,49 @@ class TempTowerController(QObject):
         'aba': {
             'filename': 'temptower-aba.stl',
             'start value': 260,
-            'change value': 5,
+            'change value': -5,
         },
 
         'abs': {
             'filename': 'temptower-abs.stl',
             'start value': 250,
-            'change value': 5,
+            'change value': -5,
         },
 
         'nylon': {
             'filename': 'temptower-nylon.stl',
             'start value': 260,
-            'change value': 5,
+            'change value': -5,
         },
 
         'pc': {
             'filename': 'temptower-pc.stl',
             'start value': 310,
-            'change value': 5,
+            'change value': -5,
         },
 
         'petg': {
             'filename': 'temptower-petg.stl',
             'start value': 250,
-            'change value': 5,
+            'change value': -5,
         },
 
         'pla': {
             'filename': 'temptower-pla.stl',
             'start value': 230,
-            'change value': 5,
+            'change value': -5,
         },
 
         'pla+': {
             'filename': 'temptower-pla+.stl',
             'start value': 230,
-            'change value': 5,
+            'change value': -5,
         },
 
         'tpu': {
             'filename': 'temptower-tpu.stl',
             'start value': 230,
-            'change value': 5,
+            'change value': -5,
         },
     }
 

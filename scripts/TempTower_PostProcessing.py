@@ -13,7 +13,7 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';TempTower: start temp = {startTemp}, temp change = {tempChange}\n'
+    gcode[0] = gcode[0] + f';TempTower start temp = {startTemp}, temp change = {tempChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -38,15 +38,15 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
                 # If the end of the base has been reached, start modifying the temperature
                 if (layerIndex == baseLayers):
                     Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentTemp}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; Setting temperature to {currentTemp} for first section')
-                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp}')
+                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; AutoTowersGenerator Setting temperature to {currentTemp} for first section')
+                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp} ; AutoTowersGenerator Added')
 
                 # If the end of a section has been reached, decrease the temperature
                 if ((layerIndex - baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
                     currentTemp += tempChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentTemp}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; Setting temperature to {currentTemp} for next section')
-                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp}')
+                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; AutoTowersGenerator Setting temperature to {currentTemp} for next section')
+                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp} ; AutoTowersGenerator Addeds')
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result
