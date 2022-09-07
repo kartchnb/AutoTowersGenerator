@@ -175,9 +175,6 @@ module Generate_Section(label)
             // Generate a round column on the right side of the section
             translate([Tower_Width/2 - Cube_Size/2, 0, 0])
                 Generate_RoundSectionColumn();
-
-            // Generate the bridge at the top of the section
-            Generate_SectionBridge();
         }
 
         // Carve out the label for this section
@@ -231,24 +228,6 @@ module Generate_RoundSectionColumn()
         hollow_size = Cube_Size - Wall_Thickness*3;
         translate([0, 0, -Iota])
             cylinder(d=hollow_size, Cube_Size + Iota*2);
-    }
-}
-
-
-
-// Generate a bridge connecting the two section columns
-module Generate_SectionBridge()
-{
-    translate([0, 0, Cube_Size - Bridge_Thickness - Cap_Height])
-    difference()
-    {
-        // Generate the bridge proper
-        translate([-Tower_Width/2 + Cube_Size, -Bridge_Length/2, 0])
-            cube([Tower_Width - Cube_Size - Cube_Size/2, Bridge_Length, Bridge_Thickness]);
-
-        // Cut away the part of the bridge extending into the round section column
-        translate([Tower_Width/2 - Cube_Size/2, 0, -Iota])
-            cylinder(d=Cube_Size, Cube_Size);
     }
 }
 

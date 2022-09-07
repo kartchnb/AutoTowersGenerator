@@ -1,7 +1,7 @@
 {
     "name": "Auto Towers Generator",
     "author": "Brad Kartchner",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "api": 7,
     "supported_sdk_versions": ["7.9.0", "8.0.0"],
     "description": "Automates the generation of several parameterized calibration models.",

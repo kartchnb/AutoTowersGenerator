@@ -34,6 +34,8 @@ from . import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
 
+    _gcodeProcessedMarker = ';Post-processed by the AutoTowersGenerator plugin'
+
 
 
     def __init__(self):
@@ -42,28 +44,33 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add menu items for this plugin
         self.setMenuName('Auto Towers')
-        self.addMenuItem('Fan Tower', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
+        self.addMenuItem('Fan Tower (0-100%)', lambda: self._fanTowerController.generate('0-100'))
+        self.addMenuItem('Fan Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
         self.addMenuItem('', lambda: None)
-        self.addMenuItem('Retraction Tower (Distance)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionDistanceTowerController.generate()))
-        self.addMenuItem('Retraction Tower (Speed)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionSpeedTowerController.generate()))
+        self.addMenuItem('Retraction Distance Tower (1-6 mm)', lambda: self._retractionDistanceTowerController.generate('1-6'))
+        self.addMenuItem('Retraction Distance Tower (4-9 mm)', lambda: self._retractionDistanceTowerController.generate('4-9'))
+        self.addMenuItem('Retraction Distance Tower (7-12 mm)', lambda: self._retractionDistanceTowerController.generate('7-12'))
+        self.addMenuItem('Retraction Distance Tower (Custom)', lambda: self._retractionDistanceTowerController.generate())
         self.addMenuItem(' ', lambda: None)
-        self.addMenuItem('Temp Tower (ABS)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('ABS')))
-        self.addMenuItem('Temp Tower (PETG)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PETG')))
-        self.addMenuItem('Temp Tower (PLA)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PLA')))
-        self.addMenuItem('Temp Tower (PLA+)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('PLA+')))
-        self.addMenuItem('Temp Tower (TPU)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate('TPU')))
-        self.addMenuItem('Temp Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate(None)))
+        self.addMenuItem('Retraction Speed Tower (10-50 mm/s)', lambda: self._retractionSpeedTowerController.generate('10-50'))
+        self.addMenuItem('Retraction Speed Tower (35-75 mm/s)', lambda: self._retractionSpeedTowerController.generate('35-75'))
+        self.addMenuItem('Retraction Speed Tower (60-100 mm/s)', lambda: self._retractionSpeedTowerController.generate('60-100'))
+        self.addMenuItem('Retraction Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionSpeedTowerController.generate()))
         self.addMenuItem('  ', lambda: None)
+        self.addMenuItem('Temperature Tower (ABA)', lambda: self._tempTowerController.generate('aba'))
+        self.addMenuItem('Temperature Tower (ABS)', lambda: self._tempTowerController.generate('abs'))
+        self.addMenuItem('Temperature Tower (NYLON)', lambda: self._tempTowerController.generate('nylon'))
+        self.addMenuItem('Temperature Tower (PC)', lambda: self._tempTowerController.generate('pc'))
+        self.addMenuItem('Temperature Tower (PETG)', lambda: self._tempTowerController.generate('petg'))
+        self.addMenuItem('Temperature Tower (PLA)', lambda: self._tempTowerController.generate('pla'))
+        self.addMenuItem('Temperature Tower (PLA+)', lambda: self._tempTowerController.generate('pla+'))
+        self.addMenuItem('Temperature Tower (TPU)', lambda: self._tempTowerController.generate('tpu'))
+        self.addMenuItem('Temperature Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate()))
+        self.addMenuItem('   ', lambda: None)
         self.addMenuItem('Settings', lambda: self._settingsDialog.show())
 
-        # Create a temporary folder
-        self._temporaryFolder = tempfile.TemporaryDirectory()
-
-        # Initialize the OpenSCAD interface object
-        self._openScadInterface = OpenScadInterface.OpenScadInterface()
-
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
-        self._postProcessingCallback = None
+        self._towerControllerPostProcessingCallback = None
         self._importedNode = None
 
         # Keep track of whether a model has been generated and is in the scene
@@ -79,34 +86,20 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
-        CuraApplication.getInstance().mainWindowChanged.connect(self._createRemoveButton)
-
-        # Connect our post-processing capabilities to be called when printing starts
-        Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcess)
+        CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
 
 
 
-    _cachedPluginPath = None
     @property
-    def _pluginPath(self):
+    def _pluginPath(self)->str:
         ''' Returns the path to the plugin directory '''
 
-        if self._cachedPluginPath is None:
-            self._cachedPluginPath = PluginRegistry.getInstance().getPluginPath(self.getPluginId())
-        return self._cachedPluginPath
+        return PluginRegistry.getInstance().getPluginPath(self.getPluginId())
 
 
 
     @property
-    def _stlPath(self):
-        ''' Returns the path to the directory where STL models are generated '''
-
-        return self._temporaryFolder.name
-
-
-
-    @property
-    def _openScadSourcePath(self):
+    def _openScadSourcePath(self)->str:
         ''' Returns the path to the OpenSCAD source models'''
 
         return os.path.join(self._pluginPath, 'openscad')
@@ -114,7 +107,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     
     @property
-    def _guiPath(self):
+    def _guiPath(self)->str:
         ''' Returns the path to the GUI files directory '''
 
         return os.path.join(self._pluginPath, 'gui', f'qt{PYQT_VERSION}')
@@ -122,14 +115,25 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @property
-    def _settingsFilePath(self):
+    def _stlPath(self)->str:
+        ''' Returns the path where STL files are stored '''
+
+        return os.path.join(self._pluginPath, 'stl')
+
+
+
+    @property
+    def _settingsFilePath(self)->str:
         ''' Returns the path of the settings file '''
+
         return os.path.join(self._pluginPath, 'settings.json')
 
 
+
     _cachedRemoveModelsButton = None
+
     @property
-    def _removeModelsButton(self):
+    def _removeAutoTowerButton(self)->QObject:
         ''' Returns the button used to remove the Auto Tower from the scene '''
 
         if self._cachedRemoveModelsButton is None:
@@ -139,8 +143,9 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     _cachedSettingsDialog = None
+
     @property
-    def _settingsDialog(self):
+    def _settingsDialog(self)->QObject:
         ''' Returns the settings dialog '''
 
         if self._cachedSettingsDialog is None:
@@ -150,8 +155,9 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     _cachedWaitDialog = None
+
     @property
-    def _waitDialog(self):
+    def _waitDialog(self)->QObject:
         ''' Returns the dialog used to tell the user that generating a model may take a long time '''
 
         if self._cachedWaitDialog is None:
@@ -161,52 +167,57 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     _cachedFanTowerController = None
-    @property
-    def _fanTowerController(self):
-        ''' Returns the object used to create a Fan Tower '''
 
+    @property
+    def _fanTowerController(self)->FanTowerController:
+        ''' Returns the object used to create a Fan Tower '''
+        
         if self._cachedFanTowerController is None:
-            self._cachedFanTowerController = FanTowerController.FanTowerController(self._guiPath, self._modelCallback)
+            self._cachedFanTowerController = FanTowerController.FanTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedFanTowerController
 
 
 
     _cachedRetractionDistanceTowerController = None
+
     @property
-    def _retractionDistanceTowerController(self):
+    def _retractionDistanceTowerController(self)->RetractDistanceTowerController:
         ''' Returns the object used to create a Retraction Distance Tower '''
 
         if self._cachedRetractionDistanceTowerController is None:
-            self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._guiPath, self._modelCallback)
+            self._cachedRetractionDistanceTowerController = RetractDistanceTowerController.RetractDistanceTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedRetractionDistanceTowerController
 
 
 
     _cachedRetractionSpeedTowerController = None
+
     @property
-    def _retractionSpeedTowerController(self):
+    def _retractionSpeedTowerController(self)->RetractSpeedTowerController:
         ''' Returns the object used to create a Retraction Speed Tower '''
 
         if self._cachedRetractionSpeedTowerController is None:
-            self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._guiPath, self._modelCallback)
+            self._cachedRetractionSpeedTowerController = RetractSpeedTowerController.RetractSpeedTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedRetractionSpeedTowerController
 
 
 
     _cachedTempTowerController = None
+
     @property
-    def _tempTowerController(self):
+    def _tempTowerController(self)->TempTowerController:
         ''' Returns the object used to create a Temperature Tower '''
 
         if self._cachedTempTowerController is None:
-            self._cachedTempTowerController = TempTowerController.TempTowerController(self._guiPath, self._modelCallback)
+            self._cachedTempTowerController = TempTowerController.TempTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedTempTowerController
 
 
 
     _settingsTable = None
+
     @property
-    def _settings(self):
+    def _settings(self)->dict:
         ''' Provides lazy initialization of plugin settings '''
 
         if self._settingsTable == None:
@@ -214,24 +225,40 @@ class AutoTowersGenerator(QObject, Extension):
                 # Load settings from the settings file, if it exists
                 with open(self._settingsFilePath, 'r') as settingsFile:
                     self._settingsTable = json.load(settingsFile)
+
+                # Forward the OpenScad path to the OpenScadInterface object
+                self._openScadInterface.SetOpenScadPath(self._settingsTable['openscad path'])
+
             except:
                 # Initialize settings with default values
                 self._settingsTable = {
-                    'openscad path': '',
+                    'openscad path': self._openScadInterface.OpenScadPath,
                 }
 
         return self._settingsTable
 
 
 
+    _cachedOpenScadInterface = None
+    @property
+    def _openScadInterface(self)->OpenScadInterface.OpenScadInterface:
+        ''' Provides lazy instantiation of the OpenScad interface '''
+
+        if self._cachedOpenScadInterface is None:
+            self._cachedOpenScadInterface = OpenScadInterface.OpenScadInterface()
+
+        return self._cachedOpenScadInterface
+
+
+
     # The path to the OpenSCAD program
     openScadPathChanged = pyqtSignal()
-    
-
 
     # Called to set the OpenSCAD path
-    def setOpenScadPath(self, value):
-        # Ensure the path ends with the openscad executable
+    def setOpenScadPath(self, value)->None:
+        ''' Ensures an openscad path provided by the user is properly formatted '''
+
+        # Ensure the path ends with the openscad executable file name
         if value != '':
             if platform.system().lower() == 'windows':
                 if value.lower().endswith('openscad') == False and value.lower().endswith('openscad.exe') == False:
@@ -240,24 +267,24 @@ class AutoTowersGenerator(QObject, Extension):
                 if value.lower().endswith('openscad') == False:
                     value = os.path.join(value, 'openscad')
 
-        self._settings['openscad path'] = value
+        # Forward the OpenScad path to the OpenScadInterface object
+        self._openScadInterface.SetOpenScadPath(value)
+
+        # Notify listeners that the path has changed
         self.openScadPathChanged.emit()
-
-
 
     # Returns the OpenSCAD path
     @pyqtProperty(str, notify=openScadPathChanged, fset=setOpenScadPath)
-    def openScadPath(self) -> str:
-        if self._settings['openscad path'] != '':
-            return self._settings['openscad path']
-        else:
-            return self._openScadInterface.DefaultOpenScadPath
+    def openScadPath(self)->str:
+        ''' Provides access to the openscad path for the settings dialog ''' 
+
+        return self._openScadInterface.OpenScadPath
 
 
 
     autoTowerGeneratedChanged = pyqtSignal()
     @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
-    def autoTowerGenerated(self):
+    def autoTowerGenerated(self)->bool:
         ''' Used to show or hide the button for removing the generated Auto Tower '''
 
         return self._autoTowerGenerated
@@ -265,7 +292,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @pyqtSlot()
-    def removeButtonClicked(self):
+    def removeButtonClicked(self)->None:
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
         # Remove the tower
@@ -277,31 +304,39 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @pyqtSlot()
-    def saveSettings(self):
+    def saveSettings(self)->None:
         ''' Saves plugin settings to a json file so they persist between sessions '''
 
+        # Update the OpenScad path from the OpenScadInterface object
+        self._settings['openscad path'] = self._openScadInterface.OpenScadPath
+
+        # Save the settings to the settings file
         with open(self._settingsFilePath, 'w') as settingsFile:
             json.dump(self._settings, settingsFile)
 
 
 
-    def _executeIfOpenScadPathIsValid(self, function):
-        ''' Executes the specified function if the OpenSCAD path is valid
+    def _executeIfOpenScadPathIsValid(self, function)->None:
+        ''' Checks if the OpenScad path is valid and, if it is, executes the provided function
             This should be used to protect any function that relies on OpenSCAD '''
 
-        # If the OpenSCAD path is not valid, prompt the user to set it
-        if self.openScadPath == '':
-            Message('The OpenSCAD path was unable to be determined. Please configure it manually and try again.').show()
-            self._settingsDialog.show()
-
         # If the OpenSCAD path is valid, execute the function
-        else:
+        if self._openScadInterface.OpenScadPathValid:
             function()
 
+        # If the OpenSCAD path is not valid, prompt the user to set it
+        else:
+            message = 'This function requires OpenSCAD ((https://openscad.org/)\n'
+            message += 'Ensure it is installed and the path is set correctly in the plugin\n'
+            if self._openScadInterface.OpenScadPath != '':
+                message += f'The current path is {self._openScadInterface.OpenScadPath}\n'
+
+            Message(message, title=self._pluginName).show()
 
 
 
-    def _removeAutoTower(self):
+
+    def _removeAutoTower(self)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
 
         # Indicate that there is no longer an Auto Tower in the scene
@@ -312,7 +347,8 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerOperation.undo()
 
         # Remove the post-processing callback
-        self._postProcessingCallback = None
+        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
+        self._towerControllerPostProcessingCallback = None
 
         # Stop listening for machine and layer height changes
         try:
@@ -328,7 +364,8 @@ class AutoTowersGenerator(QObject, Extension):
             pass
 
 
-    def _createDialog(self, qml_filename):
+
+    def _createDialog(self, qml_filename)->QObject:
         ''' Creates a dialog object from a QML file name 
             The QML file is assumed to be in the GUI directory             
             Returns a dialog object, with this object assigned as the "manager" '''
@@ -339,32 +376,28 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _createRemoveButton(self):
+    def _displayRemoveAutoTowerButton(self)->None:
         ''' Adds a button to Cura's window to remove the Auto Tower '''
 
-        CuraApplication.getInstance().addAdditionalComponent('saveButton', self._removeModelsButton)
+        CuraApplication.getInstance().addAdditionalComponent('saveButton', self._removeAutoTowerButton)
 
 
 
-    def _generateStlFilename(self, openScadFilename, openScadParameters):
-        ''' Generates a (hopefully) unique STL filename from an OpenSCAD source file name and the parameters used to generate the STL model '''
+    def _loadStlCallback(self, stlFilePath, postProcessingCallback)->None:
+        ''' This callback is called by the tower model controller if a preset tower is requested '''
 
-        # Combine the OpenSCAD file name and the parameters into a single string and then generate a hash for it
-        # 64 bits is a bit of overkill, so it's cut down to make a smaller file name with a larger chance of name clashes
-        parameterValues = [str(value) for value in list(openScadParameters.values())]
-        stringToHash = openScadFilename + ' '.join(parameterValues)
-        hashedString = hashlib.sha256(stringToHash.encode()).hexdigest()
-        hashedInt = int(hashedString, 16)
-        halfHashedInt = hashedInt >> 128
-        halfHashedString = f'{halfHashedInt:x}'
-        
-        # The STL filename is the hashed string with a .stl extension
-        stlFilename = f'{halfHashedString}.stl'
-        return stlFilename
+        # If the file does not exist, display an error message
+        if os.path.isfile(stlFilePath) == False:
+            Logger.log('e', f'The preset file "{stlFilePath}" does not exist')
+            Message(f'The selected preset is not available', title = self._pluginName).show()
+            return
+
+        # Import the STL file into the scene
+        self._importStl(stlFilePath, postProcessingCallback)
 
 
 
-    def _modelCallback(self, openScadFilename, openScadParameters, _postProcessingCallback):
+    def _generateAndLoadStlCallback(self, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
         # Record the current layer height
@@ -385,38 +418,52 @@ class AutoTowersGenerator(QObject, Extension):
         
         # Compile the STL file name
         openScadFilePath = os.path.join(self._openScadSourcePath, openScadFilename)
-        stlFilename = self._generateStlFilename(openScadFilename, openScadParameters)
-        stlFilePath = os.path.join(self._stlPath, stlFilename)
+        stlFilename = 'custom_autotower.stl'
+        stlOutputDir = tempfile.TemporaryDirectory()
+        stlFilePath = os.path.join(stlOutputDir.name, stlFilename)
 
-        # If the needed STL file does not already exist, generate it from scratch
+        # Generate the STL file
+        # Since it can take a while to generate the STL file, do it in a separate thread to allow the GUI to remain responsive
+        Logger.log('d', f'Running OpenSCAD in the background')
+        
+        # Start the generation process
+        job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
+        job.run()
+
+        # Wait for OpenSCAD to finish
+        # This should probably be done by having a function called when the job finishes...
+        while (job.isRunning()):
+            pass
+        Logger.log('d', f'OpenSCAD finished')
+
+        # Make sure the STL file was generated
         if os.path.isfile(stlFilePath) == False:
-            # Since it can take a while to generate the STL file, do it in a separate thread to allow the GUI to remain responsive
-            Logger.log('d', f'Running OpenSCAD in the background')
-            
-            # Start the generation process
-            job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath, self.openScadPath)
-            job.run()
+            Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
+            errorMessage = self._openScadInterface.errorMessage
+            Message(f'OpenSCAD Failed with message:\n{errorMessage})', title = self._pluginName).show()
+            self._waitDialog.hide()
+            return
 
-            # Wait for OpenSCAD to finish
-            # This should probably be done by having a function called when the job finishes...
-            while (job.isRunning()):
-                pass
-            Logger.log('d', f'OpenSCAD finished')
+        # Import the STL file into the scene
+        self._importStl(stlFilePath, postProcessingCallback)
 
-            # Make sure the STL file was generated
-            if os.path.isfile(stlFilePath) == False:
-                Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
-                errorMessage = self._openScadInterface.errorMessage
-                Message(f'OpenSCAD Failed with message:\n{errorMessage})', title = self._pluginName).show()
-                self._waitDialog.hide()
-                return
+
+
+    def _importStl(self, stlFilePath, postProcessingCallback)->None:
+        ''' Imports an STL file into the scene '''
+
+        # Remove all models from the scene
+        self._autoTowerGenerated = False
+        CuraApplication.getInstance().deleteAll()
+        CuraApplication.getInstance().processEvents()
 
         # Import the STL file into the scene
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, False)
         CuraApplication.getInstance().processEvents()
 
         # Register the post-processing callback for this particular tower
-        self._postProcessingCallback = _postProcessingCallback
+        Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcess)
+        self._towerControllerPostProcessingCallback = postProcessingCallback
 
         # Register that the Auto Tower has been generated
         self._autoTowerGenerated = True
@@ -435,7 +482,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _onMachineChanged(self):
+    def _onMachineChanged(self)->None:
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
 
@@ -444,7 +491,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _onPrintSettingChanged(self, setting_key, property_name):
+    def _onPrintSettingChanged(self, setting_key, property_name)->None:
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
         # This check is redundant and probably not needed
@@ -467,34 +514,33 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _postProcess(self, output_device):
+    def _postProcess(self, output_device)->None:
         ''' This callback is called just before gcode is generated for the model 
             (this happens when the sliced model is sent to the printer or a file '''
 
-        # Proceed if a post-processing callback has been registered
-        if not self._postProcessingCallback is None:
+        # Retrieve the g-code from the scene
+        scene = Application.getInstance().getController().getScene()
 
-            # Proceed if there is g-code in the scene
-            scene = Application.getInstance().getController().getScene()
-            if hasattr(scene, 'gcode_dict'):
+        try:
+            # Proceed if the g-code is valid
+            gcode_dict = getattr(scene, 'gcode_dict')
+        except AttributeError:
+            # If there is no g-code, there's nothing more to do
+            return
 
-                # Proceed if the g-code is valid
-                gcode_dict = getattr(scene, 'gcode_dict')
-                if gcode_dict:
+        try:
+            # Retrieve the g-code for the current build plate
+            active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
+            gcode = gcode_dict[active_build_plate_id]
+        except TypeError:
+            # If there is no g-code for the current build plate, there's nothing more to do
+            return
 
-                    # Proceed if there is g-code for the current build plate
-                    active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
-                    gcode = gcode_dict[active_build_plate_id]
-                    if gcode:
+        # Proceed if the g-code has not already been post-processed
+        if self._gcodeProcessedMarker not in gcode[0]:
 
-                        # Proceed if the g-code has not already been post-processed
-                        if ';Post-processed by AutoTowersGenerator' not in gcode[0]:
+            # Mark the g-code as having been post-processed
+            gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
-                            # Call the callback to post-process the g-code
-                            gcode = self._postProcessingCallback(gcode)
-
-                            # Mark the g-code as having been post-processed
-                            gcode[0] += ';Post-processed by AutoTowersGenerator\n'
-
-                        else:
-                            Logger.log('e', 'G-code has already been post-processed')
+            # Call the callback to post-process the g-code
+            gcode = self._towerControllerPostProcessingCallback(gcode)

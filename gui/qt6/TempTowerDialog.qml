@@ -109,7 +109,7 @@ UM.Dialog
                 text: manager.towerDescriptionStr
                 onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
-        }
+       }
     }
 
     rightButtons: Button

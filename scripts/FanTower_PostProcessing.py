@@ -12,7 +12,7 @@ def execute(gcode, startPercent, percentChange, sectionLayers, baseLayers):
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] += f';FanTower: start fan % = {startPercent}, fan % change = {percentChange}\n'
+    gcode[0] = gcode[0] + f';FanTower: start fan % = {startPercent}, fan % change = {percentChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?

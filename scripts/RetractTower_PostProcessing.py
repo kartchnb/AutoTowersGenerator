@@ -108,7 +108,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     towerLabel = "speed" if towerType == "speed" else "dist"
 
     # Document the settings in the g-code
-    gcode[0] += f';RetractTower ({towerLabel}): start {towerLabel} = {startValue}, speed {towerLabel} = {valueChange}\n'
+    gcode[0] = gcode[0] + f';RetractTower ({towerLabel}): start {towerLabel} = {startValue}, speed {towerLabel} = {valueChange}\n'
 
     extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))

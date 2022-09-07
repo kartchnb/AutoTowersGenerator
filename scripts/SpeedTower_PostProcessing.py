@@ -17,7 +17,7 @@ def execute(self, gcode, startSpeed, speedChange, sectionLayers, baseLayers, tow
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] += f';SpeedTower ({towerType}): start speed = {startSpeed}, speed change = {speedChange}\n'
+    gcode[0] = gcode[0] + f';SpeedTower ({towerType}): start speed = {startSpeed}, speed change = {speedChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
