@@ -148,9 +148,9 @@ class AutoTowersGenerator(QObject, Extension):
     def _settingsDialog(self)->QObject:
         ''' Returns the settings dialog '''
 
-        # Make sure the settings are loaded
+        # Hack - Make sure the settings are loaded
         self._settings
-        
+
         if self._cachedSettingsDialog is None:
             self._cachedSettingsDialog = self._createDialog('SettingsDialog.qml')
         return self._cachedSettingsDialog
