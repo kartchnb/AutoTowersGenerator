@@ -9,23 +9,38 @@ UM.Dialog
     id: dialog
     title: "Generating Auto Tower"
 
-    minimumWidth: screenScaleFactor * 500;
-    minimumHeight: screenScaleFactor * 112;
-    width: minimumWidth
-    height: minimumHeight
+    width: screenScaleFactor * 445
+    height: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height)
+    minimumWidth: width
+    minimumHeight: height
+    maximumWidth: width
+    maximumHeight: height
     flags: Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint;
 
     RowLayout
     {
+        id: contents
+        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
         spacing: UM.Theme.getSize("default_margin").width
-        Layout.fillHeight: true
-        Layout.fillWidth: true
 
-        Image
+
+        Rectangle
         {
-            source: "../openscad.png"
+            Layout.preferredWidth: icon.width
+            Layout.preferredHeight: icon.height
+            Layout.fillHeight: true
+            color: UM.Theme.getColor("primary_button")
+
+            Image
+            {
+                id: icon
+                source: Qt.resolvedUrl("../openscad.png")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
-        Label
+
+       Label
         {
             Layout.fillHeight: true
             Layout.fillWidth: true

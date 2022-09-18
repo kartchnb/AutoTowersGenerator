@@ -9,27 +9,31 @@ UM.Dialog
     id: dialog
     title: "AutoTowersGenerator Settings"
 
-    minimumWidth: screenScaleFactor * 445;
-    minimumHeight: screenScaleFactor * 245;
+    minimumWidth: screenScaleFactor * 445
+    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     RowLayout
     {
-        anchors.fill: parent
+        id: contents
+        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
         spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
+            Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: "#00017b"
+            color: UM.Theme.getColor("primary_button")
 
             Image
             {
                 id: icon
-                source: "../plugin_icon.png"
+                source: Qt.resolvedUrl("../plugin_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         } 
 
@@ -50,16 +54,20 @@ UM.Dialog
             {
                 id: openScadPath
                 text: manager.openScadPath
-                //onTextChanged: if (manager.openScadPath != text) manager.openScadPath = text
             }
         }
     }
 
     rightButtons: Button
     {
-        id: generateButton
         text: "OK"
         onClicked: dialog.accept()
+    }
+
+    leftButtons: Button
+    {
+        text: "Cancel"
+        onClicked: dialog.reject()
     }
 
     onAccepted:

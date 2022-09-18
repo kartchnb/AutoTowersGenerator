@@ -10,30 +10,37 @@ UM.Dialog
     id: dialog
     title: "Retraction Tower (Speed)"
 
-    minimumWidth: screenScaleFactor * 435;
-    minimumHeight: screenScaleFactor * 245;
+    buttonSpacing: UM.Theme.getSize("default_margin").width
+    minimumWidth: screenScaleFactor * 445
+    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
+    backgroundColor: UM.Theme.getColor("main_background")
+
     // Define the width of the text input text boxes
-    property int numberInputWidth: screenScaleFactor * 100
+    property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
 
     RowLayout
     {
-        anchors.fill: parent
+        id: contents
+        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
         spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
+            Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: '#00017b'
+            color: UM.Theme.getColor("primary_button")
 
             Image
             {
                 id: icon
-                source: "../retracttower_icon.png"
+                source: Qt.resolvedUrl("../retracttower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
 
@@ -52,7 +59,6 @@ UM.Dialog
             }
             Cura.TextField
             {
-                id: startValueInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startSpeedStr
@@ -65,7 +71,6 @@ UM.Dialog
             }
             Cura.TextField
             {
-                id: endValueInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endSpeedStr
@@ -78,7 +83,6 @@ UM.Dialog
             }
             Cura.TextField
             {
-                id: valueChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.speedChangeStr
@@ -91,7 +95,6 @@ UM.Dialog
             }
             Cura.TextField
             {
-                id: towerDescriptionInput
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
                 onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
@@ -99,12 +102,19 @@ UM.Dialog
         }
     }
 
-    rightButtons: Button
-    {
-        id: generateButton
-        text: "Generate"
-        onClicked: dialog.accept()
-    }
+    rightButtons: 
+    [
+        Cura.SecondaryButton
+        {
+            text: "Cancel"
+            onClicked: dialog.reject()
+        },
+        Cura.PrimaryButton
+        {
+            text: "OK"
+            onClicked: dialog.accept()
+        }
+    ]
 
     onAccepted:
     {

@@ -9,31 +9,35 @@ UM.Dialog
     id: dialog
     title: "Temperature Tower"
 
-    minimumWidth: screenScaleFactor * 455
-    minimumHeight: screenScaleFactor * 300
+    minimumWidth: screenScaleFactor * 445
+    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     // Define the width of the text input text boxes
-    property int numberInputWidth: screenScaleFactor * 100
+    property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
 
     RowLayout
     {
-        anchors.fill: parent
+        id: contents
+        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
         spacing: UM.Theme.getSize("default_margin").width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
+            Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: '#00017b'
+            color: UM.Theme.getColor("primary_button")
 
             Image
             {
                 id: icon
-                source: "../temptower_icon.png"
+                source: Qt.resolvedUrl("../temptower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
-            }
+                anchors.horizontalCenter: parent.horizontalCenter
+           }
         }
 
         GridLayout
@@ -51,7 +55,6 @@ UM.Dialog
             }
             TextField
             {
-                id: startTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.startTemperatureStr
@@ -64,7 +67,6 @@ UM.Dialog
             }
             TextField
             {
-                id: endTempInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
                 text: manager.endTemperatureStr
@@ -77,7 +79,6 @@ UM.Dialog
             }
             TextField
             {
-                id: tempChangeInput
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: manager.temperatureChangeStr
@@ -90,9 +91,8 @@ UM.Dialog
             }
             TextField
             {
-                id: materialLabelInput
                 Layout.preferredWidth: numberInputWidth
-                inputMask: "Xxxx"
+                validator: RegExpValidator { regExp: /.{0,3}/ }
                 text: manager.materialLabelStr
                 onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
             }
@@ -113,9 +113,14 @@ UM.Dialog
 
     rightButtons: Button
     {
-        id: generateButton
-        text: "Generate"
+        text: "OK"
         onClicked: dialog.accept()
+    }
+
+    leftButtons: Button
+    {
+        text: "Cancel"
+        onClicked: dialog.reject()
     }
 
     onAccepted:
