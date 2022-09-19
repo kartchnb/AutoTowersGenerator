@@ -61,6 +61,12 @@ class RetractSpeedTowerController(QObject):
 
 
 
+    @staticmethod
+    def getPresetNames()->list:
+        return list(RetractSpeedTowerController._presetTables.keys())
+
+
+
     _cachedSettingsDialog = None
 
     @property
@@ -186,8 +192,11 @@ class RetractSpeedTowerController(QObject):
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
+        # Determine the tower name
+        towerName = f'Preset Retraction Speed Tower {presetName}'
+
         # Use the callback to load the preset STL file
-        self._loadStlCallback(stlFilePath, self.postProcess)
+        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
 
 
 
@@ -232,8 +241,11 @@ class RetractSpeedTowerController(QObject):
         openScadParameters ['Tower_Label'] = towerDescription
         openScadParameters ['Column_Label'] = 'SPD'
 
+        # Determine the tower name
+        towerName = f'Auto-Generated Retraction Speed Tower {startSpeed}-{endSpeed}x{speedChange}'
+
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 

@@ -24,49 +24,49 @@ class TempTowerController(QObject):
     _nominalSectionHeight = 8.0
 
     _presetTables = {
-        'aba': {
+        'ABA': {
             'filename': 'temptower-aba.stl',
             'start value': 260,
             'change value': -5,
         },
 
-        'abs': {
+        'ABS': {
             'filename': 'temptower-abs.stl',
             'start value': 250,
             'change value': -5,
         },
 
-        'nylon': {
+        'Nylon': {
             'filename': 'temptower-nylon.stl',
             'start value': 260,
             'change value': -5,
         },
 
-        'pc': {
+        'PC': {
             'filename': 'temptower-pc.stl',
             'start value': 310,
             'change value': -5,
         },
 
-        'petg': {
+        'PETG': {
             'filename': 'temptower-petg.stl',
             'start value': 250,
             'change value': -5,
         },
 
-        'pla': {
+        'PLA': {
             'filename': 'temptower-pla.stl',
             'start value': 230,
             'change value': -5,
         },
 
-        'pla+': {
+        'PLA+': {
             'filename': 'temptower-pla+.stl',
             'start value': 230,
             'change value': -5,
         },
 
-        'tpu': {
+        'TPU': {
             'filename': 'temptower-tpu.stl',
             'start value': 230,
             'change value': -5,
@@ -87,6 +87,12 @@ class TempTowerController(QObject):
         self._startTemperature = 0
         self._temperatureChange = 0
         self._baseLayers = 0
+
+
+
+    @staticmethod
+    def getPresetNames()->list:
+        return list(TempTowerController._presetTables.keys())
 
 
 
@@ -230,8 +236,11 @@ class TempTowerController(QObject):
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
+        # Determine the tower name
+        towerName = f'Preset Temperature Tower {presetName}'
+
         # Use the callback to load the preset STL file
-        self._loadStlCallback(stlFilePath, self.postProcess)
+        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
 
 
 
@@ -277,8 +286,11 @@ class TempTowerController(QObject):
         openScadParameters ['Column_Label'] = materialLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
+        # Determine the tower name
+        towerName = f'Auto-Generated Temperature Tower {startTemperature}-{endTemperature}x{temperatureChange}'
+
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 

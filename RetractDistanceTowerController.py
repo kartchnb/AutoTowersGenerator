@@ -61,6 +61,12 @@ class RetractDistanceTowerController(QObject):
 
 
 
+    @staticmethod
+    def getPresetNames()->list:
+        return list(RetractDistanceTowerController._presetTables.keys())
+
+
+
     _cachedSettingsDialog = None
 
     @property
@@ -186,8 +192,11 @@ class RetractDistanceTowerController(QObject):
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
+        # Determine the tower name
+        towerName = f'Preset Retraction Distance Tower {presetName}'
+
         # Use the callback to load the preset STL file
-        self._loadStlCallback(stlFilePath, self.postProcess)
+        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
 
 
 
@@ -232,8 +241,11 @@ class RetractDistanceTowerController(QObject):
         openScadParameters ['Tower_Label'] = towerDescription
         openScadParameters ['Column_Label'] = 'DIST'
 
+        # Determine the tower name
+        towerName = f'Auto-Generated Retraction Distance Tower {startDistance}-{endDistance}x{distanceChange}'
+
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 

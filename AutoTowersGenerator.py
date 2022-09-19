@@ -42,29 +42,30 @@ class AutoTowersGenerator(QObject, Extension):
         QObject.__init__(self)
         Extension.__init__(self)
 
-        # Add menu items for this plugin
+        # Add a menu for this plugin
         self.setMenuName('Auto Towers')
-        self.addMenuItem('Fan Tower (0-100%)', lambda: self._fanTowerController.generate('0-100'))
+
+        # Add menu entries for fan towers
+        for presetName in FanTowerController.FanTowerController.getPresetNames():
+            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
         self.addMenuItem('Fan Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
+        
+        # Add menu entires for retraction distance towers
         self.addMenuItem('', lambda: None)
-        self.addMenuItem('Retraction Distance Tower (1-6 mm)', lambda: self._retractionDistanceTowerController.generate('1-6'))
-        self.addMenuItem('Retraction Distance Tower (4-9 mm)', lambda: self._retractionDistanceTowerController.generate('4-9'))
-        self.addMenuItem('Retraction Distance Tower (7-12 mm)', lambda: self._retractionDistanceTowerController.generate('7-12'))
+        for presetName in RetractDistanceTowerController.RetractDistanceTowerController.getPresetNames():
+            self.addMenuItem(f'Retraction Distance Tower ({presetName})', lambda presetName=presetName: self._retractionDistanceTowerController.generate(presetName))
         self.addMenuItem('Retraction Distance Tower (Custom)', lambda: self._retractionDistanceTowerController.generate())
+
+        # Add menu entries for retraction speed towers
         self.addMenuItem(' ', lambda: None)
-        self.addMenuItem('Retraction Speed Tower (10-50 mm/s)', lambda: self._retractionSpeedTowerController.generate('10-50'))
-        self.addMenuItem('Retraction Speed Tower (35-75 mm/s)', lambda: self._retractionSpeedTowerController.generate('35-75'))
-        self.addMenuItem('Retraction Speed Tower (60-100 mm/s)', lambda: self._retractionSpeedTowerController.generate('60-100'))
+        for presetName in RetractSpeedTowerController.RetractSpeedTowerController.getPresetNames():
+            self.addMenuItem(f'Retraction Speed Tower ({presetName})', lambda presetName=presetName: self._retractionSpeedTowerController.generate(presetName))
         self.addMenuItem('Retraction Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionSpeedTowerController.generate()))
+        
+        # Add menu entries for temperature towers
         self.addMenuItem('  ', lambda: None)
-        self.addMenuItem('Temperature Tower (ABA)', lambda: self._tempTowerController.generate('aba'))
-        self.addMenuItem('Temperature Tower (ABS)', lambda: self._tempTowerController.generate('abs'))
-        self.addMenuItem('Temperature Tower (NYLON)', lambda: self._tempTowerController.generate('nylon'))
-        self.addMenuItem('Temperature Tower (PC)', lambda: self._tempTowerController.generate('pc'))
-        self.addMenuItem('Temperature Tower (PETG)', lambda: self._tempTowerController.generate('petg'))
-        self.addMenuItem('Temperature Tower (PLA)', lambda: self._tempTowerController.generate('pla'))
-        self.addMenuItem('Temperature Tower (PLA+)', lambda: self._tempTowerController.generate('pla+'))
-        self.addMenuItem('Temperature Tower (TPU)', lambda: self._tempTowerController.generate('tpu'))
+        for presetName in TempTowerController.TempTowerController.getPresetNames():
+            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
         self.addMenuItem('Temperature Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate()))
         self.addMenuItem('   ', lambda: None)
         self.addMenuItem('Settings', lambda: self._settingsDialog.show())
@@ -348,6 +349,9 @@ class AutoTowersGenerator(QObject, Extension):
         Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
         self._towerControllerPostProcessingCallback = None
 
+        # Clear the job name
+        CuraApplication.getInstance().getPrintInformation().setJobName('')
+
         # Stop listening for machine and layer height changes
         try:
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
@@ -381,7 +385,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _loadStlCallback(self, stlFilePath, postProcessingCallback)->None:
+    def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller if a preset tower is requested '''
 
         # If the file does not exist, display an error message
@@ -391,11 +395,11 @@ class AutoTowersGenerator(QObject, Extension):
             return
 
         # Import the STL file into the scene
-        self._importStl(stlFilePath, postProcessingCallback)
+        self._importStl(towerName, stlFilePath, postProcessingCallback)
 
 
 
-    def _generateAndLoadStlCallback(self, openScadFilename, openScadParameters, postProcessingCallback)->None:
+    def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
         # Record the current layer height
@@ -443,11 +447,11 @@ class AutoTowersGenerator(QObject, Extension):
             return
 
         # Import the STL file into the scene
-        self._importStl(stlFilePath, postProcessingCallback)
+        self._importStl(towerName, stlFilePath, postProcessingCallback)
 
 
 
-    def _importStl(self, stlFilePath, postProcessingCallback)->None:
+    def _importStl(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' Imports an STL file into the scene '''
 
         # Remove all models from the scene
@@ -477,6 +481,9 @@ class AutoTowersGenerator(QObject, Extension):
         # Display a warning if supports are enabled        
         if self._currentSupportEnabled == True:
             Message('The "Generate Support" option is selected. For best results, deselect this before printing').show()
+
+        # Rename the current print job
+        CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
 
 
 
@@ -509,7 +516,6 @@ class AutoTowersGenerator(QObject, Extension):
                     Message('The "Generate Support" option has been selected. For best results, deselect this before printing').show()
                 self._currentSupportEnabled = support_enabled
                 
-
 
 
     def _postProcess(self, output_device)->None:

@@ -50,6 +50,11 @@ class FanTowerController(QObject):
 
 
 
+    @staticmethod
+    def getPresetNames()->list:
+        return list(FanTowerController._presetTables.keys())
+
+
     _cachedSettingsDialog = None
 
     @property
@@ -175,8 +180,11 @@ class FanTowerController(QObject):
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
+        # Determine the tower name
+        towerName = f'Preset Fan Tower {presetName}'
+
         # Use the callback to load the preset STL file
-        self._loadStlCallback(stlFilePath, self.postProcess)
+        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
 
 
 
@@ -220,8 +228,11 @@ class FanTowerController(QObject):
         openScadParameters ['Tower_Label'] = towerDescription
         openScadParameters ['Column_Label'] = 'FAN'
 
+        # Determine the tower name
+        towerName = f'Auto-Generated Fan Tower {startPercent}-{endPercent}x{percentChange}'
+
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 
