@@ -5,6 +5,12 @@ Tower_Label = "";
 // The label to add to the bottom of the right column
 Column_Label = "";
 
+// Text to prefix to the section labels
+Section_Label_Prefix = "";
+
+// Text to suffix to the section labels
+Section_Label_Suffix = "";
+
 // The starting value (speed or distance) for the tower
 Starting_Value = 1.0;
 
@@ -30,7 +36,7 @@ Font = "Arial:style=Bold";
 Label_Sections = true;
 
 // The height of the section labels in relation to the height of each section
-Section_Label_Height_Multiplier = 0.301;
+Section_Label_Height_Multiplier = 0.401;
 
 // The height of the tower label in relation to the length of the column
 Tower_Label_Height_Multiplier = 0.601;
@@ -236,13 +242,14 @@ module Generate_Model()
     // Generate the text that will be carved into the square section column
     module Generate_SectionLabel(label)
     {
+        full_label = str(Section_Label_Prefix, label, Section_Label_Suffix);
         label_depth = Wall_Thickness/2;
 
         translate([-Tower_Width/2 + Cube_Size/2, -Cube_Size/2 - Iota, Cube_Size/2])
         rotate([90, 0, 0])
         translate([0, 0, -label_depth])
         linear_extrude(label_depth + Iota)
-            text(text=label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
+            text(text=full_label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
     }
 
 
@@ -250,7 +257,7 @@ module Generate_Model()
     // Generate the curved text that will be carved into the first rounded section column
     module Generate_ColumnLabel(label)
     {
-        // This function is rushed and hacky, but it works.
+        // This function is rushed and hacky, but it works
         // For now...
 
         letter_radius = Cube_Size/2 - Label_Depth;

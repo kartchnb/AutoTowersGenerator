@@ -5,6 +5,12 @@ Tower_Label = "";
 // The temperature the tower was printed at
 Temperature_Label = "";
 
+// Text to prefix to the section labels
+Section_Label_Prefix = "";
+
+// Text to suffix to the section labels
+Section_Label_Suffix = "";
+
 // The starting speed
 Starting_Speed = 20;
 
@@ -33,7 +39,7 @@ Label_Sections = true;
 Slope_Angle = 45.001;
 
 // The height of the section labels in relation to the height of each section
-Section_Label_Height_Multiplier = 0.301;
+Section_Label_Height_Multiplier = 0.401;
 
 // The height of the tower label in relation to the length of the column
 Tower_Label_Height_Multiplier = 0.601;
@@ -185,11 +191,13 @@ module Generate_Model()
     // Generate the text that will be carved into the square section column
     module Generate_SectionLabel(label)
     {
+        full_label = str(Section_Label_Prefix, label, Section_Label_Suffix);
+
         translate([0, Column_Size/2 - Panel_Inset + Label_Depth, (Section_Height - Cap_Height)/2])
         rotate([90, 0, 180])
         translate([0, 0, -Label_Depth])
         linear_extrude(Label_Depth)
-            text(text=label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
+            text(text=full_label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
     }
 
 

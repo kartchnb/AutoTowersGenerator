@@ -5,6 +5,12 @@ Tower_Label = "";
 // The label to add the to right column
 Column_Label = "";
 
+// Text to prefix to the section labels
+Section_Label_Prefix = "";
+
+// Text to suffix to the section labels
+Section_Label_Suffix = "";
+
 // The starting value (temperature or fan speed)
 Starting_Value = 220;
 
@@ -30,7 +36,7 @@ Font = "Arial:style=Bold";
 Label_Sections = true;
 
 // The height of the section labels in relation to the height of each section
-Section_Label_Height_Multiplier = 0.301;
+Section_Label_Height_Multiplier = 0.401;
 
 // The height of the tower label in relation to the length of the column
 Tower_Label_Height_Multiplier = 0.601;
@@ -265,11 +271,12 @@ module Generate_Model()
     // Generate the text that will be carved into the square section column
     module Generate_SectionLabel(label)
     {
+        full_label = str(Section_Label_Prefix, label, Section_Label_Suffix);
         translate([-Tower_Width/2 + Cube_Size/2, -Cube_Size/2 - Iota, Cube_Size/2])
         rotate([90, 0, 0])
         translate([0, 0, -Label_Depth])
         linear_extrude(Label_Depth + Iota)
-            text(text=label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
+            text(text=full_label, font=Font, size=Section_Label_Font_Size, halign="center", valign="center");
     }
 
 
