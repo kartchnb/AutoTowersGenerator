@@ -91,6 +91,18 @@ UM.Dialog
 
             UM.Label 
             { 
+                text: "Tower Label" 
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+            }
+
+            UM.Label 
+            { 
                 text: "Tower Description" 
             }
             Cura.TextField

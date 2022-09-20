@@ -11,7 +11,7 @@ UM.Dialog
     title: "Temperature Tower"
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
-    minimumWidth: screenScaleFactor * 455
+    minimumWidth: screenScaleFactor * 445
     minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
     maximumHeight: minimumHeight
     width: minimumWidth
@@ -89,14 +89,14 @@ UM.Dialog
 
             UM.Label
             {
-                text: "Material Label"
+                text: "Tower Label"
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.materialLabelStr
-                onTextChanged: if (manager.materialLabelStr != text) manager.materialLabelStr = text
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
 
             UM.Label

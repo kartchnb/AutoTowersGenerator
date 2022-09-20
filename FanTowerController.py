@@ -113,6 +113,21 @@ class FanTowerController(QObject):
 
 
 
+    # The label to carve at the bottom of the tower
+    _towerLabelStr = ''
+
+    towerLabelStrChanged = pyqtSignal()
+    
+    def setTowerLabelStr(self, value)->None:
+        self._towerLabelStr = value
+        self.towerLabelStrChanged.emit()
+
+    @pyqtProperty(str, notify=towerLabelStrChanged, fset=setTowerLabelStr)
+    def towerLabelStr(self)->str:
+        return self._towerLabelStr
+
+
+
     # The description to carve up the side of the tower
     _towerDescriptionStr = 'Fan'
 
@@ -195,6 +210,7 @@ class FanTowerController(QObject):
         startPercent = float(self.startPercentStr)
         endPercent = float(self.endPercentStr)
         percentChange = float(self.percentChangeStr)
+        towerLabel = self.towerLabelStr
         towerDescription = self.towerDescriptionStr
 
         # Query the current layer height
@@ -225,8 +241,8 @@ class FanTowerController(QObject):
         openScadParameters ['Value_Change'] = percentChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
+        openScadParameters ['Column_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
-        openScadParameters ['Column_Label'] = 'FAN'
 
         # Determine the tower name
         towerName = f'Auto-Generated Fan Tower {startPercent}-{endPercent}x{percentChange}'

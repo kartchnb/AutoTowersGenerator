@@ -1,23 +1,19 @@
-import QtQuick 6.0
-import QtQuick.Controls 6.0
-import QtQuick.Layouts 6.0
+import QtQuick 2.11
+import QtQuick.Controls 2.11
+import QtQuick.Layouts 1.11
 
-import UM 1.6 as UM
-import Cura 1.7 as Cura
+import UM 1.2 as UM
 
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower (Distance)"
+    title: "Retraction Tower"
 
-    buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
     minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
-
-    backgroundColor: UM.Theme.getColor("main_background")
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
@@ -52,48 +48,76 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
+ 
+            UM.Label
+            {
+                text: "Tower Type"
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    manager.towerType = model[currentIndex]["value"]
+                }
+            }
+
+            Label 
+            { 
+                text: "Starting Value" 
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.startValueStr
+                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
+            }
+
+            Label 
+            { 
+                text: "Ending Value" 
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
+                text: manager.endValueStr
+                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
+            }
+
+            Label 
+            { 
+                text: "Value Change" 
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.valueChangeStr
+                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
+            }
 
             UM.Label 
             { 
-                text: "Starting Distance" 
+                text: "Tower Label" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startDistanceStr
-                onTextChanged: if (manager.startDistanceStr != text) manager.startDistanceStr = text
+                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
 
-            UM.Label 
-            { 
-                text: "Ending Distance" 
-            }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endDistanceStr
-                onTextChanged: if (manager.endDistanceStr != text) manager.endDistanceStr = text
-            }
-
-            UM.Label 
-            { 
-                text: "Distance Change" 
-            }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.distanceChangeStr
-                onTextChanged: if (manager.distanceChangeStr != text) manager.distanceChangeStr = text
-            }
-
-            UM.Label 
+            Label 
             { 
                 text: "Tower Description" 
             }
-            Cura.TextField
+            TextField
             {
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
@@ -102,19 +126,17 @@ UM.Dialog
         }
     }
 
-    rightButtons: 
-    [
-        Cura.SecondaryButton
-        {
-            text: "Cancel"
-            onClicked: dialog.reject()
-        },
-        Cura.PrimaryButton
-        {
-            text: "OK"
-            onClicked: dialog.accept()
-        }
-    ]
+    rightButtons: Button
+    {
+        text: "OK"
+        onClicked: dialog.accept()
+    }
+
+    leftButtons: Button
+    {
+        text: "Cancel"
+        onClicked: dialog.reject()
+    }
 
     onAccepted:
     {

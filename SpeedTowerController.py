@@ -22,12 +22,12 @@ class SpeedTowerController(QObject):
     _qmlFilename = 'SpeedTowerDialog.qml'
 
     _towerTypesModel = [
-        {"value": "Speed"}, 
-        {"value": "Acceleration"}, 
-        {"value": "Jerk"}, 
-        {"value": "Junction"}, 
-        {"value": "Marlin Linear"}, 
-        {"value": "RepRap Pressure"},
+        {'value': 'Speed', 'label': 'SPEED'}, 
+        {'value': 'Acceleration', 'label': 'ACCELERATION'}, 
+        {'value': 'Jerk', 'label': 'JERK'}, 
+        {'value': 'Junction', 'label': 'JUNCTION'}, 
+        {'value': 'Marlin Linear', 'label': 'MARLIN LINEAR'}, 
+        {'value': 'RepRap Pressure', 'label': 'REPRAP PRESSURE'},
     ]
 
     _nominalBaseHeight = 0.8
@@ -70,6 +70,7 @@ class SpeedTowerController(QObject):
         self._startValue = 0
         self._valueChange = 0
         self._baseLayers = 0
+        self._sectionLayers = 0
 
 
 
@@ -271,7 +272,7 @@ class SpeedTowerController(QObject):
         temperatureLabel = self.temperatureLabelStr
 
         # Query the current layer height
-        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")
+        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty('layer_height', 'value')
 
         # Correct the base height to ensure an integer number of layers in the base
         self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up

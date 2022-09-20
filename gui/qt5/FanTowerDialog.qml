@@ -87,6 +87,18 @@ UM.Dialog
 
             Label 
             { 
+                text: "Tower Label" 
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /.{0,3}/ }
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+            }
+
+            Label 
+            { 
                 text: "Tower Description" 
             }
             TextField

@@ -61,9 +61,6 @@ UM.Dialog
 
                 onCurrentIndexChanged: 
                 {
-                    // If the tower label is tracking the tower type, update it to match the new selection
-                    if (manager.towerLabelStr == manager.towerType) manager.towerLabelStr = model[currentIndex]["value"]
-                    
                     manager.towerType = model[currentIndex]["value"]
                 }
             }

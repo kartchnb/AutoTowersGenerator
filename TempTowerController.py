@@ -155,17 +155,17 @@ class TempTowerController(QObject):
 
 
     # The material label to add to the tower
-    _materialLabelStr = ''
+    _towerLabelStr = ''
 
-    materialLabelStrChanged = pyqtSignal()
+    towerLabelStrChanged = pyqtSignal()
     
     def setMaterialLabelStr(self, value)->None:
-        self._materialLabelStr = value
-        self.materialLabelStrChanged.emit()
+        self._towerLabelStr = value
+        self.towerLabelStrChanged.emit()
 
-    @pyqtProperty(str, notify=materialLabelStrChanged, fset=setMaterialLabelStr)
-    def materialLabelStr(self)->str:
-        return self._materialLabelStr
+    @pyqtProperty(str, notify=towerLabelStrChanged, fset=setMaterialLabelStr)
+    def towerLabelStr(self)->str:
+        return self._towerLabelStr
 
 
 
@@ -251,7 +251,7 @@ class TempTowerController(QObject):
         startTemperature = float(self.startTemperatureStr)
         endTemperature = float(self.endTemperatureStr)
         temperatureChange = float(self.temperatureChangeStr)
-        materialLabel = self.materialLabelStr
+        towerLabel = self.towerLabelStr
         towerDescription = self.towerDescriptionStr
 
         # Query the current layer height
@@ -282,7 +282,7 @@ class TempTowerController(QObject):
         openScadParameters ['Value_Change'] = temperatureChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
-        openScadParameters ['Column_Label'] = materialLabel
+        openScadParameters ['Column_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
         # Determine the tower name

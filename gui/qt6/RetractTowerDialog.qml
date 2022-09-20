@@ -8,7 +8,7 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower (Speed)"
+    title: "Retraction Tower"
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
@@ -52,41 +52,57 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
+ 
+            UM.Label
+            {
+                text: "Tower Type"
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    manager.towerType = model[currentIndex]["value"]
+                }
+            }
 
             UM.Label 
             { 
-                text: "Starting Speed" 
+                text: "Starting Value" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startSpeedStr
-                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
+                text: manager.startValueStr
+                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
             }
 
             UM.Label 
             { 
-                text: "Ending Speed" 
+                text: "Ending Value" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endSpeedStr
-                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
+                text: manager.endValueStr
+                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
             }
 
             UM.Label 
             { 
-                text: "Speed Change" 
+                text: "Value Change" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.speedChangeStr
-                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
+                text: manager.valueChangeStr
+                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
             }
 
             UM.Label 
