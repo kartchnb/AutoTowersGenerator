@@ -1,4 +1,3 @@
-// This dialog is a placeholder for when I get around to incorporating a speed tower
 import QtQuick 6.0
 import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
@@ -54,13 +53,23 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            UM.Label 
-            { 
-                text: "Speed Type to Control" 
-            }
-            ComboBox 
+            UM.Label
             {
-                model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
+                text: "Tower Type"
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    // If the tower label is tracking the tower type, update it to match the new selection
+                    if (manager.towerLabelStr == manager.towerType) manager.towerLabelStr = model[currentIndex]["value"]
+
+                    manager.towerType = model[currentIndex]["value"]
+                }
             }
 
             UM.Label 
@@ -71,7 +80,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: "8"
+                text: manager.startSpeedStr
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
             UM.Label 
@@ -82,7 +92,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: "32"
+                text: manager.endSpeedStr
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
             UM.Label 
@@ -93,17 +104,30 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "4"
+                text: manager.speedChangeStr
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
     
             UM.Label 
             { 
-                text: "Tower Description" 
+                text: "Tower Label" 
             }
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+            }
+    
+            UM.Label 
+            { 
+                text: "Side Label" 
+            }
+            Cura.TextField
+            {
+                Layout.fillWidth: true
+                text: manager.temperatureLabelStr
+                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
             }
         }
     }

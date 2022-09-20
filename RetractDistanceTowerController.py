@@ -25,19 +25,19 @@ class RetractDistanceTowerController(QObject):
 
     _presetTables = {
         '1-6': {
-            'filename': 'retractdistancetower-1-6.stl',
+            'filename': 'retracttower distance 1-6.stl',
             'start value': 1,
             'change value': 1,
         },
 
         '4-9': {
-            'filename': 'retractdistancetower-4-9.stl',
+            'filename': 'retracttower distance 4-9.stl',
             'start value': 4,
             'change value': 1,
         },
 
         '7-12': {
-            'filename': 'retractdistancetower-7-12.stl',
+            'filename': 'retracttower distance 7-12.stl',
             'start value': 7,
             'change value': 1,
         },
@@ -46,7 +46,7 @@ class RetractDistanceTowerController(QObject):
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        QObject.__init__(self)
+        super().__init__()
 
         self._loadStlCallback = loadStlCallback
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
@@ -126,7 +126,7 @@ class RetractDistanceTowerController(QObject):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = ''
+    _towerDescriptionStr = 'Retraction'
 
     towerDescriptionStrChanged = pyqtSignal()
     
@@ -158,7 +158,7 @@ class RetractDistanceTowerController(QObject):
         try:
             presetTable = self._presetTables[presetName]
         except KeyError:
-            Logger.log('e', f'A RetractDistanceTower preset named "{presetName}" was requested, but has not been correctly defined')
+            Logger.log('e', f'A RetractDistanceTower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset's file name
@@ -168,14 +168,14 @@ class RetractDistanceTowerController(QObject):
             Logger.log('e', f'The "filename" entry for RetractDistanceTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's starting fan percent
+        # Load the preset's starting distance
         try:
             self._startDistance = presetTable['start value']
         except KeyError:
             Logger.log('e', f'The "start value" for RetractDistanceTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's fan change percent
+        # Load the preset's distance change value
         try:
             self._distanceChange = presetTable['change value']
         except KeyError:
@@ -200,7 +200,6 @@ class RetractDistanceTowerController(QObject):
 
 
 
-    # This function is called when the 'Generate' button on the temp tower settings dialog is clicked
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
@@ -253,9 +252,6 @@ class RetractDistanceTowerController(QObject):
     # provided as part of 5axes' CalibrationShapes plugin
     def postProcess(self, gcode)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
-        # Determine the parameters for the tower
-        startDistance = float(self.startDistanceStr)
-        distanceChange = float(self.distanceChangeStr)
 
         # Call the post-processing script
         gcode = RetractTower_PostProcessing.execute(gcode, self._startDistance, self._distanceChange, self._sectionLayers, self._baseLayers, 'distance')

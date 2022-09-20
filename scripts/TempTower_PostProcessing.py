@@ -1,19 +1,25 @@
-# This script was heavily adapted from the TempFanTower script developed by
-# 5axes as part of his excellent CalibrationShapes plugin
+# This script was adapted (although largely taken wholesale) from the 
+# TempFanTower script developed by 5axes as part of his excellent 
+# CalibrationShapes plugin
+#
+# Version 2.0 - 17 Sep 2022: 
+#   Updates as part of the plugin upgrade for Cura 5.1
 
 from UM.Logger import Logger
 
-__version__ = '1.0'
+__version__ = '2.0'
 
-def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
-    Logger.log('d', 'Begin TempTower post-processing')
-    Logger.log('d', f'Starting temperature = {startTemp}')
-    Logger.log('d', f'Temperature change = {tempChange}')
+
+
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
+    Logger.log('d', 'AutoTowersGenerator beginning TempTower post-processing')
+    Logger.log('d', f'Starting temperature = {startValue}')
+    Logger.log('d', f'Temperature change = {valueChange}')
     Logger.log('d', f'Base layers = {baseLayers}')
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';TempTower start temp = {startTemp}, temp change = {tempChange}\n'
+    gcode[0] = gcode[0] + f';TempTower start temp = {startValue}, temp change = {valueChange}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
@@ -22,7 +28,7 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
     baseLayers += 2
 
     # Start at the selected starting temperature
-    currentTemp = startTemp
+    currentValue = startValue
 
     # Iterate over each layer in the g-code
     for layer in gcode:
@@ -37,20 +43,20 @@ def execute(gcode, startTemp, tempChange, sectionLayers, baseLayers):
 
                 # If the end of the base has been reached, start modifying the temperature
                 if (layerIndex == baseLayers):
-                    Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentTemp}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; AutoTowersGenerator Setting temperature to {currentTemp} for first section')
-                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp} ; AutoTowersGenerator Added')
+                    Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentValue}')
+                    lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for first section')
+                    lines.insert(lineIndex + 2, f'M117 Temp {currentValue} ; AutoTowersGenerator added')
 
                 # If the end of a section has been reached, decrease the temperature
                 if ((layerIndex - baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
-                    currentTemp += tempChange
-                    Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentTemp}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentTemp} ; AutoTowersGenerator Setting temperature to {currentTemp} for next section')
-                    lines.insert(lineIndex + 2, f'M117 Temp {currentTemp} ; AutoTowersGenerator Addeds')
+                    currentValue += valueChange
+                    Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentValue}')
+                    lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for next section')
+                    lines.insert(lineIndex + 2, f'M117 Temp {currentValue} ; AutoTowersGenerator addeds')
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result
 
-    Logger.log('d', 'End Temp Tower post-processing')
+    Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     
     return gcode

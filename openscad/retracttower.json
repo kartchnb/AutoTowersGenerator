@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "Distance 1-6": {
+        "retracttower distance 1-6": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -12,13 +12,13 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "1",
-            "Tower_Label": "Retract Dist",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "Distance 4-9": {
+        "retracttower distance 4-9": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -30,13 +30,13 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "4",
-            "Tower_Label": "Retract Dist",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "Distance 7-12": {
+        "retracttower distance 7-12": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -48,13 +48,13 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "7",
-            "Tower_Label": "Retract Dist",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "Speed 10-50": {
+        "retracttower speed 10-50": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
@@ -66,13 +66,13 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "10",
-            "Tower_Label": "Retract Speed",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "10",
             "Wall_Thickness": "0.6"
         },
-        "Speed 35-75": {
+        "retracttower speed 35-75": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
@@ -84,13 +84,13 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "35",
-            "Tower_Label": "Retract Speed",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "10",
             "Wall_Thickness": "0.6"
         },
-        "Speed 60-100": {
+        "retracttower speed 60-100": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
@@ -102,7 +102,7 @@
             "Section_Height": "8",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "60",
-            "Tower_Label": "Retract Speed",
+            "Tower_Label": "Retraction",
             "Tower_Label_Height_Multiplier": "0.6",
             "Tower_Width_Multiplier": "5.0",
             "Value_Change": "10",

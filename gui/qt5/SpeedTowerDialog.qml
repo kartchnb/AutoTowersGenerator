@@ -1,4 +1,3 @@
-// This dialog is a placeholder for when I get around to incorporating a speed tower
 import QtQuick 2.11
 import QtQuick.Controls 2.11
 import QtQuick.Layouts 1.11
@@ -50,13 +49,23 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label 
-            { 
-                text: "Speed Type to Control" 
-            }
-            ComboBox 
+            Label
             {
-                model: ["acceleration", "jerk", "junction", "Marlin linear", "RepRap pressure"]
+                text: "Tower Type"
+            }
+            ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    // If the tower label is tracking the tower type, update it to match the new selection
+                    if (manager.towerLabelStr == manager.towerType) manager.towerLabelStr = model[currentIndex]["value"]
+                    
+                    manager.towerType = model[currentIndex]["value"]
+                }
             }
 
             Label 
@@ -67,7 +76,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "8"
+                text: manager.startSpeedStr
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
             Label 
@@ -78,7 +88,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: "32"
+                text: manager.endSpeedStr
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
             Label 
@@ -89,17 +100,30 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: "4"
+                text: manager.speedChangeStr
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
     
             Label 
             { 
-                text: "Tower Description" 
+                text: "Tower Label" 
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: ""
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+            }
+    
+            Label 
+            { 
+                text: "Side Label" 
+            }
+            TextField
+            {
+                Layout.fillWidth: true
+                text: manager.temperatureLabelStr
+                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
             }
         }
     }

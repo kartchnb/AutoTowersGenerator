@@ -11,14 +11,14 @@ Section_Label_Prefix = "";
 // Text to suffix to the section labels
 Section_Label_Suffix = "";
 
-// The starting speed
-Starting_Speed = 20;
+// The starting value
+Starting_Value = 20;
 
-// The ending speed
-Ending_Speed = 100;
+// The ending value
+Ending_Value = 100;
 
-// The amount to change the speed between sections
-Speed_Change = 10;
+// The amount to change the value between sections
+Value_Change = 10;
 
 // The height of the base
 Base_Height = 0.801;
@@ -87,12 +87,12 @@ Screenshot_Vpt = [ 0.00, 0.00, 15.00 ];
 $fn = $preview ? Preview_Quality_Value : Render_Quality_Value;
 
 // Ensure the value change has the correct sign
-Speed_Change_Corrected = Ending_Speed > Starting_Speed
-    ? abs(Speed_Change)
-    : -abs(Speed_Change);
+Value_Change_Corrected = Ending_Value > Starting_Value
+    ? abs(Value_Change)
+    : -abs(Value_Change);
 
 // Determine how many sections to generate
-Section_Count = ceil(abs(Ending_Speed - Starting_Speed) / abs(Speed_Change) + 1);
+Section_Count = ceil(abs(Ending_Value - Starting_Value) / abs(Value_Change) + 1);
 
 // Determine the size (width and length) of each column cube
 Column_Size = Section_Height*1.5;
@@ -140,7 +140,7 @@ module Generate_Model()
         for (section = [0: Section_Count - 1])
         {
             // Determine the value for this section
-            value = Starting_Speed + (Speed_Change_Corrected * section);
+            value = Starting_Value + (Value_Change_Corrected * section);
 
             // Determine the offset of the section
             z_offset = section*Section_Height;
@@ -253,7 +253,8 @@ module Generate_Model()
 
 
 // Generate the model
-Generate_Model();
+rotate([0, 0, 180])
+    Generate_Model();
 
 // Orient the viewport
 $vpd = Orient_for_Screenshot ? Screenshot_Vpd : $vpd;

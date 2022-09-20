@@ -27,7 +27,7 @@ class FanTowerController(QObject):
 
     _presetTables = {
         '0-100': {
-            'filename': 'fantower-0-100.stl',
+            'filename': 'fantower 0-100.stl',
             'start value': 0,
             'change value': 20,
         },
@@ -35,7 +35,7 @@ class FanTowerController(QObject):
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        QObject.__init__(self)
+        super().__init__()
 
         self._loadStlCallback = loadStlCallback
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
@@ -114,7 +114,7 @@ class FanTowerController(QObject):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = ''
+    _towerDescriptionStr = 'Fan'
 
     towerDescriptionStrChanged = pyqtSignal()
     
@@ -146,7 +146,7 @@ class FanTowerController(QObject):
         try:
             presetTable = self._presetTables[presetName]
         except KeyError:
-            Logger.log('e', f'A FanTower preset named "{presetName}" was requested, but has not been correctly defined')
+            Logger.log('e', f'A FanTower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset's file name
@@ -238,6 +238,7 @@ class FanTowerController(QObject):
 
     def postProcess(self, gcode)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
+        
         # Call the post-processing script
         gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers)
 

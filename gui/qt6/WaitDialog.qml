@@ -7,7 +7,7 @@ import UM 1.6 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Generating Auto Tower"
+    title: "Generating the Tower"
 
     width: screenScaleFactor * 445
     height: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height)

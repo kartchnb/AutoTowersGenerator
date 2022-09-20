@@ -25,49 +25,49 @@ class TempTowerController(QObject):
 
     _presetTables = {
         'ABA': {
-            'filename': 'temptower-aba.stl',
+            'filename': 'temptower aba.stl',
             'start value': 260,
             'change value': -5,
         },
 
         'ABS': {
-            'filename': 'temptower-abs.stl',
+            'filename': 'temptower abs.stl',
             'start value': 250,
             'change value': -5,
         },
 
         'Nylon': {
-            'filename': 'temptower-nylon.stl',
+            'filename': 'temptower nylon.stl',
             'start value': 260,
             'change value': -5,
         },
 
         'PC': {
-            'filename': 'temptower-pc.stl',
+            'filename': 'temptower pc.stl',
             'start value': 310,
             'change value': -5,
         },
 
         'PETG': {
-            'filename': 'temptower-petg.stl',
+            'filename': 'temptower petg.stl',
             'start value': 250,
             'change value': -5,
         },
 
         'PLA': {
-            'filename': 'temptower-pla.stl',
+            'filename': 'temptower pla.stl',
             'start value': 230,
             'change value': -5,
         },
 
         'PLA+': {
-            'filename': 'temptower-pla+.stl',
+            'filename': 'temptower pla+.stl',
             'start value': 230,
             'change value': -5,
         },
 
         'TPU': {
-            'filename': 'temptower-tpu.stl',
+            'filename': 'temptower tpu.stl',
             'start value': 230,
             'change value': -5,
         },
@@ -76,7 +76,7 @@ class TempTowerController(QObject):
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        QObject.__init__(self)
+        super().__init__()
 
         self._loadStlCallback = loadStlCallback
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
@@ -170,7 +170,7 @@ class TempTowerController(QObject):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = ''
+    _towerDescriptionStr = 'Temperature'
 
     towerDescriptionStrChanged = pyqtSignal()
     
@@ -202,7 +202,7 @@ class TempTowerController(QObject):
         try:
             presetTable = self._presetTables[presetName]
         except KeyError:
-            Logger.log('e', f'A TempTower preset named "{presetName}" was requested, but has not been correctly defined')
+            Logger.log('e', f'A TempTower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset's file name
@@ -212,14 +212,14 @@ class TempTowerController(QObject):
             Logger.log('e', f'The "filename" entry for TempTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's starting fan percent
+        # Load the preset's starting temperature
         try:
             self._startTemperature = presetTable['start value']
         except KeyError:
             Logger.log('e', f'The "start value" for TempTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's fan change percent
+        # Load the preset's temperature change value
         try:
             self._temperatureChange = presetTable['change value']
         except KeyError:
@@ -244,7 +244,6 @@ class TempTowerController(QObject):
 
 
 
-    # This function is called when the "Generate" button on the temp tower settings dialog is clicked
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
@@ -297,9 +296,6 @@ class TempTowerController(QObject):
     # This function is called by the main script when it's time to post-process the tower model
     def postProcess(self, gcode)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
-        # Read the parameters from the dialog
-        startTemperature = float(self.startTemperatureStr)
-        temperatureChange = float(self.temperatureChangeStr)
 
         # Call the post-processing script
         gcode = TempTower_PostProcessing.execute(gcode, self._startTemperature, self._temperatureChange, self._sectionLayers, self._baseLayers)

@@ -27,6 +27,7 @@ from . import OpenScadJob
 from . import FanTowerController
 from . import RetractDistanceTowerController
 from . import RetractSpeedTowerController
+from . import SpeedTowerController
 from . import TempTowerController
 
 
@@ -44,6 +45,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add a menu for this plugin
         self.setMenuName('Auto Towers')
+        sectionCount = 0
 
         # Add menu entries for fan towers
         for presetName in FanTowerController.FanTowerController.getPresetNames():
@@ -51,23 +53,36 @@ class AutoTowersGenerator(QObject, Extension):
         self.addMenuItem('Fan Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
         
         # Add menu entires for retraction distance towers
-        self.addMenuItem('', lambda: None)
+        self.addMenuItem(' ' * sectionCount, lambda: None)
+        sectionCount += 1
         for presetName in RetractDistanceTowerController.RetractDistanceTowerController.getPresetNames():
             self.addMenuItem(f'Retraction Distance Tower ({presetName})', lambda presetName=presetName: self._retractionDistanceTowerController.generate(presetName))
         self.addMenuItem('Retraction Distance Tower (Custom)', lambda: self._retractionDistanceTowerController.generate())
 
         # Add menu entries for retraction speed towers
-        self.addMenuItem(' ', lambda: None)
+        self.addMenuItem(' ' * sectionCount, lambda: None)
+        sectionCount += 1
         for presetName in RetractSpeedTowerController.RetractSpeedTowerController.getPresetNames():
             self.addMenuItem(f'Retraction Speed Tower ({presetName})', lambda presetName=presetName: self._retractionSpeedTowerController.generate(presetName))
         self.addMenuItem('Retraction Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._retractionSpeedTowerController.generate()))
         
+        # Add menu entries for speed towers
+        self.addMenuItem(' ' * sectionCount, lambda: None)
+        sectionCount += 1
+        for presetName in SpeedTowerController.SpeedTowerController.getPresetNames():
+            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
+        self.addMenuItem('Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._speedTowerController.generate()))
+
         # Add menu entries for temperature towers
-        self.addMenuItem('  ', lambda: None)
+        self.addMenuItem(' ' * sectionCount, lambda: None)
+        sectionCount += 1
         for presetName in TempTowerController.TempTowerController.getPresetNames():
             self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
         self.addMenuItem('Temperature Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate()))
-        self.addMenuItem('   ', lambda: None)
+
+        # Add a menu item for the settings dialog
+        self.addMenuItem(' ' * sectionCount, lambda: None)
+        sectionCount += 1
         self.addMenuItem('Settings', lambda: self._settingsDialog.show())
 
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
@@ -173,7 +188,7 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedFanTowerController = None
 
     @property
-    def _fanTowerController(self)->FanTowerController:
+    def _fanTowerController(self)->FanTowerController.FanTowerController:
         ''' Returns the object used to create a Fan Tower '''
         
         if self._cachedFanTowerController is None:
@@ -185,7 +200,7 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedRetractionDistanceTowerController = None
 
     @property
-    def _retractionDistanceTowerController(self)->RetractDistanceTowerController:
+    def _retractionDistanceTowerController(self)->RetractDistanceTowerController.RetractDistanceTowerController:
         ''' Returns the object used to create a Retraction Distance Tower '''
 
         if self._cachedRetractionDistanceTowerController is None:
@@ -197,7 +212,7 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedRetractionSpeedTowerController = None
 
     @property
-    def _retractionSpeedTowerController(self)->RetractSpeedTowerController:
+    def _retractionSpeedTowerController(self)->RetractSpeedTowerController.RetractSpeedTowerController:
         ''' Returns the object used to create a Retraction Speed Tower '''
 
         if self._cachedRetractionSpeedTowerController is None:
@@ -206,10 +221,22 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _cachedSpeedTowerController = None
+
+    @property
+    def _speedTowerController(self)->SpeedTowerController.SpeedTowerController:
+        ''' Returns the object used to create a Speed Tower '''
+
+        if self._cachedSpeedTowerController is None:
+            self._cachedSpeedTowerController = SpeedTowerController.SpeedTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+        return self._cachedSpeedTowerController
+
+
+
     _cachedTempTowerController = None
 
     @property
-    def _tempTowerController(self)->TempTowerController:
+    def _tempTowerController(self)->TempTowerController.TempTowerController:
         ''' Returns the object used to create a Temperature Tower '''
 
         if self._cachedTempTowerController is None:
