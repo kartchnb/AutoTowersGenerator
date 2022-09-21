@@ -34,7 +34,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../openscad.png")
+                source: Qt.resolvedUrl("../../Images/openscad_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }

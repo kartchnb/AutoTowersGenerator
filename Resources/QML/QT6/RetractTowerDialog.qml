@@ -38,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../retracttower_icon.png")
+                source: Qt.resolvedUrl("../../Images/retracttower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }

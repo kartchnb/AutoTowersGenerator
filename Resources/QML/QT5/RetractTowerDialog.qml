@@ -7,7 +7,7 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Temperature Tower"
+    title: "Retraction Tower"
 
     minimumWidth: screenScaleFactor * 445
     minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
@@ -34,10 +34,10 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../temptower_icon.png")
+                source: Qt.resolvedUrl("../../Images/retracttower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-           }
+            }
         }
 
         GridLayout
@@ -48,58 +48,74 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
-
-            Label
+ 
+            UM.Label
             {
-                text: "Starting Temperature"
+                text: "Tower Type"
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    manager.towerType = model[currentIndex]["value"]
+                }
+            }
+
+            Label 
+            { 
+                text: "Starting Value" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startTemperatureStr
-                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
+                text: manager.startValueStr
+                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
             }
 
-            Label
-            {
-                text: "Ending Temperature"
+            Label 
+            { 
+                text: "Ending Value" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endTemperatureStr
-                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
+                text: manager.endValueStr
+                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
             }
 
-            Label
-            {
-                text: "Temperature Change"
+            Label 
+            { 
+                text: "Value Change" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.temperatureChangeStr
-                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
+                text: manager.valueChangeStr
+                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
             }
 
-            Label
-            {
-                text: "Tower Label"
+            UM.Label 
+            { 
+                text: "Tower Label" 
             }
-            TextField
+            Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /.{0,3}/ }
+                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
 
-            Label
-            {
-                text: "Tower Description"
+            Label 
+            { 
+                text: "Tower Description" 
             }
             TextField
             {

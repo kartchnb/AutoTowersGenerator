@@ -7,7 +7,7 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower"
+    title: "Speed Tower"
 
     minimumWidth: screenScaleFactor * 445
     minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
@@ -34,7 +34,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../retracttower_icon.png")
+                source: Qt.resolvedUrl("../../Images/speedtower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -48,12 +48,12 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
- 
-            UM.Label
+
+            Label
             {
                 text: "Tower Type"
             }
-            Cura.ComboBox
+            ComboBox
             {
                 Layout.fillWidth: true
                 model: manager.towerTypesModel
@@ -67,61 +67,60 @@ UM.Dialog
 
             Label 
             { 
-                text: "Starting Value" 
+                text: "Starting Speed" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startValueStr
-                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
+                text: manager.startSpeedStr
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
             Label 
             { 
-                text: "Ending Value" 
+                text: "Ending Speed" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endValueStr
-                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
+                text: manager.endSpeedStr
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
             Label 
             { 
-                text: "Value Change" 
+                text: "Speed Change" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.valueChangeStr
-                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
+                text: manager.speedChangeStr
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
-
-            UM.Label 
-            { 
-                text: "Tower Label" 
-            }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
-            }
-
+    
             Label 
             { 
-                text: "Tower Description" 
+                text: "Tower Label" 
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+            }
+    
+            Label 
+            { 
+                text: "Side Label" 
+            }
+            TextField
+            {
+                Layout.fillWidth: true
+                text: manager.temperatureLabelStr
+                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
             }
         }
     }

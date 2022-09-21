@@ -8,7 +8,7 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "Temperature Tower"
+    title: "Speed Tower"
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
@@ -16,6 +16,8 @@ UM.Dialog
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
+
+    backgroundColor: UM.Theme.getColor("main_background")
 
     // Define the width of the text input text boxes
     property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
@@ -36,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../temptower_icon.png")
+                source: Qt.resolvedUrl("../../Images/speedtower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -53,63 +55,78 @@ UM.Dialog
 
             UM.Label
             {
-                text: "Starting Temperature"
+                text: "Tower Type"
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: manager.towerTypesModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    manager.towerType = model[currentIndex]["value"]
+                }
+            }
+
+            UM.Label 
+            { 
+                text: "Starting Speed" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startTemperatureStr
-                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
+                text: manager.startSpeedStr
+                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
 
-            UM.Label
-            {
-                text: "Ending Temperature"
+            UM.Label 
+            { 
+                text: "Ending Speed" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endTemperatureStr
-                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
+                text: manager.endSpeedStr
+                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
 
-            UM.Label
-            {
-                text: "Temperature Change"
+            UM.Label 
+            { 
+                text: "Speed Change" 
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.temperatureChangeStr
-                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
+                text: manager.speedChangeStr
+                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
-
-            UM.Label
-            {
-                text: "Tower Label"
-            }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
-            }
-
-            UM.Label
-            {
-                text: "Tower Description"
+    
+            UM.Label 
+            { 
+                text: "Tower Label" 
             }
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: manager.towerLabelStr
+                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
-       }
+    
+            UM.Label 
+            { 
+                text: "Side Label" 
+            }
+            Cura.TextField
+            {
+                Layout.fillWidth: true
+                text: manager.temperatureLabelStr
+                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+            }
+        }
     }
 
     rightButtons: 

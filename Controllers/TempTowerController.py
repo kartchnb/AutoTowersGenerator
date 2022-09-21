@@ -13,12 +13,13 @@ from UM.Application import Application
 from UM.Logger import Logger
 
 # Import the script that does the actual post-processing
-from .scripts import TempTower_PostProcessing
+from ..Postprocessing import TempTower_PostProcessing
 
 
 
 class TempTowerController(QObject):
     _openScadFilename = 'temptower.scad'
+    _qmlFilename = 'TempTowerDialog.qml'
 
     _nominalBaseHeight = 0.8
     _nominalSectionHeight = 8.0
@@ -102,7 +103,7 @@ class TempTowerController(QObject):
     def _settingsDialog(self)->QObject:
         ''' Lazy instantiation of this tower's settings dialog '''
         if self._cachedSettingsDialog is None:
-            qmlFilePath = os.path.join(self._guiPath, 'TempTowerDialog.qml')
+            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
             self._cachedSettingsDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
 
         return self._cachedSettingsDialog

@@ -13,7 +13,7 @@ from UM.Application import Application
 from UM.Logger import Logger
 
 # Import the script that does the actual post-processing
-from .scripts import RetractTower_PostProcessing
+from ..Postprocessing import RetractTower_PostProcessing
 
 
 
@@ -118,7 +118,7 @@ class RetractTowerController(QObject):
 
 
     # The speed tower type 
-    _towerType = _towerTypesModel[0]["value"]
+    _towerType = _towerTypesModel[0]['value']
 
     towerTypeChanged = pyqtSignal()
 
@@ -178,7 +178,7 @@ class RetractTowerController(QObject):
 
 
     # The label to carve at the bottom of the tower
-    _towerLabelStr = ''
+    _towerLabelStr = _towerTypesModel[0]['label']
 
     towerLabelStrChanged = pyqtSignal()
     

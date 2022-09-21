@@ -21,13 +21,13 @@ from UM.Message import Message
 from UM.PluginRegistry import PluginRegistry
 
 from . import MeshImporter
-from . import OpenScadInterface
-from . import OpenScadJob
+from .OpenScadInterface import OpenScadInterface
+from .OpenScadJob import OpenScadJob
 
-from . import FanTowerController
-from . import RetractTowerController
-from . import SpeedTowerController
-from . import TempTowerController
+from .Controllers.FanTowerController import FanTowerController
+from .Controllers.RetractTowerController import RetractTowerController
+from .Controllers.SpeedTowerController import SpeedTowerController
+from .Controllers.TempTowerController import TempTowerController
 
 
 
@@ -47,28 +47,28 @@ class AutoTowersGenerator(QObject, Extension):
         sectionCount = 0
 
         # Add menu entries for fan towers
-        for presetName in FanTowerController.FanTowerController.getPresetNames():
+        for presetName in FanTowerController.getPresetNames():
             self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
         self.addMenuItem('Fan Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
         
         # Add menu entries for retraction towers
         self.addMenuItem(' ' * sectionCount, lambda: None)
         sectionCount += 1
-        for presetName in RetractTowerController.RetractTowerController.getPresetNames():
+        for presetName in RetractTowerController.getPresetNames():
             self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._retractTowerController.generate(presetName))
         self.addMenuItem('Retraction Tower (Custom)', lambda: self._retractTowerController.generate())
         
         # Add menu entries for speed towers
         self.addMenuItem(' ' * sectionCount, lambda: None)
         sectionCount += 1
-        for presetName in SpeedTowerController.SpeedTowerController.getPresetNames():
+        for presetName in SpeedTowerController.getPresetNames():
             self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
         self.addMenuItem('Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._speedTowerController.generate()))
 
         # Add menu entries for temperature towers
         self.addMenuItem(' ' * sectionCount, lambda: None)
         sectionCount += 1
-        for presetName in TempTowerController.TempTowerController.getPresetNames():
+        for presetName in TempTowerController.getPresetNames():
             self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
         self.addMenuItem('Temperature Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate()))
 
@@ -110,15 +110,15 @@ class AutoTowersGenerator(QObject, Extension):
     def _openScadSourcePath(self)->str:
         ''' Returns the path to the OpenSCAD source models'''
 
-        return os.path.join(self._pluginPath, 'openscad')
+        return os.path.join(self._pluginPath, 'Resources', 'OpenScad')
 
 
     
     @property
-    def _guiPath(self)->str:
-        ''' Returns the path to the GUI files directory '''
+    def _qmlPath(self)->str:
+        ''' Returns the path to where the QML dialog files directory '''
 
-        return os.path.join(self._pluginPath, 'gui', f'qt{PYQT_VERSION}')
+        return os.path.join(self._pluginPath, 'Resources', 'QML', f'QT{PYQT_VERSION}')
 
 
 
@@ -126,7 +126,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _stlPath(self)->str:
         ''' Returns the path where STL files are stored '''
 
-        return os.path.join(self._pluginPath, 'stl')
+        return os.path.join(self._pluginPath, 'Resources', 'STL')
 
 
 
@@ -134,7 +134,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _settingsFilePath(self)->str:
         ''' Returns the path of the settings file '''
 
-        return os.path.join(self._pluginPath, 'settings.json')
+        return os.path.join(self._pluginPath, 'Resources', 'settings.json')
 
 
 
@@ -180,11 +180,11 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedFanTowerController = None
 
     @property
-    def _fanTowerController(self)->FanTowerController.FanTowerController:
+    def _fanTowerController(self)->FanTowerController:
         ''' Returns the object used to create a Fan Tower '''
         
         if self._cachedFanTowerController is None:
-            self._cachedFanTowerController = FanTowerController.FanTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+            self._cachedFanTowerController = FanTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedFanTowerController
 
 
@@ -192,11 +192,11 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedRetractTowerController = None
 
     @property
-    def _retractTowerController(self)->RetractTowerController.RetractTowerController:
+    def _retractTowerController(self)->RetractTowerController:
         ''' Returns the object used to create a Retraction Distance Tower '''
 
         if self._cachedRetractTowerController is None:
-            self._cachedRetractTowerController = RetractTowerController.RetractTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+            self._cachedRetractTowerController = RetractTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedRetractTowerController
 
 
@@ -204,11 +204,11 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedSpeedTowerController = None
 
     @property
-    def _speedTowerController(self)->SpeedTowerController.SpeedTowerController:
+    def _speedTowerController(self)->SpeedTowerController:
         ''' Returns the object used to create a Speed Tower '''
 
         if self._cachedSpeedTowerController is None:
-            self._cachedSpeedTowerController = SpeedTowerController.SpeedTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+            self._cachedSpeedTowerController = SpeedTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedSpeedTowerController
 
 
@@ -216,11 +216,11 @@ class AutoTowersGenerator(QObject, Extension):
     _cachedTempTowerController = None
 
     @property
-    def _tempTowerController(self)->TempTowerController.TempTowerController:
+    def _tempTowerController(self)->TempTowerController:
         ''' Returns the object used to create a Temperature Tower '''
 
         if self._cachedTempTowerController is None:
-            self._cachedTempTowerController = TempTowerController.TempTowerController(self._guiPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+            self._cachedTempTowerController = TempTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedTempTowerController
 
 
@@ -256,11 +256,11 @@ class AutoTowersGenerator(QObject, Extension):
 
     _cachedOpenScadInterface = None
     @property
-    def _openScadInterface(self)->OpenScadInterface.OpenScadInterface:
+    def _openScadInterface(self)->OpenScadInterface:
         ''' Provides lazy instantiation of the OpenScad interface '''
 
         if self._cachedOpenScadInterface is None:
-            self._cachedOpenScadInterface = OpenScadInterface.OpenScadInterface()
+            self._cachedOpenScadInterface = OpenScadInterface()
 
         return self._cachedOpenScadInterface
 
@@ -379,7 +379,7 @@ class AutoTowersGenerator(QObject, Extension):
             The QML file is assumed to be in the GUI directory             
             Returns a dialog object, with this object assigned as the "manager" '''
 
-        qml_file_path = os.path.join(self._guiPath, qml_filename)
+        qml_file_path = os.path.join(self._qmlPath, qml_filename)
         dialog = Application.getInstance().createQmlComponent(qml_file_path, {'manager': self})
         return dialog
 
@@ -436,7 +436,7 @@ class AutoTowersGenerator(QObject, Extension):
         Logger.log('d', f'Running OpenSCAD in the background')
         
         # Start the generation process
-        job = OpenScadJob.OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
+        job = OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
         job.run()
 
         # Wait for OpenSCAD to finish

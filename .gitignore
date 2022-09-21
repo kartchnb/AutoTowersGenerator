@@ -1,10 +1,7 @@
 # Don't check-in my development files
 my.notes
-test_gui.sh
-test_cura.sh
 settings.json
-
-# Don't check-in Gimp XCF files
+*.sh
 *.xcf
 
 # Byte-compiled / optimized / DLL files
@@ -136,4 +133,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-openscad/generate_stls.sh

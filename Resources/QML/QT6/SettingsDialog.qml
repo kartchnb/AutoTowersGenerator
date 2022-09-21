@@ -38,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../plugin_icon.png")
+                source: Qt.resolvedUrl("../../Images/autotowersgenerator_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }

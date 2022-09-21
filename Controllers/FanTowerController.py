@@ -15,12 +15,13 @@ from UM.Application import Application
 from UM.Logger import Logger
 
 # Import the script that does the actual post-processing
-from .scripts import FanTower_PostProcessing
+from ..Postprocessing import FanTower_PostProcessing
 
 
 
 class FanTowerController(QObject):
     _openScadFilename = 'temptower.scad'
+    _qmlFilename = 'FanTowerDialog.qml'
 
     _nominalBaseHeight = 0.8
     _nominalSectionHeight = 8.0
@@ -61,7 +62,7 @@ class FanTowerController(QObject):
     def _settingsDialog(self)->QObject:
         ''' Lazy instantiation of this tower's settings dialog '''
         if self._cachedSettingsDialog is None:
-            qmlFilePath = os.path.join(self._guiPath, 'FanTowerDialog.qml')
+            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
             self._cachedSettingsDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
 
         return self._cachedSettingsDialog

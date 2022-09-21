@@ -7,7 +7,7 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Speed Tower"
+    title: "Fan Tower"
 
     minimumWidth: screenScaleFactor * 445
     minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
@@ -34,7 +34,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../speedtower_icon.png")
+                source: Qt.resolvedUrl("../../Images/fantower_icon.png")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -49,78 +49,63 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            Label
-            {
-                text: "Tower Type"
-            }
-            ComboBox
-            {
-                Layout.fillWidth: true
-                model: manager.towerTypesModel
-                textRole: "value"
-
-                onCurrentIndexChanged: 
-                {
-                    manager.towerType = model[currentIndex]["value"]
-                }
-            }
-
             Label 
             { 
-                text: "Starting Speed" 
+                text: "Starting Fan Percent"
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startSpeedStr
-                onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
+                text: manager.startPercentStr
+                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
             }
 
             Label 
             { 
-                text: "Ending Speed" 
+                text: "Ending Fan Percent" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endSpeedStr
-                onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
+                text: manager.endPercentStr
+                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
             }
 
             Label 
             { 
-                text: "Speed Change" 
+                text: "Fan Speed Change" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.speedChangeStr
-                onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
+                text: manager.percentChangeStr
+                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
             }
-    
+
             Label 
             { 
                 text: "Tower Label" 
             }
             TextField
             {
-                Layout.fillWidth: true
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /.{0,3}/ }
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
-    
+
             Label 
             { 
-                text: "Side Label" 
+                text: "Tower Description" 
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.temperatureLabelStr
-                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+                text: manager.towerDescriptionStr
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

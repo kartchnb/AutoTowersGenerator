@@ -11,7 +11,7 @@ Cura.SecondaryButton
     }
     toolTipContentAlignment: UM.Enums.ContentAlignment.AlignLeft
     onClicked: manager.removeButtonClicked()
-    iconSource: Qt.resolvedUrl("../remove_tower_icon.svg")
+    iconSource: Qt.resolvedUrl("../../Images/remove_tower_icon.svg")
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
 }
