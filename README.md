@@ -28,7 +28,7 @@ Generating and printing a calibration tower is easy!  Simply select the tower yo
 
 ## A couple of things to note:
 
- - Although this plugin can be used without having OpenSCAD installed, you'll get much more flexibility and power out of it if you do.  Download and install from [openscad.org].
+ - Although this plugin can be used without having OpenSCAD installed, you'll get much more flexibility and power out of it if you do.  Download and install from [openscad.org](https://openscad.org/).
 
 - There is no need to add a post-processing script after creating the tower.  The post-processing is automatically done for you!  
 
