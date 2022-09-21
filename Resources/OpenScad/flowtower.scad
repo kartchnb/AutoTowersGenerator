@@ -2,6 +2,9 @@
 // The label to add to the tower
 Tower_Label = "";
 
+// The temperature the tower was printed at
+Temperature_Label = "";
+
 // Text to prefix to the section labels
 Section_Label_Prefix = "";
 
@@ -12,7 +15,7 @@ Section_Label_Suffix = "";
 Starting_Value = 85;
 
 // The ending value
-Ending_Value = 1115;
+Ending_Value = 115;
 
 // The amount to change the value between sections
 Value_Change = 5;
@@ -39,13 +42,10 @@ Section_Label_Height_Multiplier = 0.401;
 Tower_Label_Height_Multiplier = 0.601;
 
 // The height of the temperature label in relation to the height of each section
-Temperature_Label_Height_Multiplier = 0.301;
+Temperature_Label_Height_Multiplier = 0.401;
 
 // The thickness of walls in the tower
 Wall_Thickness = 0.601;
-
-// The amount to inset the panels in each section
-Panel_Inset = 0.501;
 
 // The value to use for creating the model preview (lower is faster)
 Preview_Quality_Value = 24;
@@ -89,13 +89,16 @@ Value_Change_Corrected = Ending_Value > Starting_Value
 Section_Count = ceil(abs(Ending_Value - Starting_Value) / abs(Value_Change) + 1);
 
 // Determine the size (width and length) of each section cube
-Section_Size = Section_Height*1.5;
+Section_Size = Section_Height;
+
+// Determine the diameter of the hole to cut through each section
+Section_Hole_Diameter = min(Section_Height, Section_Size) - Wall_Thickness*2;
 
 // Calculate the amount to expand the base beyond the size of the tower
 Base_Extension = Wall_Thickness*4;
 
 // Calculate the horizontal size of the base of the tower
-Base_Size = Section_Size + Base_Extension*2;
+Base_Size = Section_Size*2 + Base_Extension*2;
 
 // Calculate the font size
 Section_Label_Font_Size = Section_Height * Section_Label_Height_Multiplier;
@@ -129,9 +132,17 @@ module Generate_Model()
             // Determine the offset of the section
             z_offset = section*Section_Height;
 
+            // Determine the rotation of the section
+            z_rot = -90 * section;
+
             // Generate the section itself and move it into place
             translate([0, 0, z_offset])
+            rotate([0, 0, z_rot])
+            {
                 Generate_Section(str(value));
+                if (section < Section_Count - 1)
+                    Generate_SectionConnector();
+            }
         }
     }
 
@@ -143,13 +154,34 @@ module Generate_Model()
         difference()
         {
             // Create the main body of the section
-            translate([-Section_Size/2, -Section_Size/2, 0])
+            translate([-Section_Size, -Section_Size, 0])
                 cube([Section_Size, Section_Size, Section_Height]);
-        }
 
-        // Carve out the label for this section
-        if (Label_Sections)
-            Generate_SectionLabel(label);
+            translate([-Section_Size - Section_Size/2, -Section_Size/2, Section_Height/2])
+            rotate([0, 90, 0])
+                cylinder(d=Section_Hole_Diameter, Section_Size*2);
+
+            // Carve out the label for this section
+            if (Label_Sections)
+                Generate_SectionLabel(label);
+        }
+    }
+
+
+
+    // Generate the sloping connector that connects one section to the next
+    module Generate_SectionConnector()
+    {
+        points =
+        [
+            [0, 0],
+            [Section_Height, Section_Size],
+            [Section_Height, 0],
+        ];
+
+        rotate([0, -90, 0])
+        linear_extrude(Section_Size)
+            polygon(points);
     }
 
 
@@ -158,7 +190,7 @@ module Generate_Model()
     module Generate_SectionLabel(label)
     {
         full_label = str(Section_Label_Prefix, label, Section_Label_Suffix);
-        translate([-Tower_Width/2 + Cube_Size/2, -Cube_Size/2 - Iota, Cube_Size/2])
+        translate([-Section_Size/2, -Section_Size, Section_Height/2])
         rotate([90, 0, 0])
         translate([0, 0, -Label_Depth])
         linear_extrude(Label_Depth + Iota)
@@ -170,10 +202,10 @@ module Generate_Model()
     // Generate the text that will be carved up the side of the tower
     module Generate_TowerLabel(label)
     {
-        translate([Section_Size/2 - Label_Depth, 0, Wall_Thickness])
-        rotate([0, -90, 180])
+        translate([Base_Size/4, 0, 0])
+        rotate([0, 0, 90])
         linear_extrude(Label_Depth + Iota)
-            text(text=label, font=Font, size=Tower_Label_Font_Size, halign="left", valign="center");
+            text(text=label, font=Font, size=Tower_Label_Font_Size, halign="center", valign="center");
     }
 
 
@@ -182,10 +214,12 @@ module Generate_Model()
     // was printed at
     module Generate_TemperatureLabel(label)
     {
-        translate([Section_Size/4, -Section_Size/2 + Label_Depth, Wall_Thickness])
-        rotate([0, -90, 90])
+        translate([-Base_Size/4, 0, 0])
+        rotate([0, 0, 90])
+        translate([Base_Size/4, 0, 0])
+        rotate([0, 0, 90])
         linear_extrude(Label_Depth + Iota)
-            text(text=label, font=Font, size=Temperature_Label_Font_Size, halign="left", valign="center");
+            text(text=label, font=Font, size=Temperature_Label_Font_Size, halign="center", valign="center");
     }
 
 
@@ -197,7 +231,7 @@ module Generate_Model()
         Generate_Base();
 
         translate([0, 0, Base_Height])
-        difference()
+        union()
         {
             // set the tower on top of the base
             Generate_Tower();
@@ -218,8 +252,7 @@ module Generate_Model()
 
 
 // Generate the model
-rotate([0, 0, 180])
-    Generate_Model();
+Generate_Model();
 
 // Orient the viewport
 $vpd = Orient_for_Screenshot ? Screenshot_Vpd : $vpd;

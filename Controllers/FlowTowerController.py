@@ -18,7 +18,7 @@ from ..Postprocessing import FlowTower_PostProcessing
 
 
 class FlowTowerController(QObject):
-    _openScadFilename = 'speedtower.scad'
+    _openScadFilename = 'flowtower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _nominalBaseHeight = 0.8

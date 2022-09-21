@@ -108,33 +108,6 @@
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "flowtower 85-115": {
-            "Base_Height": "0.8",
-            "Ending_Value": "115",
-            "Font": "Arial:style=Bold",
-            "Iota": "0.001",
-            "Label_Sections": "true",
-            "Orient_for_Screenshot": "false",
-            "Panel_Inset": "0.5",
-            "Preview_Quality_Value": "24",
-            "Render_Quality_Value": "24",
-            "Screenshot_Vpd": "140",
-            "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[75, 0, 45]",
-            "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
-            "Section_Label_Height_Multiplier": "0.4",
-            "Section_Label_Prefix": "",
-            "Section_Label_Suffix": "",
-            "Slope_Angle": "45",
-            "Starting_Value": "85",
-            "Temperature_Label": "",
-            "Temperature_Label_Height_Multiplier": "0.3",
-            "Tower_Label": "FLOW",
-            "Tower_Label_Height_Multiplier": "0.6",
-            "Value_Change": "5",
-            "Wall_Thickness": "0.6"
-        }
     },
     "fileFormatVersion": "1"
 }
