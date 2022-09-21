@@ -15,7 +15,7 @@ class OpenScadInterface:
 
     def __init__(self):
         self.errorMessage = ''
-        self._openScadPath = None
+        self._openScadPath = ''
 
 
 
@@ -29,7 +29,7 @@ class OpenScadInterface:
     @property
     def OpenScadPath(self)->str:
         ''' Return the path to OpenScad - an attempt will be made to automatically determine it if needed '''
-        if self._openScadPath is None:
+        if self._openScadPath == '':
             self._openScadPath = self._GetDefaultOpenScadPath()
 
         return self._openScadPath

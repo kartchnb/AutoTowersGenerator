@@ -250,7 +250,6 @@ class AutoTowersGenerator(QObject, Extension):
         # Warn the user if the OpenScad path is not valid
         if not self._openScadInterface.OpenScadPathValid:
             message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
-            message += 'Customized towers will not be available'
             Message(message, title=self._pluginName).show()
 
         # Create a settings dictionary to dump to the settings file

@@ -62,6 +62,7 @@ UM.Dialog
                 id: openScadPath
                 Layout.fillWidth: true
                 text: manager.openScadPathSetting
+                onTextChanged: if (manager.openScadPathSetting != text) manager.openScadPathSetting = text
             }
         }
     }
