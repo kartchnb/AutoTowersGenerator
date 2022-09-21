@@ -36,6 +36,8 @@ Although this plugin can be used without having OpenSCAD installed, you'll get m
 
 - The plugin attempts to automatically locate your OpenSCAD executable. If it fails to find it, try specifying the full path in the settings item under the AutoTowersGenerator plugin menu. 
 
+- I owe a huge debt to 5axes and his Calibration Shapes plugin.  The post-processing code was adapted directly from his plugin and I learned a lot from reviewing his code.  If you haven't installed his plugin yet, stop reading and do so now.
+
 - I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
 
 - Finally, share and enjoy!
