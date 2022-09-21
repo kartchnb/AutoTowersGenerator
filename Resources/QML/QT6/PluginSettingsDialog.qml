@@ -1,6 +1,7 @@
 import QtQuick 6.0
 import QtQuick.Controls 6.0
 import QtQuick.Layouts 6.0
+import QtQuick.Dialogs
 
 import UM 1.6 as UM
 import Cura 1.7 as Cura
@@ -24,7 +25,7 @@ UM.Dialog
 
     RowLayout
     {
-        id:contents
+        id: contents
         width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
         spacing: UM.Theme.getSize("default_margin").width
 
@@ -61,7 +62,7 @@ UM.Dialog
             {
                 id: openScadPath
                 Layout.fillWidth: true
-                text: manager.openScadPath
+                text: manager.openScadPathSetting
             }
         }
     }
@@ -83,6 +84,7 @@ UM.Dialog
     onAccepted:
     {
         manager.openScadPath = openScadPath.text
-        manager.saveSettings()
+        manager.pluginSettingsModified()
     }
+
 }

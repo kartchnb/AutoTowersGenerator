@@ -73,6 +73,6 @@ UM.Dialog
     onAccepted:
     {
         manager.openScadPath = openScadPath.text
-        manager.saveSettings()
+        manager.pluginSettingsModified()
     }
 }

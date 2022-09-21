@@ -15,10 +15,9 @@ class OpenScadInterface:
 
     def __init__(self):
         self.errorMessage = ''
+        self._openScadPath = None
 
 
-
-    _openScadPath = ''
 
     def SetOpenScadPath(self, openScadPath):
         ''' Manually assign the OpenScad path '''
@@ -30,7 +29,7 @@ class OpenScadInterface:
     @property
     def OpenScadPath(self)->str:
         ''' Return the path to OpenScad - an attempt will be made to automatically determine it if needed '''
-        if self._openScadPath == '':
+        if self._openScadPath is None:
             self._openScadPath = self._GetDefaultOpenScadPath()
 
         return self._openScadPath
@@ -53,7 +52,7 @@ class OpenScadInterface:
     @property
     def _OpenScadCommand(self)->str:
         ''' Converts the OpenScad path into a form that can be executed
-            This is mostly required for Linux '''
+            Currently, this is only needed for Linux '''
 
         command = ''
 

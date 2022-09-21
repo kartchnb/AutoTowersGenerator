@@ -42,40 +42,8 @@ class AutoTowersGenerator(QObject, Extension):
         QObject.__init__(self)
         Extension.__init__(self)
 
-        # Add a menu for this plugin
-        self.setMenuName('Auto Towers')
-        sectionCount = 0
-
-        # Add menu entries for fan towers
-        for presetName in FanTowerController.getPresetNames():
-            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
-        self.addMenuItem('Fan Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._fanTowerController.generate()))
-        
-        # Add menu entries for retraction towers
-        self.addMenuItem(' ' * sectionCount, lambda: None)
-        sectionCount += 1
-        for presetName in RetractTowerController.getPresetNames():
-            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._retractTowerController.generate(presetName))
-        self.addMenuItem('Retraction Tower (Custom)', lambda: self._retractTowerController.generate())
-        
-        # Add menu entries for speed towers
-        self.addMenuItem(' ' * sectionCount, lambda: None)
-        sectionCount += 1
-        for presetName in SpeedTowerController.getPresetNames():
-            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
-        self.addMenuItem('Speed Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._speedTowerController.generate()))
-
-        # Add menu entries for temperature towers
-        self.addMenuItem(' ' * sectionCount, lambda: None)
-        sectionCount += 1
-        for presetName in TempTowerController.getPresetNames():
-            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
-        self.addMenuItem('Temperature Tower (Custom)', lambda: self._executeIfOpenScadPathIsValid(lambda: self._tempTowerController.generate()))
-
-        # Add a menu item for the settings dialog
-        self.addMenuItem(' ' * sectionCount, lambda: None)
-        sectionCount += 1
-        self.addMenuItem('Settings', lambda: self._settingsDialog.show())
+        # Initialize the plugin settings
+        self._pluginSettings = {}
 
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
         self._towerControllerPostProcessingCallback = None
@@ -95,6 +63,9 @@ class AutoTowersGenerator(QObject, Extension):
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
         CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
+
+        # Finish initializing the plugin after Cura's fully ready
+        Application.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
 
 
 
@@ -131,8 +102,8 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @property
-    def _settingsFilePath(self)->str:
-        ''' Returns the path of the settings file '''
+    def _pluginSettingsFilePath(self)->str:
+        ''' Returns the path of the plugins settings file '''
 
         return os.path.join(self._pluginPath, 'Resources', 'settings.json')
 
@@ -150,18 +121,15 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _cachedSettingsDialog = None
+    _cachedPluginSettingsDialog = None
 
     @property
-    def _settingsDialog(self)->QObject:
+    def _pluginSettingsDialog(self)->QObject:
         ''' Returns the settings dialog '''
 
-        # Hack - Make sure the settings are loaded
-        self._settings
-
-        if self._cachedSettingsDialog is None:
-            self._cachedSettingsDialog = self._createDialog('SettingsDialog.qml')
-        return self._cachedSettingsDialog
+        if self._cachedPluginSettingsDialog is None:
+            self._cachedPluginSettingsDialog = self._createDialog('PluginSettingsDialog.qml')
+        return self._cachedPluginSettingsDialog
 
 
 
@@ -225,35 +193,6 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _settingsTable = None
-
-    @property
-    def _settings(self)->dict:
-        ''' Provides lazy initialization of plugin settings '''
-
-        if self._settingsTable == None:
-            try:
-                # Load settings from the settings file, if it exists
-                with open(self._settingsFilePath, 'r') as settingsFile:
-                    self._settingsTable = json.load(settingsFile)
-
-                # Forward the OpenScad path to the OpenScadInterface object
-                openScadPath = self._settingsTable['openscad path']
-                Logger.log('d', f'Loaded openscad path = "{openScadPath}"')
-                self._openScadInterface.SetOpenScadPath(openScadPath)
-                Logger.log('d', f'Now openscad path = "{self._openScadInterface.OpenScadPath}"')
-
-            except FileNotFoundError:
-                Logger.log('d', 'Settings file not found - initializing')
-                # Initialize settings with default values
-                self._settingsTable = {
-                    'openscad path': self._openScadInterface.OpenScadPath,
-                }
-
-        return self._settingsTable
-
-
-
     _cachedOpenScadInterface = None
     @property
     def _openScadInterface(self)->OpenScadInterface:
@@ -266,34 +205,26 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    # The path to the OpenSCAD program
-    openScadPathChanged = pyqtSignal()
-
-    # Called to set the OpenSCAD path
-    def setOpenScadPath(self, value)->None:
-        ''' The OpenScad path is really stored in the OpenScadInterface object '''
-
-        # Forward the OpenScad path to the OpenScadInterface object
-        self._openScadInterface.SetOpenScadPath(value)
-
-        # Notify listeners that the path has changed
-        self.openScadPathChanged.emit()
-
-    # Returns the OpenSCAD path
-    @pyqtProperty(str, notify=openScadPathChanged, fset=setOpenScadPath)
-    def openScadPath(self)->str:
-        ''' Provides access to the openscad path for the settings dialog ''' 
-
-        return self._openScadInterface.OpenScadPath
-
-
-
     autoTowerGeneratedChanged = pyqtSignal()
     @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
     def autoTowerGenerated(self)->bool:
         ''' Used to show or hide the button for removing the generated Auto Tower '''
 
         return self._autoTowerGenerated
+
+
+
+    _openScadPathSetting = ''
+
+    _openScadPathSettingChanged = pyqtSignal()
+    
+    def setOpenScadPathSetting(self, value)->None:
+        self._openScadPathSetting = value
+        self._openScadPathSettingChanged.emit()
+
+    @pyqtProperty(str, notify=_openScadPathSettingChanged, fset=setOpenScadPathSetting)
+    def openScadPathSetting(self)->str:
+        return self._openScadPathSetting
 
 
 
@@ -310,35 +241,82 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @pyqtSlot()
-    def saveSettings(self)->None:
+    def pluginSettingsModified(self)->None:
         ''' Saves plugin settings to a json file so they persist between sessions '''
 
-        # Update the OpenScad path from the OpenScadInterface object
-        self._settings['openscad path'] = self._openScadInterface.OpenScadPath
+        # Send the new OpenScad path to the OpenScad Interface
+        self._openScadInterface.SetOpenScadPath(self.openScadPathSetting)
 
-        # Save the settings to the settings file
-        with open(self._settingsFilePath, 'w') as settingsFile:
-            json.dump(self._settings, settingsFile)
-
-
-
-    def _executeIfOpenScadPathIsValid(self, function)->None:
-        ''' Checks if the OpenScad path is valid and, if it is, executes the provided function
-            This should be used to protect any function that relies on OpenSCAD '''
-
-        # If the OpenSCAD path is valid, execute the function
-        if self._openScadInterface.OpenScadPathValid:
-            function()
-
-        # If the OpenSCAD path is not valid, prompt the user to set it
-        else:
-            message = 'This function requires OpenSCAD ((https://openscad.org/)\n'
-            message += 'Ensure it is installed and the path is set correctly in the plugin\n'
-            if self._openScadInterface.OpenScadPath != '':
-                message += f'The current path is {self._openScadInterface.OpenScadPath}\n'
-
+        # Warn the user if the OpenScad path is not valid
+        if not self._openScadInterface.OpenScadPathValid:
+            message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
+            message += 'Customized towers will not be available'
             Message(message, title=self._pluginName).show()
 
+        # Create a settings dictionary to dump to the settings file
+        pluginSettings = {
+            'openscad path': self.openScadPathSetting
+        }
+
+        # Save the settings to the settings file
+        with open(self._pluginSettingsFilePath, 'w') as settingsFile:
+            json.dump(pluginSettings, settingsFile)
+
+
+
+    def _loadPluginSettings(self)->None:
+        ''' Load plugin settings from the settings.json file  '''
+
+        try:
+            # Load settings from the settings file, if it exists
+            with open(self._pluginSettingsFilePath, 'r') as settingsFile:
+                pluginSettings = json.load(settingsFile)
+
+            # Forward the OpenScad path to the OpenScadInterface object
+            self.setOpenScadPathSetting(pluginSettings['openscad path'])
+            self._openScadInterface.SetOpenScadPath(self.openScadPathSetting)
+
+        except (FileNotFoundError, KeyError):
+            pass
+
+
+
+    def _initializeMenu(self)->None:
+        # Add a menu for this plugin
+        self.setMenuName('Auto Towers')
+
+        dividerCount = 0;
+
+        # Add menu entries for fan towers
+        for presetName in FanTowerController.getPresetNames():
+            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
+        self.addMenuItem('Fan Tower (Custom)', lambda: self._openScadGuard(lambda: self._fanTowerController.generate()))
+        
+        # Add menu entries for retraction towers
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
+        for presetName in RetractTowerController.getPresetNames():
+            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._retractTowerController.generate(presetName))
+        self.addMenuItem('Retraction Tower (Custom)', lambda: self._openScadGuard(lambda: self._retractTowerController.generate()))
+        
+        # Add menu entries for speed towers
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
+        for presetName in SpeedTowerController.getPresetNames():
+            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
+        self.addMenuItem('Speed Tower (Custom)', lambda: self._openScadGuard(lambda: self._speedTowerController.generate()))
+
+        # Add menu entries for temperature towers
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
+        for presetName in TempTowerController.getPresetNames():
+            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
+        self.addMenuItem('Temperature Tower (Custom)', lambda: self._openScadGuard(lambda: self._tempTowerController.generate()))
+
+        # Add a menu item for modifying plugin settings
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
+        self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
 
 
 
@@ -392,17 +370,55 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    def _displayPluginSettingsDialog(self)->None:
+        ''' Prepares and displays the plugin settings dialog '''
+
+        # Update the OpenScad path from the OpenScad interface
+        self.setOpenScadPathSetting(self._openScadInterface.OpenScadPath)
+
+        self._pluginSettingsDialog.show()
+
+
+
+    def _onPluginsLoadedCallback(self):
+        ''' Called after plugins have been loaded
+            Iniializing here means that Cura is fully ready '''
+
+        # Load plugin settings
+        self._loadPluginSettings()
+
+        # Add menus
+        self._initializeMenu()
+
+
+
     def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller if a preset tower is requested '''
 
         # If the file does not exist, display an error message
         if os.path.isfile(stlFilePath) == False:
-            Logger.log('e', f'The preset file "{stlFilePath}" does not exist')
-            Message(f'The selected preset is not available', title = self._pluginName).show()
+            errorMessage = f'The STL file "{stlFilePath}" does not exist'
+            Logger.log('e', errorMessage)
+            Message(errorMessage, title = self._pluginName).show()
             return
 
         # Import the STL file into the scene
         self._importStl(towerName, stlFilePath, postProcessingCallback)
+
+
+
+    def _openScadGuard(self, function) -> None:
+        ''' Check if OpenScad has been properly set up and run the supplied function if it is '''
+
+        if self._openScadInterface.OpenScadPathValid:
+            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is valid - launching the function')
+            function()
+
+        else:
+            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is invalid')
+            message = 'This functionality relies on OpenSCAD, which is not installed or configured correctly\n'
+            message += 'Please ensure OpenSCAD is installed (openscad.org) and that its path has been set correctly in this plugin\'s settings\n'
+            Message(message, title=self._pluginName).show()
 
 
 
@@ -433,9 +449,6 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Generate the STL file
         # Since it can take a while to generate the STL file, do it in a separate thread to allow the GUI to remain responsive
-        Logger.log('d', f'Running OpenSCAD in the background')
-        
-        # Start the generation process
         job = OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
         job.run()
 
@@ -443,13 +456,12 @@ class AutoTowersGenerator(QObject, Extension):
         # This should probably be done by having a function called when the job finishes...
         while (job.isRunning()):
             pass
-        Logger.log('d', f'OpenSCAD finished')
 
         # Make sure the STL file was generated
         if os.path.isfile(stlFilePath) == False:
-            Logger.log('e', f'Failed to generate {stlFilePath} from {openScadFilename}')
-            errorMessage = self._openScadInterface.errorMessage
-            Message(f'OpenSCAD Failed with message:\n{errorMessage})', title = self._pluginName).show()
+            errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}":\n{self._openScadInterface.errorMessage}'
+            Logger.log('e', errorMessage)
+            Message(errorMessage, title=self._pluginName).show()
             self._waitDialog.hide()
             return
 
