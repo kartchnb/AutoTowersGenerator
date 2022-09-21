@@ -25,6 +25,7 @@ from .OpenScadInterface import OpenScadInterface
 from .OpenScadJob import OpenScadJob
 
 from .Controllers.FanTowerController import FanTowerController
+from .Controllers.FlowTowerController import FlowTowerController
 from .Controllers.RetractTowerController import RetractTowerController
 from .Controllers.SpeedTowerController import SpeedTowerController
 from .Controllers.TempTowerController import TempTowerController
@@ -154,6 +155,18 @@ class AutoTowersGenerator(QObject, Extension):
         if self._cachedFanTowerController is None:
             self._cachedFanTowerController = FanTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
         return self._cachedFanTowerController
+
+
+
+    _cachedFlowTowerController = None
+
+    @property
+    def _flowTowerController(self)->FlowTowerController:
+        ''' Returns the object used to create a Flow Tower '''
+        
+        if self._cachedFlowTowerController is None:
+            self._cachedFlowTowerController = FlowTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+        return self._cachedFlowTowerController
 
 
 
@@ -290,6 +303,13 @@ class AutoTowersGenerator(QObject, Extension):
         for presetName in FanTowerController.getPresetNames():
             self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
         self.addMenuItem('Fan Tower (Custom)', lambda: self._openScadGuard(lambda: self._fanTowerController.generate()))
+
+        # Add menu entries for flow towers
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
+        for presetName in FlowTowerController.getPresetNames():
+            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._flowTowerController.generate(presetName))
+        self.addMenuItem('Flow Tower (Custom)', lambda: self._openScadGuard(lambda: self._flowTowerController.generate()))
         
         # Add menu entries for retraction towers
         self.addMenuItem(' ' * dividerCount, lambda: None)

@@ -130,7 +130,7 @@ class FanTowerController(QObject):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = 'Fan'
+    _towerDescriptionStr = 'FAN'
 
     towerDescriptionStrChanged = pyqtSignal()
     

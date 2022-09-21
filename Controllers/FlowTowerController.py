@@ -13,65 +13,24 @@ from UM.Application import Application
 from UM.Logger import Logger
 
 # Import the script that does the actual post-processing
-from ..Postprocessing import RetractTower_PostProcessing
+from ..Postprocessing import FlowTower_PostProcessing
 
 
 
-class RetractTowerController(QObject):
-    _openScadFilename = 'retracttower.scad'
-    _qmlFilename = 'RetractTowerDialog.qml'
-
-    _towerTypesModel = [
-        {'value': 'Distance', 'label': 'DST'}, 
-        {'value': 'Speed', 'label': 'SPD'}, 
-    ]
+class FlowTowerController(QObject):
+    _openScadFilename = 'speedtower.scad'
+    _qmlFilename = 'FlowTowerDialog.qml'
 
     _nominalBaseHeight = 0.8
     _nominalSectionHeight = 8.0
 
     _presetTables = {
-        'Disance 1-6': {
-            'filename': 'retracttower distance 1-6.stl',
-            'start value': 1,
-            'change value': 1,
-            'tower type': 'Distance',
+        '85-115': {
+            'filename': 'flowtower 85-115.stl',
+            'start value': 85,
+            'change value': 5,
         },
-
-        'Disance 4-9': {
-            'filename': 'retracttower distance 4-9.stl',
-            'start value': 4,
-            'change value': 1,
-            'tower type': 'Distance',
-        },
-
-        'Distance 7-12': {
-            'filename': 'retracttower distance 7-12.stl',
-            'start value': 7,
-            'change value': 1,
-            'tower type': 'Distance',
-        },
- 
-         'Speed 10-50': {
-            'filename': 'retracttower speed 10-50.stl',
-            'start value': 10,
-            'change value': 10,
-            'tower type': 'Speed',
-        },
-
-        'Speed 35-75': {
-            'filename': 'retracttower speed 35-75.stl',
-            'start value': 35,
-            'change value': 10,
-            'tower type': 'Speed',
-        },
-
-        'Speed 60-100': {
-            'filename': 'retracttower speed 60-100.stl',
-            'start value': 60,
-            'change value': 10,
-            'tower type': 'Speed',
-        },
-   }
+    }
 
 
 
@@ -87,13 +46,12 @@ class RetractTowerController(QObject):
         self._startValue = 0
         self._valueChange = 0
         self._baseLayers = 0
-        self._sectionLayers = 0
 
 
 
     @staticmethod
     def getPresetNames()->list:
-        return list(RetractTowerController._presetTables.keys())
+        return list(FlowTowerController._presetTables.keys())
 
 
 
@@ -110,33 +68,11 @@ class RetractTowerController(QObject):
 
 
 
-    # The available tower types
-    @pyqtProperty(list)
-    def towerTypesModel(self):
-        return self._towerTypesModel
-
-
-
-    # The speed tower type 
-    _towerType = _towerTypesModel[0]['value']
-
-    towerTypeChanged = pyqtSignal()
-
-    def setTowerType(self, value)->None:
-        self._towerType = value
-        self.towerTypeChanged.emit()
-
-    @pyqtProperty(str, notify=towerTypeChanged, fset=setTowerType)
-    def towerType(self)->str:
-        return self._towerType
-
-
-
-    # The starting retraction value for the tower
-    _startValueStr = '1'
+    # The starting value for the tower
+    _startValueStr = '85'
 
     startValueStrChanged = pyqtSignal()
-
+    
     def setStartValueStr(self, value)->None:
         self._startValueStr = value
         self.startValueStrChanged.emit()
@@ -147,11 +83,11 @@ class RetractTowerController(QObject):
 
 
 
-    # The ending retraction value for the tower
-    _endValueStr = '6'
-    
-    endValueStrChanged = pyqtSignal()
+    # The ending value for the tower
+    _endValueStr = '115'
 
+    endValueStrChanged = pyqtSignal()
+    
     def setEndValueStr(self, value)->None:
         self._endValueStr = value
         self.endValueStrChanged.emit()
@@ -162,23 +98,23 @@ class RetractTowerController(QObject):
 
 
 
-    # The amount to change the retraction value between tower sections
-    _valueChangeStr = '1'
+    # The amount to change the value between tower sections
+    _valueChangeStr = '5'
 
     valueChangeStrChanged = pyqtSignal()
-
-    def setValueChange(self, value)->None:
+    
+    def setValueChangeStr(self, value)->None:
         self._valueChangeStr = value
         self.valueChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChange)
+    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChangeStr)
     def valueChangeStr(self)->str:
         return self._valueChangeStr
 
 
 
-    # The label to carve at the bottom of the tower
-    _towerLabelStr = _towerTypesModel[0]['label']
+    # The label to add to the tower
+    _towerLabelStr = 'FLOW'
 
     towerLabelStrChanged = pyqtSignal()
     
@@ -192,18 +128,18 @@ class RetractTowerController(QObject):
 
 
 
-    # The description to carve up the side of the tower
-    _towerDescriptionStr = 'RETRACTION'
+    # The temperature label to add to the tower
+    _temperatureLabelStr = ''
 
-    towerDescriptionStrChanged = pyqtSignal()
+    temperatureLabelStrChanged = pyqtSignal()
     
-    def setTowerDescriptionStr(self, value)->None:
-        self._towerDescriptionStr = value
-        self.towerDescriptionStrChanged.emit()
+    def setTemperatureLabelStr(self, value)->None:
+        self._temperatureLabelStr = value
+        self.temperatureLabelStrChanged.emit()
 
-    @pyqtProperty(str, notify=towerDescriptionStrChanged, fset=setTowerDescriptionStr)
-    def towerDescriptionStr(self)->str:
-        return self._towerDescriptionStr
+    @pyqtProperty(str, notify=temperatureLabelStrChanged, fset=setTemperatureLabelStr)
+    def temperatureLabelStr(self)->str:
+        return self._temperatureLabelStr
 
 
 
@@ -215,6 +151,10 @@ class RetractTowerController(QObject):
         
         # Generate a custom tower
         else:
+            # Query the current printing temperature
+            printTemperature = Application.getInstance().getGlobalContainerStack().getProperty('material_print_temperature', 'value')
+            self.setTemperatureLabelStr(f'{printTemperature}\u00b0')
+
             self._settingsDialog.show()
 
 
@@ -225,35 +165,28 @@ class RetractTowerController(QObject):
         try:
             presetTable = self._presetTables[presetName]
         except KeyError:
-            Logger.log('e', f'A RetractTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A SpeedTower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset's file name
         try:
             stlFileName = presetTable['filename']
         except KeyError:
-            Logger.log('e', f'The "filename" entry for RetractTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "filename" entry for SpeedTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's starting value
+        # Load the preset's starting speed
         try:
             self._startValue = presetTable['start value']
         except KeyError:
-            Logger.log('e', f'The "start value" for RetractTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "start value" for SpeedTower preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's value change value
+        # Load the preset's speed change value
         try:
             self._valueChange = presetTable['change value']
         except KeyError:
-            Logger.log('e', f'The "change value" for RetractTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's tower type value
-        try:
-            self._towerType = presetTable['tower type']
-        except KeyError:
-            Logger.log('e', f'The "tower type" for RetractTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "change value" for SpeedTower preset table "{presetName}" has not been defined')
             return
 
         # Query the current layer height
@@ -267,7 +200,7 @@ class RetractTowerController(QObject):
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
         # Determine the tower name
-        towerName = f'Preset Retraction Value Tower {presetName}'
+        towerName = f'Preset Flow Tower {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(towerName, stlFilePath, self.postProcess)
@@ -277,12 +210,12 @@ class RetractTowerController(QObject):
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
-        # Determine the parameters for the tower
+        # Read the parameters directly from the dialog
         startValue = float(self.startValueStr)
         endValue = float(self.endValueStr)
         valueChange = float(self.valueChangeStr)
         towerLabel = self.towerLabelStr
-        towerDescription = self.towerDescriptionStr
+        temperatureLabel = self.temperatureLabelStr
 
         # Query the current layer height
         layerHeight = Application.getInstance().getGlobalContainerStack().getProperty('layer_height', 'value')
@@ -312,11 +245,11 @@ class RetractTowerController(QObject):
         openScadParameters ['Value_Change'] = valueChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
-        openScadParameters ['Tower_Label'] = towerDescription
-        openScadParameters ['Column_Label'] = towerLabel
+        openScadParameters ['Tower_Label'] = towerLabel
+        openScadParameters ['Temperature_Label'] = temperatureLabel
 
         # Determine the tower name
-        towerName = f'Auto-Generated Retraction Tower ({self._towerType}) {startValue}-{endValue}x{valueChange}'
+        towerName = f'Auto-Generated Flow Tower {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -328,6 +261,6 @@ class RetractTowerController(QObject):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = RetractTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType)
+        gcode = FlowTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers)
 
         return gcode

@@ -171,7 +171,7 @@ class TempTowerController(QObject):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = 'Temperature'
+    _towerDescriptionStr = 'TEMPERATURE'
 
     towerDescriptionStrChanged = pyqtSignal()
     
