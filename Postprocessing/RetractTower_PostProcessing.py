@@ -4,15 +4,20 @@
 #
 # Version 2.0 - 17 Sep 2022: 
 #   Updates as part of the plugin upgrade for Cura 5.1
+# Version 2.1 - 21 Sep 2022: 
+#   Updated to match Version 1.8 of 5axes' RetractTower processing script
 
 from UM.Logger import Logger
 from UM.Application import Application
-import re # To perform the search
+import re 
 from enum import Enum
 
-__version__ = '2.0'
+__version__ = '2.1'
 
 
+def is_begin_layer_line(line: str) -> bool:
+    '''Check if current line is the start of a layer section.'''
+    return line.startswith(";LAYER:")
 
 def is_retract_line(line: str) -> bool:
     '''Check if current line is a retract segment'''
@@ -65,6 +70,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     
     current_e = 0
     current_f = 0
+    first_code = False
 
     # Iterate over each layer in the g-code
     for layer in gcode:
@@ -81,6 +87,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                 relative_extrusion = False
             if is_reset_extruder_line(line):
                 current_e = 0
+                save_e = 0
                 
             # If we have defined a value
             if currentValue >= 0:
@@ -107,11 +114,15 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator extruding filament at {currentValue} mm/s (relative)' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
                                 else:
-                                    lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; AutoTowersGenerator extruding {currentValue:.1f} mm of filament (relative)'
+                                    if first_code:
+                                        lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; AutoTowersGenerator extruding {current_e:.1f} mm of filament (relative)'
+                                        first_code = False
+                                    else:
+                                        lines[lineIndex] = f'G1 F{int(current_f)} E{currentValue:.5f} ; AutoTowersGenerator extruding {currentValue:.1f} mm of filament (relative)'
                                     lcd_gcode = f'M117 DST {currentValue:.1f}mm ; AutoTowersGenerator added'
                         else:
                             # Retracting filament (absolute)
-                            if save_e>current_e:
+                            if save_e > current_e:
                                 if towerType == 'speed':
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator retracting filament at {currentValue} mm/s (absolute)' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
@@ -130,10 +141,11 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                 if searchE:
                     save_e=float(searchE.group(1))             
             
-            if line.startswith(';LAYER:'):
+            if is_begin_layer_line(line):
                 # Initialize the change
-                if (layerIndex==baseLayers):
+                if (layerIndex == baseLayers):
                     currentValue = startValue
+                    first_code = True
                     lines.insert(lineIndex + 1, '; AutoTowersGenerator start of the first section')
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
                     if towerType == 'speed':
@@ -142,7 +154,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         lcd_gcode = f'M117 DST {startValue:.1f}mm ; AutoTowersGenerator added'
                 
                 # Change the current value   
-                if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
+                if ((layerIndex - baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
                     currentValue += valueChange
                     lines.insert(lineIndex + 1, '; AutoTowersGenerator start of the next section')
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')

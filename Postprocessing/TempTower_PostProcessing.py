@@ -4,10 +4,15 @@
 #
 # Version 2.0 - 17 Sep 2022: 
 #   Updates as part of the plugin upgrade for Cura 5.1
+# Version 2.1 - 21 Sep 2022: 
+#   Updated to match Version 1.6 of 5axes' TempFanTower processing script
 
 from UM.Logger import Logger
 
-__version__ = '2.0'
+__version__ = '2.1'
+
+def is_start_of_layer(line: str) -> bool:
+    return line.startswith(';LAYER:')
 
 
 
@@ -38,17 +43,17 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
         lines = layer.split('\n')
         for line in lines:
             # If this is the start of the current layer
-            if line.startswith(';LAYER:'):
+            if is_start_of_layer(line):
                 lineIndex = lines.index(line)
 
                 # If the end of the base has been reached, start modifying the temperature
-                if (layerIndex == baseLayers):
+                if layerIndex == baseLayers:
                     Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentValue}')
                     lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for first section')
                     lines.insert(lineIndex + 2, f'M117 Temp {currentValue} ; AutoTowersGenerator added')
 
                 # If the end of a section has been reached, decrease the temperature
-                if ((layerIndex - baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
+                if ((layerIndex - baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentValue}')
                     lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for next section')

@@ -4,14 +4,30 @@
 #
 # Version 2.0 - 17 Sep 2022: 
 #   Updates as part of the plugin upgrade for Cura 5.1
+# Version 2.1 - 21 Sep 2022: 
+#   Updated to match Version 1.6 of 5axes' TempFanTower processing script
 
 from UM.Logger import Logger
 
-__version__ = '2.0'
+__version__ = '2.1'
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
+def is_fan_speed_change_line(line: str) -> bool:
+    return line.startswith('M106 S')
+
+def is_fan_off_line(line: str) -> bool:
+    return line.startswith('M107')
+
+def is_start_of_bridge(line: str) -> bool:
+    return line.startswith(';BRIDGE')
+
+def is_start_of_layer(line: str) -> bool:
+    return line.startswith(';LAYER:')
+
+
+
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, maintainBridgeValue):
     Logger.log('d', 'AutoTowersGenerator beginning FanTower post-processing')
     Logger.log('d', f'Start speed = {startValue}%')
     Logger.log('d', f'Speed change = {valueChange}%')
@@ -30,7 +46,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
     # Start at the selected starting percentage
     currentValue = startValue
 
-    afterbridge = False
+    afterBridge = False
 
     # Iterate over each layer in the g-code
     for layer in gcode:
@@ -39,29 +55,38 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
         # Iterate over each command line in the layer
         lines = layer.split('\n')
         for line in lines:
-            if line.startswith('M106 S') and (layerIndex-baseLayers)>0 and afterbridge:
-                Logger.log('d', f'Resuming fan speed of {currentValue}% after bridge at layer {layerIndex - 2}')
-                lineIndex = lines.index(line)
-                currentFanValue = int((currentValue * 255)/100)  #  100% = 255 pour ventilateur
-                lines[lineIndex] = f'M106 S{currentFanValue} ; AutoTowersGenerator Resuming fan speed of {currentValue}% after bridge'
-                afterbridge = False
-                lines.insert(lineIndex + 1, f'M117 Speed {currentValue}%')
+            # If the fan speed is being changed after a bridge section was printed
+            if is_fan_speed_change_line(line) and layerIndex > baseLayers and afterBridge:
+                if afterBridge or not maintainBridgeValue:
+                    Logger.log('d', f'Resuming fan speed of {currentValue}% after bridge at layer {layerIndex - 2}')
+                    lineIndex = lines.index(line)
+                    currentFanValue = int((currentValue * 255)/100)  #  100% = 255 pour ventilateur
+                    lines[lineIndex] = f'M106 S{currentFanValue} ; AutoTowersGenerator Resuming fan speed of {currentValue}% after bridge'
+                    afterBridge = False
+                    lines.insert(lineIndex + 1, f'M117 Speed {currentValue}%')
+                else:
+                    lineIndex = lines.index(line)
+                    afterBridge = True
 
-            if line.startswith('M107') and (layerIndex-baseLayers)>0:
+            if is_fan_off_line(line) and layerIndex > baseLayers:
                 Logger.log('d', f'Just completed a bridge at layer {layerIndex - 2}')
-                afterbridge = True
+                afterBridge = True
                 lineIndex = lines.index(line)
 
-            if line.startswith(";LAYER:"):
+            if is_start_of_bridge(line):
+                afterBridge = False
                 lineIndex = lines.index(line)
 
-                if (layerIndex==baseLayers):
+            if is_start_of_layer(line):
+                lineIndex = lines.index(line)
+
+                if layerIndex==baseLayers:
                     Logger.log('d', f'Start of first section at layer {layerIndex - 2} - setting fan speed to {currentValue}%')
                     currentFanValue = int((currentValue * 255)/100)  #  100% = 255 pour ventilateur
                     lines.insert(lineIndex + 1, f'M106 S{currentFanValue} ; AutoTowersGenerator setting fan speed to {currentValue}% for the first section')
                     lines.insert(lineIndex + 2, f'M117 Speed {currentValue}% ; AutoTowersGenerator added')
 
-                if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex-baseLayers)>0):
+                if ((layerIndex-baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
                     currentValue += valueChange
                     Logger.log('d', f'Start of new section at layer {layerIndex - 2} - setting fan speed to {currentValue}%')
                     currentFanValue = int((currentValue * 255)/100)  #  100% = 255 pour ventilateur
