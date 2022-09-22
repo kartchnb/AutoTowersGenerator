@@ -17,7 +17,7 @@ def is_start_of_layer(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
     Logger.log('d', 'AutoTowersGenerator beginning FlowTower post-processing')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')

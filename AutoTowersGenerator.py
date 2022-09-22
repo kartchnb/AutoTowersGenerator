@@ -540,12 +540,13 @@ class AutoTowersGenerator(QObject, Extension):
         # This check is redundant and probably not needed
         if self._autoTowerGenerated == True:
 
-            # Warn the user if the layer height changes
+            # Remove the tower if the layer height changes
             if setting_key == 'layer_height' and property_name == 'value':
                 layerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
                 if layerHeight != self._generatedLayerHeight and layerHeight != self._currentLayerHeight:
                     self._currentLayerHeight = self._generatedLayerHeight
-                    Message('The layer height has changed. For best results, regenerate the Auto Tower').show()
+                    self._removeAutoTower()
+                    Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()        
 
             # Warn the user if supports are enabled
             if setting_key == 'support_enable' and property_name == 'value':

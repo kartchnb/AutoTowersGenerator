@@ -92,7 +92,7 @@ Section_Count = ceil(abs(Ending_Value - Starting_Value) / abs(Value_Change) + 1)
 Section_Size = Section_Height;
 
 // Determine the diameter of the hole to cut through each section
-Section_Hole_Diameter = min(Section_Height, Section_Size) - Wall_Thickness*2;
+Section_Hole_Diameter = min(Section_Height, Section_Size) - Wall_Thickness*4;
 
 // Calculate the amount to expand the base beyond the size of the tower
 Base_Extension = Wall_Thickness*4;
