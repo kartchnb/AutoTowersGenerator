@@ -49,7 +49,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     Logger.log('d', f'Section layers = {sectionLayers}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';RetractTower ({towerLabel}) start {towerLabel} = {startValue}, {towerLabel} change = {valueChange}\n'
+    gcode[0] = gcode[0] + f';RetractTower ({towerType}) start {towerType} = {startValue}, {towerType} change = {valueChange}\n'
 
     extruder = Application.getInstance().getGlobalContainerStack().extruderList[0]
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
