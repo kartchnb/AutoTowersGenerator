@@ -1,7 +1,5 @@
-import hashlib
 import json
 import os
-import platform
 import tempfile
 
 # Import the correct version of PyQt
@@ -24,6 +22,7 @@ from . import MeshImporter
 from .OpenScadInterface import OpenScadInterface
 from .OpenScadJob import OpenScadJob
 
+from .Controllers.BedLevelController import BedLevelController
 from .Controllers.FanTowerController import FanTowerController
 from .Controllers.FlowTowerController import FlowTowerController
 from .Controllers.RetractTowerController import RetractTowerController
@@ -146,6 +145,18 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _cachedBedLevelController = None
+
+    @property
+    def _bedLevelController(self)->BedLevelController:
+        ''' Returns the object used to create a Bed Level print '''
+        
+        if self._cachedBedLevelController is None:
+            self._cachedBedLevelController = BedLevelController(self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback, self._pluginName)
+        return self._cachedBedLevelController
+
+
+
     _cachedFanTowerController = None
 
     @property
@@ -249,7 +260,7 @@ class AutoTowersGenerator(QObject, Extension):
         self._removeAutoTower()
 
         # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
+        Message('The Auto-generated model and its associated post-processing has been removed', title=self._pluginName).show()
 
 
 
@@ -305,36 +316,43 @@ class AutoTowersGenerator(QObject, Extension):
         self.addMenuItem('Fan Tower (Custom)', lambda: self._openScadGuard(lambda: self._fanTowerController.generate()))
 
         # Add menu entries for flow towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
         for presetName in FlowTowerController.getPresetNames():
             self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._flowTowerController.generate(presetName))
         self.addMenuItem('Flow Tower (Custom)', lambda: self._openScadGuard(lambda: self._flowTowerController.generate()))
         
         # Add menu entries for retraction towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
         for presetName in RetractTowerController.getPresetNames():
             self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._retractTowerController.generate(presetName))
         self.addMenuItem('Retraction Tower (Custom)', lambda: self._openScadGuard(lambda: self._retractTowerController.generate()))
         
         # Add menu entries for speed towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
         for presetName in SpeedTowerController.getPresetNames():
             self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
         self.addMenuItem('Speed Tower (Custom)', lambda: self._openScadGuard(lambda: self._speedTowerController.generate()))
 
         # Add menu entries for temperature towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
         for presetName in TempTowerController.getPresetNames():
             self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
         self.addMenuItem('Temperature Tower (Custom)', lambda: self._openScadGuard(lambda: self._tempTowerController.generate()))
 
-        # Add a menu item for modifying plugin settings
-        self.addMenuItem(' ' * dividerCount, lambda: None)
+        # Add menu entries for bedlevel prints
         dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        for presetName in BedLevelController.getPresetNames():
+            self.addMenuItem(f'Bed Level ({presetName})', lambda presetName=presetName: self._bedLevelController.generate(presetName))
+        self.addMenuItem('Bed Level (Custom)', lambda: self._openScadGuard(lambda: self._bedLevelController.generate()))
+
+        # Add a menu item for modifying plugin settings
+        dividerCount += 1
+        self.addMenuItem(' ' * dividerCount, lambda: None)
         self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
 
 
