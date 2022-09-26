@@ -102,6 +102,20 @@ class BedLevelController(QObject):
         if bed_adhesion != "none":
             Message(f'Bed adhesion is currently set to "{bed_adhesion}"\nSelect "none" for best results', title=self._pluginName).show()
 
+            # Adjust the print size based on the selected bed adhesion
+            if bed_adhesion == 'skirt':
+                skirt_gap = containerStack.getProperty('skirt_gap', 'value')
+                print_width -= skirt_gap * 2
+                print_depth -= skirt_gap * 2
+            elif bed_adhesion == 'brim':
+                brim_width = containerStack.getProperty('brim_width', 'value')
+                print_width -= brim_width * 2
+                print_depth -= brim_width * 2
+            elif bed_adhesion == 'raft':
+                raft_margin = containerStack.getProperty('raft_margin', 'value')
+                print_width -= raft_margin * 2
+                print_depth -= raft_margin * 2
+
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
         openScadParameters ['Print_Area_Width'] = print_width
