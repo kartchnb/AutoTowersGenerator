@@ -140,8 +140,7 @@ module Generate_Model()
             rotate([0, 0, z_rot])
             {
                 Generate_Section(str(value));
-                if (section < Section_Count - 1)
-                    Generate_SectionConnector();
+                Generate_SectionConnector();
             }
         }
     }
