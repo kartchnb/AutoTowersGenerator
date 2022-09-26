@@ -10,7 +10,7 @@ UM.Dialog
     title: "AutoTowersGenerator Settings"
 
     minimumWidth: screenScaleFactor * 445
-    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight

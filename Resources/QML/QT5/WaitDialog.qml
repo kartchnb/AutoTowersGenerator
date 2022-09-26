@@ -10,7 +10,7 @@ UM.Dialog
     title: "Generating the Tower"
 
     width: screenScaleFactor * 445
-    height: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height)
+    height: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height)
     minimumWidth: width
     minimumHeight: height
     maximumWidth: width

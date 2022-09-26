@@ -12,7 +12,7 @@ UM.Dialog
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
-    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
@@ -20,7 +20,7 @@ UM.Dialog
     backgroundColor: UM.Theme.getColor("main_background")
 
     // Define the width of the text input text boxes
-    property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize("button").width
 
     RowLayout
     {

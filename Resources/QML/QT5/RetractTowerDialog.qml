@@ -10,13 +10,13 @@ UM.Dialog
     title: "Retraction Tower"
 
     minimumWidth: screenScaleFactor * 445
-    minimumHeight: screenScaleFactor * (contents.childrenRect.height + 2 * UM.Theme.getSize("default_margin").height + UM.Theme.getSize("button").height)
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     // Define the width of the text input text boxes
-    property int numberInputWidth: screenScaleFactor * UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize("button").width
 
     RowLayout
     {
@@ -49,11 +49,11 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
  
-            UM.Label
+            Label
             {
                 text: "Tower Type"
             }
-            Cura.ComboBox
+            ComboBox
             {
                 Layout.fillWidth: true
                 model: manager.towerTypesModel
@@ -101,14 +101,13 @@ UM.Dialog
                 onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
             }
 
-            UM.Label 
+            Label 
             { 
                 text: "Tower Label" 
             }
-            Cura.TextField
+            TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
