@@ -51,7 +51,7 @@ UM.Dialog
 
             Label 
             { 
-                text: "Starting Flow Rate" 
+                text: "Starting Flow Rate %" 
             }
             TextField
             {
@@ -63,7 +63,7 @@ UM.Dialog
 
             Label 
             { 
-                text: "Ending Flow Rate" 
+                text: "Ending Flow Rate %" 
             }
             TextField
             {
@@ -75,7 +75,7 @@ UM.Dialog
 
             Label 
             { 
-                text: "Flow Rate Change" 
+                text: "Flow Rate % Change" 
             }
             TextField
             {

@@ -56,6 +56,12 @@ UM.Dialog
             UM.Label
             {
                 text: "Tower Type"
+                MouseArea 
+                {
+                    id: tower_type_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.ComboBox
             {
@@ -68,10 +74,21 @@ UM.Dialog
                     manager.towerType = model[currentIndex]["value"]
                 }
             }
+            UM.ToolTip
+            {
+                text: "The type of speed to vary across the tower.<p>\"Travel Speed\" towers change the speed at which the nozzle moves while printing (equivalent to Cura's \"print speed\" setting).<p>\"Acceleration\" changes how fast the nozzle accelerates during printing.<p>The other towers are more specialized."
+                visible: tower_type_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Starting Speed" 
+                MouseArea 
+                {
+                    id: starting_speed_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -80,10 +97,21 @@ UM.Dialog
                 text: manager.startSpeedStr
                 onTextChanged: if (manager.startSpeedStr != text) manager.startSpeedStr = text
             }
+            UM.ToolTip
+            {
+                text: "The speed value for the first section of the tower."
+                visible: starting_speed_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Ending Speed" 
+                MouseArea 
+                {
+                    id: ending_speed_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -92,10 +120,21 @@ UM.Dialog
                 text: manager.endSpeedStr
                 onTextChanged: if (manager.endSpeedStr != text) manager.endSpeedStr = text
             }
+            UM.ToolTip
+            {
+                text: "The speed value for the last section of the tower."
+                visible: ending_speed_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Speed Change" 
+                MouseArea 
+                {
+                    id: speed_change_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -104,10 +143,21 @@ UM.Dialog
                 text: manager.speedChangeStr
                 onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
+            UM.ToolTip
+            {
+                text: "The amount to change the speed between tower sections.<p>In combination with the starting and ending values, this determines the number of sections in the tower."
+                visible: speed_change_mouse_area.containsMouse
+            }
     
             UM.Label 
             { 
                 text: "Tower Label" 
+                MouseArea 
+                {
+                    id: tower_label_mouse_Area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -115,16 +165,32 @@ UM.Dialog
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
+            UM.ToolTip
+            {
+                text: "An optional label to carve up the side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                visible: tower_label_mouse_Area.containsMouse
+            }
     
             UM.Label 
             { 
-                text: "Side Label" 
+                text: "Temperature Label" 
+                MouseArea 
+                {
+                    id: temperature_label_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
                 Layout.fillWidth: true
                 text: manager.temperatureLabelStr
                 onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+            }
+            UM.ToolTip
+            {
+                text: "An optional secondary label to carve up the side of the tower.<p>This is intended to be used to indicate the temperature at which the tower was printed, but can be used for other purposes as well."
+                visible: temperature_label_mouse_area.containsMouse
             }
         }
     }

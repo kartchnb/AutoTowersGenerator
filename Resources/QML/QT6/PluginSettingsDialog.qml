@@ -53,6 +53,12 @@ UM.Dialog
             UM.Label 
             { 
                 text: "OpenSCAD path" 
+                MouseArea 
+                {
+                    id: openscad_path_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -60,6 +66,11 @@ UM.Dialog
                 Layout.fillWidth: true
                 text: manager.openScadPathSetting
                 onTextChanged: if (manager.openScadPathSetting != text) manager.openScadPathSetting = text
+            }
+            UM.ToolTip
+            {
+                text: "The path to the OpenSCAD executable.<p>If it is in the current path or installed in an expected location, the plugin should find it automatically.<p>You can manually set or override the path here.<p>Clearing out this value will cause the plugin to attempt to automatically locate OpenSCAD again."
+                visible: openscad_path_mouse_area.containsMouse
             }
         }
     }

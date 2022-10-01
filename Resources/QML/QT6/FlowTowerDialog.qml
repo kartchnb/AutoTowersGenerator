@@ -55,7 +55,13 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Starting Flow Rate" 
+                text: "Starting Flow Rate %" 
+                MouseArea 
+                {
+                    id: start_flow_rate_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -64,10 +70,21 @@ UM.Dialog
                 text: manager.startValueStr
                 onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
             }
+            UM.ToolTip
+            {
+                text: "The flow rate % for the first section of the tower.<p>This value will be changed for each section of the tower<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle."
+                visible: start_flow_rate_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
-                text: "Ending Flow Rate" 
+                text: "Ending Flow Rate %" 
+                MouseArea 
+                {
+                    id: end_flow_rate_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -76,10 +93,21 @@ UM.Dialog
                 text: manager.endValueStr
                 onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
             }
+            UM.ToolTip
+            {
+                text: "The flow rate % for the last section of the tower.<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle."
+                visible: end_flow_rate_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
-                text: "Flow Rate Change" 
+                text: "Flow Rate % Change" 
+                MouseArea 
+                {
+                    id: flow_rate_change_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -88,10 +116,21 @@ UM.Dialog
                 text: manager.valueChangeStr
                 onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
             }
-    
+            UM.ToolTip
+            {
+                text: "The amount to change the flow rate % between sections of the tower.<p>In combination with the start end end flow rates, this determines the number of sections in the tower."
+                visible: flow_rate_change_mouse_area.containsMouse
+            }
+   
             UM.Label 
             { 
                 text: "Tower Label" 
+                MouseArea 
+                {
+                    id: tower_label_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -99,16 +138,32 @@ UM.Dialog
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
+            UM.ToolTip
+            {
+                text: "An optional label to carve into the base of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                visible: tower_label_mouse_area.containsMouse
+            }
     
             UM.Label 
             { 
-                text: "Side Label" 
+                text: "Temperature Label" 
+                MouseArea 
+                {
+                    id: temperature_label_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
                 Layout.fillWidth: true
                 text: manager.temperatureLabelStr
                 onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+            }
+            UM.ToolTip
+            {
+                text: "An optional secondary label to carve into the base of the tower.<p>This is intended to be used to indicate the temperature at which the tower was printed, but can be used for other purposes as well."
+                visible: temperature_label_mouse_area.containsMouse
             }
         }
     }

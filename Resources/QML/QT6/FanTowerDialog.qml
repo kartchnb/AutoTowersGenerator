@@ -56,6 +56,12 @@ UM.Dialog
             UM.Label 
             { 
                 text: "Starting Fan Percent" 
+                MouseArea 
+                {
+                    id: starting_fan_percent_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -64,10 +70,21 @@ UM.Dialog
                 text: manager.startPercentStr
                 onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
             }
+            UM.ToolTip
+            {
+                text: "The fan speed % for the first section of the tower.<p>This value will be changed for each section of the tower.<p>This should be a value between 0 and 100."
+                visible: starting_fan_percent_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Ending Fan Percent" 
+                MouseArea 
+                {
+                    id: ending_fan_percent_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -76,10 +93,21 @@ UM.Dialog
                 text: manager.endPercentStr
                 onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
             }
+            UM.ToolTip
+            {
+                text: "The fan speed % for the last section of the tower.<p>This should be a value between 0 and 100."
+                visible: ending_fan_percent_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Fan Speed Change" 
+                MouseArea 
+                {
+                    id: fan_speed_change_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -88,10 +116,21 @@ UM.Dialog
                 text: manager.percentChangeStr
                 onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
             }
+            UM.ToolTip
+            {
+                text: "The amount to change the fan speed % between sections of the tower.<p>In combination with the start end end fan speed %, this determines the number of sections in the tower."
+                visible: fan_speed_change_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Tower Label" 
+                MouseArea 
+                {
+                    id: tower_label_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -100,10 +139,21 @@ UM.Dialog
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
+            UM.ToolTip
+            {
+                text: "An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less."
+                visible: tower_label_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 
                 text: "Tower Description" 
+                MouseArea 
+                {
+                    id: tower_description_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
@@ -111,16 +161,32 @@ UM.Dialog
                 text: manager.towerDescriptionStr
                 onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
+            UM.ToolTip
+            {
+                text: "An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                visible: tower_description_mouse_area.containsMouse
+            }
 
             UM.Label
             {
                 text: "Maintain Value for Bridges"
+                MouseArea 
+                {
+                    id: maintain_bridge_value_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             UM.CheckBox
             {
-                id: maintainBridgeValue
+                id: maintainBridgeValueCheckBox
                 checked: manager.maintainBridgeValue
-                onClicked: manager.maintainBridgeValue = maintainBridgeValue.checked
+                onClicked: manager.maintainBridgeValue = maintainBridgeValueCheckBox.checked
+            }
+            UM.ToolTip
+            {
+                text: "Selects whether the fan speed % for the current section is maintained while bridges are being printed."
+                visible: maintain_bridge_value_mouse_area.containsMouse
             }
         }
     }
