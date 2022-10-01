@@ -144,6 +144,21 @@ class FanTowerController(QObject):
 
 
 
+    # Determine if the same fan value is maintained while bridges are being printed
+    _maintainBridgeValue = False
+
+    maintainBridgeValueChanged = pyqtSignal()
+
+    def setMaintainBridgeValue(self, value)->None:
+        self._maintainBridgeValue = value
+        self.maintainBridgeValueChanged.emit()
+
+    @pyqtProperty(bool, notify=maintainBridgeValueChanged, fset=setMaintainBridgeValue)
+    def maintainBridgeValue(self)->bool:
+        return self._maintainBridgeValue
+
+
+
     def generate(self, preset='')->None:
         ''' Generate a tower - either a preset tower or a custom tower '''
         # If a preset was requested, load it
@@ -257,6 +272,6 @@ class FanTowerController(QObject):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
         # Call the post-processing script
-        gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers)
+        gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers, self.maintainBridgeValue)
 
         return gcode

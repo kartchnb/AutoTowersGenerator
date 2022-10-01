@@ -111,6 +111,17 @@ UM.Dialog
                 text: manager.towerDescriptionStr
                 onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
+
+            UM.Label
+            {
+                text: "Maintain Value for Bridges"
+            }
+            UM.CheckBox
+            {
+                id: maintainBridgeValue
+                checked: manager.maintainBridgeValue
+                onClicked: manager.maintainBridgeValue = maintainBridgeValue.checked
+            }
         }
     }
 

@@ -5,29 +5,31 @@
 # Version 2.0 - 17 Sep 2022: 
 #   Updates as part of the plugin upgrade for Cura 5.1
 # Version 2.1 - 21 Sep 2022: 
-#   Updated to match Version 1.6 of 5axes' TempFanTower processing script
+#   Updated based on Version 1.6 of 5axes' TempFanTower processing script, including the "maintain bridge value" option
+# Version 2.2 - 1 Oct 2022:
+#   Updated based on 5axes' suggestion to ignore commented-out gcode
 
 from UM.Logger import Logger
 
-__version__ = '2.1'
+__version__ = '2.2'
 
 
 
 def is_fan_speed_change_line(line: str) -> bool:
-    return line.startswith('M106 S')
+    return line.strip().startswith('M106 S')
 
 def is_fan_off_line(line: str) -> bool:
-    return line.startswith('M107')
+    return line.strip().startswith('M107')
 
 def is_start_of_bridge(line: str) -> bool:
-    return line.startswith(';BRIDGE')
+    return line.strip().startswith(';BRIDGE')
 
 def is_start_of_layer(line: str) -> bool:
-    return line.startswith(';LAYER:')
+    return line.strip().startswith(';LAYER:')
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, maintainBridgeValue):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, maintainBridgeValue=False):
     Logger.log('d', 'AutoTowersGenerator beginning FanTower post-processing')
     Logger.log('d', f'Start speed = {startValue}%')
     Logger.log('d', f'Speed change = {valueChange}%')

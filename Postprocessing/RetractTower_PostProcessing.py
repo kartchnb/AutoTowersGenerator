@@ -5,39 +5,42 @@
 # Version 2.0 - 17 Sep 2022: 
 #   Updates as part of the plugin upgrade for Cura 5.1
 # Version 2.1 - 21 Sep 2022: 
-#   Updated to match Version 1.8 of 5axes' RetractTower processing script
+#   Updated based on version 1.8 of 5axes' RetractTower processing script
+# Version 2.2 - 1 Oct 2022:
+#   Updated based on version 1.9 of 5axes' RetractdTower processing script
+#   Commented-out gcode is now ignored, as it should be
 
 from UM.Logger import Logger
 from UM.Application import Application
 import re 
-from enum import Enum
 
-__version__ = '2.1'
+__version__ = '2.2'
+
 
 
 def is_begin_layer_line(line: str) -> bool:
     '''Check if current line is the start of a layer section.'''
-    return line.startswith(";LAYER:")
+    return line.strip().startswith(";LAYER:")
 
 def is_retract_line(line: str) -> bool:
     '''Check if current line is a retract segment'''
-    return 'G1' in line and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
+    return line.strip().startswith('G1') and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
     
 def is_extrusion_line(line: str) -> bool:
     '''Check if current line is a standard printing segment'''
-    return 'G1' in line and 'X' in line and 'Y' in line and 'E' in line
+    return line.strip().startswith('G1') and 'X' in line and 'Y' in line and 'E' in line
 
 def is_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M83 / G91 towerType'''
-    return 'G91' in line or 'M83' in line
+    return line.strip().startswith('G91') or line.strip().startswith('M83')
 
 def is_not_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M82 / G90 towerType'''
-    return 'G90' in line or 'M82' in line
+    return line.strip().startswith('G90') or line.strip().startswith('M82')
 
 def is_reset_extruder_line(line: str) -> bool:
     '''Check if current line contain a G92 E0'''
-    return 'G92' in line and 'E0' in line
+    return line.strip().startswith('G92') and 'E0' in line
 
 
 

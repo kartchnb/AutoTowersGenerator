@@ -3,7 +3,7 @@
 # CalibrationShapes plugin
 #
 # Version 1.0 - 21 Sep 2022: 
-#   Taken from version 1.1 of 5axes' FlowTower script
+#   Based on version 1.1 of 5axes' FlowTower script
 
 from UM.Logger import Logger
 from UM.Application import Application
@@ -13,7 +13,7 @@ from enum import Enum
 __version__ = '1.0'
 
 def is_start_of_layer(line: str) -> bool:
-    return line.startswith(';LAYER:')
+    return line.strip().startswith(';LAYER:')
 
 
 

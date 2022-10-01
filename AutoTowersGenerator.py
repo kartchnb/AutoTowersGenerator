@@ -1,7 +1,5 @@
-import hashlib
 import json
 import os
-import platform
 import tempfile
 
 # Import the correct version of PyQt
@@ -301,41 +299,69 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add menu entries for fan towers
         for presetName in FanTowerController.getPresetNames():
-            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._fanTowerController.generate(presetName))
-        self.addMenuItem('Fan Tower (Custom)', lambda: self._openScadGuard(lambda: self._fanTowerController.generate()))
+            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._fanTowerController, presetName))
+        self.addMenuItem('Fan Tower (Custom)', lambda: self._generateAutoTower(self._fanTowerController))
 
         # Add menu entries for flow towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in FlowTowerController.getPresetNames():
-            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._flowTowerController.generate(presetName))
-        self.addMenuItem('Flow Tower (Custom)', lambda: self._openScadGuard(lambda: self._flowTowerController.generate()))
+            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._flowTowerController, presetName))
+        self.addMenuItem('Flow Tower (Custom)', lambda: self._generateAutoTower(self._flowTowerController))
         
         # Add menu entries for retraction towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in RetractTowerController.getPresetNames():
-            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._retractTowerController.generate(presetName))
-        self.addMenuItem('Retraction Tower (Custom)', lambda: self._openScadGuard(lambda: self._retractTowerController.generate()))
+            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._retractTowerController, presetName))
+        self.addMenuItem('Retraction Tower (Custom)', lambda: self._generateAutoTower(self._retractTowerController))
         
         # Add menu entries for speed towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in SpeedTowerController.getPresetNames():
-            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._speedTowerController.generate(presetName))
-        self.addMenuItem('Speed Tower (Custom)', lambda: self._openScadGuard(lambda: self._speedTowerController.generate()))
+            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._speedTowerController, presetName))
+        self.addMenuItem('Speed Tower (Custom)', lambda: self._generateAutoTower(self._speedTowerController))
 
         # Add menu entries for temperature towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in TempTowerController.getPresetNames():
-            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._tempTowerController.generate(presetName))
-        self.addMenuItem('Temperature Tower (Custom)', lambda: self._openScadGuard(lambda: self._tempTowerController.generate()))
+            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._tempTowerController, presetName))
+        self.addMenuItem('Temperature Tower (Custom)', lambda: self._generateAutoTower(self._tempTowerController))
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
+
+
+
+    def _generateAutoTower(self, towerController, presetName=''):
+        ''' Verifies print settings and generates the requested auto tower '''
+
+        # Auto towers cannot be generated if supports are enabled
+        supportEnabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
+        if supportEnabled:
+            Message('Cannot generate an Auto Tower with supports enabled\nDisable supports and try again', title=self._pluginName).show()
+            return
+
+        # Auto towers cannot be generated if adaptive layers are enabled
+        adaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
+        if adaptive_layers_enabled:
+            Message('Cannot generate an Auto Tower with adaptive layers enabled\nDisable adaptive layers and try again', title=self._pluginName).show()
+            return
+
+        # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
+        openscad_path_is_valid = self._openScadInterface.OpenScadPathValid
+        if presetName == '' and not openscad_path_is_valid:
+            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is invalid')
+            message = 'This functionality relies on OpenSCAD, which is not installed or configured correctly\n'
+            message += 'Please ensure OpenSCAD is installed (openscad.org) and that its path has been set correctly in this plugin\'s settings\n'
+            Message(message, title=self._pluginName).show()
+            return
+
+        towerController.generate(presetName)
 
 
 
@@ -356,7 +382,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Clear the job name
         CuraApplication.getInstance().getPrintInformation().setJobName('')
 
-        # Stop listening for machine and layer height changes
+        # Stop listening for machine changes
         try:
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
         except:
@@ -426,30 +452,12 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _openScadGuard(self, function) -> None:
-        ''' Check if OpenScad has been properly set up and run the supplied function if it is '''
-
-        if self._openScadInterface.OpenScadPathValid:
-            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is valid - launching the function')
-            function()
-
-        else:
-            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is invalid')
-            message = 'This functionality relies on OpenSCAD, which is not installed or configured correctly\n'
-            message += 'Please ensure OpenSCAD is installed (openscad.org) and that its path has been set correctly in this plugin\'s settings\n'
-            Message(message, title=self._pluginName).show()
-
-
-
     def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
         # Record the current layer height
         self._generatedLayerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
         self._currentLayerHeight = self._generatedLayerHeight
-
-        # Record the current state of the support enabled setting
-        self._currentSupportEnabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
 
         # This could take up to a couple of minutes...
         self._waitDialog.show()
@@ -493,7 +501,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Imports an STL file into the scene '''
 
         # Remove all models from the scene
-        self._autoTowerGenerated = False
+        self._autoToweradaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
         CuraApplication.getInstance().deleteAll()
         CuraApplication.getInstance().processEvents()
 
@@ -537,7 +545,9 @@ class AutoTowersGenerator(QObject, Extension):
     def _onPrintSettingChanged(self, setting_key, property_name)->None:
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
-        # This check is redundant and probably not needed
+        # BAK: The plugin should probably be rearchitectured so that each tower controls what types of settings it cares about
+
+        # This check probably redundant
         if self._autoTowerGenerated == True:
 
             # Remove the tower if the layer height changes
@@ -546,14 +556,20 @@ class AutoTowersGenerator(QObject, Extension):
                 if layerHeight != self._generatedLayerHeight and layerHeight != self._currentLayerHeight:
                     self._currentLayerHeight = self._generatedLayerHeight
                     self._removeAutoTower()
-                    Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()        
+                    Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()     
+
+            # Remove the tower if adaptive layers are enabled
+            if setting_key == 'adaptive_layer_height_enabled' and property_name == 'value':
+                adaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
+                if adaptive_layers_enabled == True:
+                    self._removeAutoTower()
+                    Message('The Auto Tower has been removed because adaptive layers were enabled', title=self._pluginName).show()
 
             # Warn the user if supports are enabled
             if setting_key == 'support_enable' and property_name == 'value':
                 support_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
-                if support_enabled == True and self._currentSupportEnabled != True:
-                    Message('The "Generate Support" option has been selected. For best results, deselect this before printing').show()
-                self._currentSupportEnabled = support_enabled
+                if support_enabled == True:
+                    Message('The Auto Tower has been removed because supports were enabled', title=self._pluginName).show()
                 
 
 

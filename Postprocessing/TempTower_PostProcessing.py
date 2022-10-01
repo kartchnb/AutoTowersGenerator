@@ -12,7 +12,7 @@ from UM.Logger import Logger
 __version__ = '2.1'
 
 def is_start_of_layer(line: str) -> bool:
-    return line.startswith(';LAYER:')
+    return line.strip().startswith(';LAYER:')
 
 
 

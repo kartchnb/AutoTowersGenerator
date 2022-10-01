@@ -13,7 +13,8 @@ from UM.Application import Application
 from UM.Logger import Logger
 
 # Import the script that does the actual post-processing
-from ..Postprocessing import SpeedTower_PostProcessing
+from ..Postprocessing import TravelSpeedTower_PostProcessing
+from ..Postprocessing import MiscSpeedTower_PostProcessing
 
 
 
@@ -22,7 +23,7 @@ class SpeedTowerController(QObject):
     _qmlFilename = 'SpeedTowerDialog.qml'
 
     _towerTypesModel = [
-        {'value': 'Speed', 'label': 'SPEED'}, 
+        {'value': 'Travel Speed', 'label': 'TRAVEL SPEED'}, 
         {'value': 'Acceleration', 'label': 'ACCELERATION'}, 
         {'value': 'Jerk', 'label': 'JERK'}, 
         {'value': 'Junction', 'label': 'JUNCTION'}, 
@@ -34,25 +35,25 @@ class SpeedTowerController(QObject):
     _nominalSectionHeight = 8.0
 
     _presetTables = {
-        'Speed 20-100': {
-            'filename': 'speedtower 20-100.stl',
+        'Travel Speed 20-100': {
+            'filename': 'speedtower travel speed 20-100.stl',
             'start value': 20,
             'change value': 20,
-            'tower type': 'Speed'
+            'tower type': 'Travel Speed'
         },
 
-        'Speed 50-150': {
-            'filename': 'speedtower 50-150.stl',
+        'Travel Speed 50-150': {
+            'filename': 'speedtower travel speed 50-150.stl',
             'start value': 50,
-            'change value': 150,
-            'tower type': 'Speed'
+            'change value': 20,
+            'tower type': 'Travel Speed'
         },
 
-        'Speed 100-200': {
-            'filename': 'speedtower 100-200.stl',
+        'Travel Speed 100-200': {
+            'filename': 'speedtower travel speed 100-200.stl',
             'start value': 100,
-            'change value': 200,
-            'tower type': 'Speed'
+            'change value': 20,
+            'tower type': 'Travel Speed'
         },
     }
 
@@ -71,6 +72,7 @@ class SpeedTowerController(QObject):
         self._valueChange = 0
         self._baseLayers = 0
         self._sectionLayers = 0
+        self._referenceSpeed = 0
 
 
 
@@ -315,6 +317,11 @@ class SpeedTowerController(QObject):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = SpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType)
+        if self._towerType == 'Travel Speed':
+            # Query the current print speed
+            currentPrintSpeed = Application.getInstance().getGlobalContainerStack().getProperty('speed_print', 'value')
+            gcode = TravelSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed)
+        else:
+            gcode = MiscSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType)
 
         return gcode
