@@ -25,10 +25,10 @@ class FlowTowerController(QObject):
     _nominalSectionHeight = 8.0
 
     _presetTables = {
-        '85-115': {
-            'filename': 'flowtower 85-115.stl',
-            'start value': 85,
-            'change value': 5,
+        '115-85': {
+            'filename': 'flowtower 115-85.stl',
+            'start value': 115,
+            'change value': -5,
         },
     }
 
