@@ -8,7 +8,7 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "AutoTowersGenerator Settings"
+    title: "AutoTowersGenerator v" + manager.pluginVersion + " Settings"
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445

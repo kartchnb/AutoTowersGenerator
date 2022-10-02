@@ -7,7 +7,7 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "AutoTowersGenerator Settings"
+    title: "AutoTowersGenerator v" + manager.pluginVersion + " Settings"
 
     minimumWidth: screenScaleFactor * 445
     minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height

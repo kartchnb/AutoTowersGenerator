@@ -218,6 +218,14 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    @pyqtProperty(str)
+    def pluginVersion(self)->str:
+        ''' Returns the plugin's version number '''
+
+        return self.getVersion()
+
+
+
     _openScadPathSetting = ''
 
     _openScadPathSettingChanged = pyqtSignal()
