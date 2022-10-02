@@ -1,9 +1,9 @@
 {
     "name": "Auto Towers Generator",
     "author": "Brad Kartchner",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "api": 7,
-    "supported_sdk_versions": ["7.9.0", "8.0.0", "8.1.0"],
+    "supported_sdk_versions": ["7.9.0", "8.0.0", "8.1.0", "8.2.0"],
     "description": "Automates the generation of several parameterized calibration models.",
 	"i18n-catalog": "cura"
 }
