@@ -185,6 +185,25 @@ class TempTowerController(QObject):
 
 
 
+    def settingsAreCompatible(self)->str:
+        ''' Check whether Cura's settings are compatible with this tower '''
+
+        activeMachine = CuraApplication.getInstance().getMachineManager().activeMachine
+
+        # The tower cannot be generated if supports are enabled
+        supportEnabled = activeMachine.getProperty('support_enable', 'value')
+        if supportEnabled:
+            return 'Cannot generate a Temp Tower with supports enabled.\nDisable supports and try again.'
+
+        # The tower cannot be generated if adaptive layers are enabled
+        adaptive_layers_enabled = activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
+        if adaptive_layers_enabled:
+            return 'Cannot generate a Temp Tower with adaptive layers enabled.\nDisable adaptive layers and try again.'
+
+        return ''
+
+
+
     def generate(self, preset='')->None:
         ''' Generate a tower - either a preset tower or a custom tower '''
         # If a preset was requested, load it

@@ -52,18 +52,11 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerGenerated = False
         self._autoTowerOperation = None
 
-        # Keep track of the layer height that an AutoTower has been generated for
-        self._generatedLayerHeight = 0
-        self._currentLayerHeight = 0
-
-        # Keep track of the current support enabled setting
-        self._currentSupportEnabled = False
-
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
         CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
 
-        # Finish initializing the plugin after Cura's fully ready
+        # Finish initializing the plugin after Cura is fully ready
         Application.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
 
 
@@ -340,16 +333,10 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, towerController, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        # Auto towers cannot be generated if supports are enabled
-        supportEnabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
-        if supportEnabled:
-            Message('Cannot generate an Auto Tower with supports enabled\nDisable supports and try again', title=self._pluginName).show()
-            return
-
-        # Auto towers cannot be generated if adaptive layers are enabled
-        adaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
-        if adaptive_layers_enabled:
-            Message('Cannot generate an Auto Tower with adaptive layers enabled\nDisable adaptive layers and try again', title=self._pluginName).show()
+        # Allow the tower controller to check Cura's settings to ensure it can be generated
+        errorMessage = towerController.settingsAreCompatible()
+        if errorMessage != '':
+            Message(errorMessage, title=self._pluginName).show()
             return
 
         # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
@@ -455,10 +442,6 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
-        # Record the current layer height
-        self._generatedLayerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
-        self._currentLayerHeight = self._generatedLayerHeight
-
         # This could take up to a couple of minutes...
         self._waitDialog.show()
         CuraApplication.getInstance().processEvents() # Allow Cura to update itself periodically through this method
@@ -524,10 +507,6 @@ class AutoTowersGenerator(QObject, Extension):
         # The dialog is no longer needed
         self._waitDialog.hide()
 
-        # Display a warning if supports are enabled        
-        if self._currentSupportEnabled == True:
-            Message('The "Generate Support" option is selected. For best results, deselect this before printing').show()
-
         # Rename the current print job
         CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
 
@@ -545,31 +524,10 @@ class AutoTowersGenerator(QObject, Extension):
     def _onPrintSettingChanged(self, setting_key, property_name)->None:
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
-        # BAK: The plugin should probably be rearchitectured so that each tower controls what types of settings it cares about
-
-        # This check probably redundant
-        if self._autoTowerGenerated == True:
-
-            # Remove the tower if the layer height changes
-            if setting_key == 'layer_height' and property_name == 'value':
-                layerHeight = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('layer_height', 'value')
-                if layerHeight != self._generatedLayerHeight and layerHeight != self._currentLayerHeight:
-                    self._currentLayerHeight = self._generatedLayerHeight
-                    self._removeAutoTower()
-                    Message('The Auto Tower has been removed because the layer height was changed', title=self._pluginName).show()     
-
-            # Remove the tower if adaptive layers are enabled
-            if setting_key == 'adaptive_layer_height_enabled' and property_name == 'value':
-                adaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
-                if adaptive_layers_enabled == True:
-                    self._removeAutoTower()
-                    Message('The Auto Tower has been removed because adaptive layers were enabled', title=self._pluginName).show()
-
-            # Warn the user if supports are enabled
-            if setting_key == 'support_enable' and property_name == 'value':
-                support_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('support_enable', 'value')
-                if support_enabled == True:
-                    Message('The Auto Tower has been removed because supports were enabled', title=self._pluginName).show()
+        # Remove the tower in response to settings changes
+        self._removeAutoTower()
+        setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
+        Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
                 
 
 
