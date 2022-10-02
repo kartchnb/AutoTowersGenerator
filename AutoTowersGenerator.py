@@ -22,6 +22,7 @@ from . import MeshImporter
 from .OpenScadInterface import OpenScadInterface
 from .OpenScadJob import OpenScadJob
 
+from .Controllers.BedLevelPrintContoller import BedLevelPrintController
 from .Controllers.FanTowerController import FanTowerController
 from .Controllers.FlowTowerController import FlowTowerController
 from .Controllers.RetractTowerController import RetractTowerController
@@ -137,66 +138,6 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _cachedFanTowerController = None
-
-    @property
-    def _fanTowerController(self)->FanTowerController:
-        ''' Returns the object used to create a Fan Tower '''
-        
-        if self._cachedFanTowerController is None:
-            self._cachedFanTowerController = FanTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
-        return self._cachedFanTowerController
-
-
-
-    _cachedFlowTowerController = None
-
-    @property
-    def _flowTowerController(self)->FlowTowerController:
-        ''' Returns the object used to create a Flow Tower '''
-        
-        if self._cachedFlowTowerController is None:
-            self._cachedFlowTowerController = FlowTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
-        return self._cachedFlowTowerController
-
-
-
-    _cachedRetractTowerController = None
-
-    @property
-    def _retractTowerController(self)->RetractTowerController:
-        ''' Returns the object used to create a Retraction Distance Tower '''
-
-        if self._cachedRetractTowerController is None:
-            self._cachedRetractTowerController = RetractTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
-        return self._cachedRetractTowerController
-
-
-
-    _cachedSpeedTowerController = None
-
-    @property
-    def _speedTowerController(self)->SpeedTowerController:
-        ''' Returns the object used to create a Speed Tower '''
-
-        if self._cachedSpeedTowerController is None:
-            self._cachedSpeedTowerController = SpeedTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
-        return self._cachedSpeedTowerController
-
-
-
-    _cachedTempTowerController = None
-
-    @property
-    def _tempTowerController(self)->TempTowerController:
-        ''' Returns the object used to create a Temperature Tower '''
-
-        if self._cachedTempTowerController is None:
-            self._cachedTempTowerController = TempTowerController(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
-        return self._cachedTempTowerController
-
-
-
     _cachedOpenScadInterface = None
     @property
     def _openScadInterface(self)->OpenScadInterface:
@@ -298,38 +239,45 @@ class AutoTowersGenerator(QObject, Extension):
 
         dividerCount = 0;
 
+        # Add menu entries for bed level prints
+        for presetName in BedLevelPrintController.getPresetNames():
+            self.addMenuItem(f'Bed Level Print ({presetName})', lambda presetName=presetName: self._generateAutoTower(BedLevelPrintController, presetName))
+        self.addMenuItem('Bed Level Print (Custom)', lambda: self._generateAutoTower(BedLevelPrintController))
+
         # Add menu entries for fan towers
+        self.addMenuItem(' ' * dividerCount, lambda: None)
+        dividerCount += 1
         for presetName in FanTowerController.getPresetNames():
-            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._fanTowerController, presetName))
-        self.addMenuItem('Fan Tower (Custom)', lambda: self._generateAutoTower(self._fanTowerController))
+            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(FanTowerController, presetName))
+        self.addMenuItem('Fan Tower (Custom)', lambda: self._generateAutoTower(FanTowerController))
 
         # Add menu entries for flow towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in FlowTowerController.getPresetNames():
-            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._flowTowerController, presetName))
-        self.addMenuItem('Flow Tower (Custom)', lambda: self._generateAutoTower(self._flowTowerController))
+            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(FlowTowerController, presetName))
+        self.addMenuItem('Flow Tower (Custom)', lambda: self._generateAutoTower(FlowTowerController))
         
         # Add menu entries for retraction towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in RetractTowerController.getPresetNames():
-            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._retractTowerController, presetName))
-        self.addMenuItem('Retraction Tower (Custom)', lambda: self._generateAutoTower(self._retractTowerController))
+            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(RetractTowerController, presetName))
+        self.addMenuItem('Retraction Tower (Custom)', lambda: self._generateAutoTower(RetractTowerController))
         
         # Add menu entries for speed towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in SpeedTowerController.getPresetNames():
-            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._speedTowerController, presetName))
-        self.addMenuItem('Speed Tower (Custom)', lambda: self._generateAutoTower(self._speedTowerController))
+            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(SpeedTowerController, presetName))
+        self.addMenuItem('Speed Tower (Custom)', lambda: self._generateAutoTower(SpeedTowerController))
 
         # Add menu entries for temperature towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
         dividerCount += 1
         for presetName in TempTowerController.getPresetNames():
-            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(self._tempTowerController, presetName))
-        self.addMenuItem('Temperature Tower (Custom)', lambda: self._generateAutoTower(self._tempTowerController))
+            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(TempTowerController, presetName))
+        self.addMenuItem('Temperature Tower (Custom)', lambda: self._generateAutoTower(TempTowerController))
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ' * dividerCount, lambda: None)
@@ -338,11 +286,13 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _generateAutoTower(self, towerController, presetName=''):
+    def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
+        controller = controllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+
         # Allow the tower controller to check Cura's settings to ensure it can be generated
-        errorMessage = towerController.settingsAreCompatible()
+        errorMessage = controller.settingsAreCompatible()
         if errorMessage != '':
             Message(errorMessage, title=self._pluginName).show()
             return
@@ -356,7 +306,7 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName).show()
             return
 
-        towerController.generate(presetName)
+        controller.generate(presetName)
 
 
 

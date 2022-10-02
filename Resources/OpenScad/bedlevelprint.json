@@ -1,0 +1,29 @@
+{
+    "parameterSets": {
+        "bedlevel 220x220": {
+            "Line_Height": "0.3",
+            "Line_Width": "0.4",
+            "Number_Of_Rings": "7",
+            "Orient_for_Screenshot": "false",
+            "Print_Area_Depth": "220",
+            "Print_Area_Width": "220",
+            "Screenshot_Vpd": "400",
+            "Screenshot_Vpf": "22.5",
+            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpt": "[0, -5, -16]"
+        },
+        "screenshot": {
+            "Line_Height": "0.1",
+            "Line_Width": "4",
+            "Number_Of_Rings": "7",
+            "Orient_for_Screenshot": "true",
+            "Print_Area_Depth": "220",
+            "Print_Area_Width": "220",
+            "Screenshot_Vpd": "400",
+            "Screenshot_Vpf": "22.5",
+            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpt": "[0, -5, -16]"
+        }
+    },
+    "fileFormatVersion": "1"
+}

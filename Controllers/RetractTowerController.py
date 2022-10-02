@@ -210,20 +210,20 @@ class RetractTowerController(QObject):
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
-        activeMachine = CuraApplication.getInstance().getMachineManager().activeMachine
+        containerStack = Application.getInstance().getGlobalContainerStack()
 
         # The tower cannot be generated if supports are enabled
-        supportEnabled = activeMachine.getProperty('support_enable', 'value')
+        supportEnabled = containerStack.getProperty('support_enable', 'value')
         if supportEnabled:
             return 'Cannot generate a Retraction Tower with supports enabled.\nDisable supports and try again.'
 
         # The tower cannot be generated if adaptive layers are enabled
-        adaptive_layers_enabled = activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
+        adaptive_layers_enabled = containerStack.getProperty('adaptive_layer_height_enabled', 'value')
         if adaptive_layers_enabled:
             return 'Cannot generate a Retraction Tower with adaptive layers enabled.\nDisable adaptive layers and try again.'
 
         # It doesn't make sense to generate a retraction tower unless retraction is enabled
-        retraction_enabled = activeMachine.getProperty('retraction_enable', 'value')
+        retraction_enabled = containerStack.getProperty('retraction_enable', 'value')
         Logger.log('d', f'retraction_enabled = {retraction_enabled}')
         if not retraction_enabled:
             return 'Cannot generate a Retraction Tower because retraction enable is set to false.\nEnable retraction and try again.'

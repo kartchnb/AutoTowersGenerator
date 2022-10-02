@@ -146,15 +146,15 @@ class FlowTowerController(QObject):
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
-        activeMachine = CuraApplication.getInstance().getMachineManager().activeMachine
+        containerStack = Application.getInstance().getGlobalContainerStack()
 
         # The tower cannot be generated if supports are enabled
-        supportEnabled = activeMachine.getProperty('support_enable', 'value')
+        supportEnabled = containerStack.getProperty('support_enable', 'value')
         if supportEnabled:
             return 'Cannot generate a Flow Tower with supports enabled.\nDisable supports and try again.'
 
         # The tower cannot be generated if adaptive layers are enabled
-        adaptive_layers_enabled = activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
+        adaptive_layers_enabled = containerStack.getProperty('adaptive_layer_height_enabled', 'value')
         if adaptive_layers_enabled:
             return 'Cannot generate a Flow Tower with adaptive layers enabled.\nDisable adaptive layers and try again.'
 
