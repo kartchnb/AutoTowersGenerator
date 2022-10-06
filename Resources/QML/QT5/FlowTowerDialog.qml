@@ -15,7 +15,7 @@ UM.Dialog
     width: minimumWidth
     height: minimumHeight
 
-    // Define the width of the text input text boxes
+    // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize("button").width
 
     RowLayout

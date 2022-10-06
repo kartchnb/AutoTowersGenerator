@@ -12,19 +12,24 @@ from cura.CuraApplication import CuraApplication
 
 from UM.Application import Application
 from UM.Logger import Logger
+from UM.Message import Message
 
 
 
 class BedLevelPrintController(QObject):
     _openScadFilename = 'bedlevelprint.scad'
+    _qmlFilename = 'BedLevelPrintDialog.qml'
 
-    _presetTables = {
-        '220x220': {
-            'filename': 'bedlevel 220x220.stl',
-            'print area width': 220,
-            'print area depth': 220,
-        },
-    }
+    _bedLevelPrintTypesModel = [
+        {'value': 'Concentric Squares', 'icon': 'bedlevelprint_concentric_squares_icon.png'}, 
+        {'value': 'X in Square', 'icon': 'bedlevelprint_x_in_square_icon.png'}, 
+        {'value': 'Circle in Square', 'icon': 'bedlevelprint_circle_in_square_icon.png'}, 
+        {'value': 'Perimeter', 'icon': 'bedlevelprint_perimeter_icon.png'}, 
+        {'value': 'Five Circles', 'icon': 'bedlevelprint_five_circles_icon.png'}, 
+    ]
+
+    _presetTables = {}
+
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
@@ -33,6 +38,7 @@ class BedLevelPrintController(QObject):
         self._loadStlCallback = loadStlCallback
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
 
+        self._guiPath = guiPath
         self._stlPath = stlPath
 
 
@@ -43,12 +49,47 @@ class BedLevelPrintController(QObject):
 
 
 
+    _cachedSettingsDialog = None
+
+    @property
+    def _settingsDialog(self)->QObject:
+        ''' Lazy instantiation of this tower's settings dialog '''
+        if self._cachedSettingsDialog is None:
+            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
+            self._cachedSettingsDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
+
+        return self._cachedSettingsDialog
+
+
+
+    # The available tower types
+    @pyqtProperty(list)
+    def bedLevelPrintTypesModel(self):
+        return self._bedLevelPrintTypesModel
+
+
+
+    # The selected bed level print type
+    _bedLevelPrintType = _bedLevelPrintTypesModel[0]['value']
+
+    bedLevelPrintTypeChanged = pyqtSignal()
+
+    def setBedLevelPrintType(self, value)->None:
+        self._bedLevelPrintType = value
+        self.bedLevelPrintTypeChanged.emit()
+
+    @pyqtProperty(str, notify=bedLevelPrintTypeChanged, fset=setBedLevelPrintType)
+    def bedLevelPrintType(self)->str:
+        return self._bedLevelPrintType
+
+
+
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
         containerStack = Application.getInstance().getGlobalContainerStack()
 
-        # The tower cannot be generated if supports are enabled
+        # The tower cannot be generated if any type of adhesion is selected
         adhesion_setting = containerStack.getProperty('adhesion_type', 'value')
         if adhesion_setting != 'none':
             setting_label = containerStack.getProperty('adhesion_type', 'label')
@@ -59,15 +100,10 @@ class BedLevelPrintController(QObject):
 
 
     def generate(self, preset='')->None:
-        ''' Generate a tower - either a preset tower or a custom tower '''
-        # If a preset was requested, load it
-        if not preset == '':
-            self._loadPreset(preset)
-        
-        # Generate a custom tower
-        else:
-            self._generateCustom()
-
+        ''' Generate a bed level print
+            Presets are not supported at this time '''
+        self._settingsDialog.show()
+            
 
 
     def _loadPreset(self, presetName)->None:
@@ -86,19 +122,30 @@ class BedLevelPrintController(QObject):
             Logger.log('e', f'The "filename" entry for BedLevel preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's starting fan percent
+        # Load the preset's print area width
         try:
-            self._startPercent = presetTable['print area width']
+            print_width = presetTable['print area width']
         except KeyError:
             Logger.log('e', f'The "print area width" for BedLevel preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's fan change percent
+        # Load the preset's print area depth
         try:
-            self._percentChange = presetTable['print area depth']
+            print_depth = presetTable['print area depth']
         except KeyError:
             Logger.log('e', f'The "print area depth" for BedLevel preset table "{presetName}" has not been defined')
             return
+
+        # Query the bed size
+        containerStack = Application.getInstance().getGlobalContainerStack()
+        bed_width = containerStack.getProperty('machine_width', 'value')
+        bed_depth = containerStack.getProperty('machine_depth', 'value')
+
+        # Abort if the bed levl print is bigger than the bed
+        if print_width > bed_width or print_depth > bed_depth:
+            message = 'This bed level print preset is too large for your printer\n'
+            message += f'Printer bed is {bed_width}x{bed_depth}mm, but the preset is {print_width}x{print_depth}mm'
+            Message(message).show()
 
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
@@ -111,9 +158,10 @@ class BedLevelPrintController(QObject):
 
 
 
-    def _generateCustom(self)->None:
-        ''' Generates a bed level print based on the current print area and Cura settings '''
-
+    @pyqtSlot()
+    def dialogAccepted(self)->None:
+        ''' This method is called by the dialog when the "Generate" button is clicked '''
+ 
         containerStack = Application.getInstance().getGlobalContainerStack()
 
         # Query the bed size
@@ -128,6 +176,7 @@ class BedLevelPrintController(QObject):
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
+        openScadParameters ['Bed_Level_Print_Type'] = self.bedLevelPrintType.lower()
         openScadParameters ['Print_Area_Width'] = bed_width
         openScadParameters ['Print_Area_Depth'] = bed_depth
         openScadParameters ['Line_Width'] = line_width

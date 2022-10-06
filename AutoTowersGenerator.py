@@ -53,6 +53,9 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerGenerated = False
         self._autoTowerOperation = None
 
+        # Keep track of the currently active tower controller
+        self._currentController = None
+
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         # Not sure if this is needed
         CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
@@ -289,10 +292,10 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        controller = controllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+        self._currentController = controllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
 
         # Allow the tower controller to check Cura's settings to ensure it can be generated
-        errorMessage = controller.settingsAreCompatible()
+        errorMessage = self._currentController.settingsAreCompatible()
         if errorMessage != '':
             Message(errorMessage, title=self._pluginName).show()
             return
@@ -306,7 +309,7 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName).show()
             return
 
-        controller.generate(presetName)
+        self._currentController.generate(presetName)
 
 
 
