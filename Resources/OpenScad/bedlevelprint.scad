@@ -2,7 +2,7 @@
 
 /* [General Parameters] */
 // The type of bed level print to generate
-Bed_Level_Print_Type = "concentric squares"; // ["concentric squares", "x in square", "circle in square", "perimeter", "five circles"]
+Bed_Level_Print_Type = "concentric squares"; // ["concentric squares", "x in square", "circle in square", "perimeter", "grid", "five circles"]
 
 // The width of the bed print area
 Print_Area_Width = 220.001;
@@ -16,12 +16,21 @@ Line_Width = 0.401;
 // The height of the lines to print
 Line_Height = 0.301;
 
+// The percentage to inset each bed level print from the edges of the print bed
+Print_Bed_Inset = 10; // [0 - 50]
+
+
+
+/* [Bed Level Print Specific Parameters] */
+// The number of square to print for the concentric squares bed level print
+Concentric_Ring_Count = 7;
+
+// The number of grids (horizontal and vertical) to print for the grid bed level print
+Grid_Cell_Count = 4;
+
 
 
 /* [Advanced Parameters] */
-// The number of concentric rectanglular rings to print (also effects the actual print size)
-Number_of_Concentric_Rings = 7;
-
 // Quality value (higher numbers mean better quality, lower numbers mean faster rendering)
 Quality_Value = 128;
 
@@ -54,9 +63,9 @@ $fn = Quality_Value;
 
 module Generate_Model()
 {
-    Reference_Size = min(Print_Area_Width, Print_Area_Depth)/Number_of_Concentric_Rings;
-    Print_Width = Print_Area_Width - Reference_Size;
-    Print_Depth = Print_Area_Depth - Reference_Size;
+    Reference_Size = min(Print_Area_Width, Print_Area_Depth)/Concentric_Ring_Count;
+    Print_Width = Print_Area_Width * (100 - Print_Bed_Inset)/100;
+    Print_Depth = Print_Area_Depth * (100 - Print_Bed_Inset)/100;
 
 
 
@@ -124,13 +133,14 @@ module Generate_Model()
         // Maybe I can scan in my notes?
         // Note that, at the moment, this doesn't work correctly for non-square print beds
         // Hopefully, I can figure this out at some point, but this is it for now
-        module curved_side(X, Y, THETA, Rc, line_width)
+        module curved_side(X, Y, Rc, line_width)
         {
-            xc = (Rc - line_width) * sin(THETA);
-            yc = (Rc - line_width) * cos(THETA);
+            theta = atan2(Y, X);
+            xc = (Rc - line_width) * sin(theta);
+            yc = (Rc - line_width) * cos(theta);
             ys = Y - yc;
-            rs = ys/cos(THETA);
-            xs = rs * sin(THETA);
+            rs = ys/cos(theta);
+            xs = rs * sin(theta);
 
             rsx = rs * (xs/ys);
             rsy = rs * (ys/xs);
@@ -150,9 +160,6 @@ module Generate_Model()
         // Calculate the center offset of the curves that make up the corners of the x
         corner_x_offset = width/2 - corner_radius;
         corner_y_offset = height/2 - corner_radius;
-
-        // Calculate the angle of the line running from the center of the x to the center of one of the corners
-        intersection_angle = atan2(height, width);
 
         // Determine the diameters of an oval that passes through the center of each of the corners
         intersection_oval_diameter = sqrt(pow(corner_x_offset,2) + pow(corner_y_offset, 2))*2;
@@ -180,13 +187,13 @@ module Generate_Model()
                 // Draw the curved sides on the left and right of the x
                 for (x_mirror = [0, 1])
                 mirror([x_mirror, 0])
-                    curved_side(corner_x_offset, corner_y_offset, intersection_angle, corner_radius, Line_Width);
+                    curved_side(corner_x_offset, corner_y_offset, corner_radius, Line_Width);
                 
                 // Draw the curved sides on the top and bottom of the x
                 for (y_mirror = [0, 1])
                 mirror([0, y_mirror])
                 rotate([0, 0, 90])
-                    curved_side(corner_y_offset, corner_x_offset, 90 - intersection_angle, corner_radius, Line_Width);
+                    curved_side(corner_y_offset, corner_x_offset, corner_radius, Line_Width);
             }
 
             // Erase everything outside the intersection oval
@@ -198,10 +205,10 @@ module Generate_Model()
 
     module Generate_Concentric_Squares()
     {
-        width_delta = Print_Area_Width/(Number_of_Concentric_Rings + 1);
-        depth_delta = Print_Area_Depth/(Number_of_Concentric_Rings + 1);
+        width_delta = Print_Area_Width/(Concentric_Ring_Count + 1);
+        depth_delta = Print_Area_Depth/(Concentric_Ring_Count + 1);
 
-        for (ring_number = [0 : Number_of_Concentric_Rings - 1])
+        for (ring_number = [0 : Concentric_Ring_Count - 1])
         {
             ring_width = width_delta * (ring_number + 1);
             ring_depth = depth_delta * (ring_number + 1);
@@ -244,6 +251,35 @@ module Generate_Model()
     module Generate_Perimeter()
     {
         square_ring([Print_Width, Print_Depth], Line_Width, center=true);
+    }
+
+
+
+    module Generate_Grid()
+    {
+        // Horizontal lines
+        for (section_number = [0 : Grid_Cell_Count - 1])
+        {
+            section_width = Print_Width/Grid_Cell_Count;
+            section_height = Print_Depth;
+            x_offset = -Print_Width/2 + section_width * section_number + section_width/2;
+            y_offset = 0;
+
+            translate([x_offset, y_offset])
+                square_ring([section_width, section_height], Line_Width, center=true);
+        }
+
+        // Vertical lines
+        for (section_number = [0 : Grid_Cell_Count - 1])
+        {
+            section_width = Print_Width;
+            section_height = Print_Depth/Grid_Cell_Count;
+            x_offset = 0;
+            y_offset = -Print_Depth/2 + section_height * section_number + section_height/2;
+
+            translate([x_offset, y_offset])
+                square_ring([section_width, section_height], Line_Width, center=true);
+        }
     }
 
 
@@ -299,6 +335,10 @@ module Generate_Model()
             else if (Bed_Level_Print_Type == "perimeter")
             {
                 Generate_Perimeter();
+            }
+            else if (Bed_Level_Print_Type == "grid")
+            {
+                Generate_Grid();
             }
             else if (Bed_Level_Print_Type == "five circles")
             {

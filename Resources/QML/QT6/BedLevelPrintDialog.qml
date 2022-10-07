@@ -80,6 +80,46 @@ UM.Dialog
                 text: "The type of bed level print to generate."
                 visible: bed_level_print_type_mouse_area.containsMouse
             }
+
+            UM.Label
+            {
+                text: "Bed Inset %"
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.bedInsetPercentageStr
+                onTextChanged: if (manager.bedInsetPercentageStr != text) manager.bedInsetPercentageStr = text
+            }
+
+            UM.Label
+            {
+                text: "Number of Squares"
+                visible: manager.bedLevelPrintType == "Concentric Squares"
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.numberOfSquaresStr
+                onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
+                visible: manager.bedLevelPrintType == "Concentric Squares"
+            }
+
+            UM.Label
+            {
+                text: "Size in Cells"
+                visible: manager.bedLevelPrintType == "Grid"
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.cellSizeStr
+                onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
+                visible: manager.bedLevelPrintType == "Grid"
+            }
         }
     }
 
