@@ -333,14 +333,14 @@ class AutoTowersGenerator(QObject, Extension):
         # Stop listening for machine changes
         try:
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        except:
-            # Not sure how to handle this yet
+        except Exception as e:
+            Logger.log('e', e)
             pass
 
         try:
             CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
         except:
-            # Not sure how to handle this yet
+            Logger.log('e', e)
             pass
 
 
@@ -476,9 +476,9 @@ class AutoTowersGenerator(QObject, Extension):
     def _onMachineChanged(self)->None:
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
-
-        self._removeAutoTower()
-        Message('The Auto Tower has been removed because the active machine was changed', title=self._pluginName).show()        
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
+            Message('The Auto Tower has been removed because the active machine was changed', title=self._pluginName).show()        
 
 
 
@@ -486,9 +486,10 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
         # Remove the tower in response to settings changes
-        self._removeAutoTower()
-        setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
-        Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
+            setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
+            Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
                 
 
 

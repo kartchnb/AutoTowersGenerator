@@ -25,6 +25,7 @@ class BedLevelPrintController(QObject):
         {'value': 'X in Square', 'icon': 'bedlevelprint_x_in_square_icon.png'}, 
         {'value': 'Circle in Square', 'icon': 'bedlevelprint_circle_in_square_icon.png'}, 
         {'value': 'Perimeter', 'icon': 'bedlevelprint_perimeter_icon.png'}, 
+        {'value': 'Grid', 'icon': 'bedlevelprint_grid_icon.png'}, 
         {'value': 'Five Circles', 'icon': 'bedlevelprint_five_circles_icon.png'}, 
     ]
 
@@ -81,6 +82,51 @@ class BedLevelPrintController(QObject):
     @pyqtProperty(str, notify=bedLevelPrintTypeChanged, fset=setBedLevelPrintType)
     def bedLevelPrintType(self)->str:
         return self._bedLevelPrintType
+
+
+
+    # The selected bed inset percentage
+    _bedInsetPercentageStr = "10"
+
+    bedInsetPercentageStrChanged = pyqtSignal()
+
+    def setBedInsetPercentageStr(self, value)->None:
+        self._bedInsetPercentageStr = value
+        self.bedInsetPercentageStrChanged.emit()
+
+    @pyqtProperty(str, notify=bedInsetPercentageStrChanged, fset=setBedInsetPercentageStr)
+    def bedInsetPercentageStr(self)->str:
+        return self._bedInsetPercentageStr
+
+
+
+    # The selected number of squares
+    _numberOfSquaresStr = "7"
+
+    numberOfSquaresStrChanged = pyqtSignal()
+
+    def setNumberOfSquaresStr(self, value)->None:
+        self._numberOfSquaresStr = value
+        self.numberOfSquaresStrChanged.emit()
+
+    @pyqtProperty(str, notify=numberOfSquaresStrChanged, fset=setNumberOfSquaresStr)
+    def numberOfSquaresStr(self)->str:
+        return self._numberOfSquaresStr
+
+
+
+    # The selected cell size
+    _cellSizeStr = "4"
+
+    cellSizeStrChanged = pyqtSignal()
+
+    def setCellSizeStr(self, value)->None:
+        self._cellSizeStr = value
+        self.cellSizeStrChanged.emit()
+
+    @pyqtProperty(str, notify=cellSizeStrChanged, fset=setCellSizeStr)
+    def cellSizeStr(self)->str:
+        return self._cellSizeStr
 
 
 
@@ -164,6 +210,10 @@ class BedLevelPrintController(QObject):
  
         containerStack = Application.getInstance().getGlobalContainerStack()
 
+        bed_inset_percent = int(self.bedInsetPercentageStr)
+        number_of_squares = int(self.numberOfSquaresStr)
+        cell_size = int(self.cellSizeStr)
+
         # Query the bed size
         bed_width = containerStack.getProperty('machine_width', 'value')
         bed_depth = containerStack.getProperty('machine_depth', 'value')
@@ -181,6 +231,9 @@ class BedLevelPrintController(QObject):
         openScadParameters ['Print_Area_Depth'] = bed_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
+        openScadParameters ['Print_Bed_Inset'] = bed_inset_percent
+        openScadParameters ['Concentric_Ring_Count'] = number_of_squares
+        openScadParameters ['Grid_Cell_Count'] = cell_size
 
         # Determine the tower name
         towerName = f'Auto-Generated Bed Level Print {bed_width}x{bed_depth}'
