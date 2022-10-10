@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "retracttower distance 1-6": {
+        "distance 1-6": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -18,7 +18,7 @@
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "retracttower distance 4-9": {
+        "distance 4-9": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -36,7 +36,7 @@
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "retracttower distance 7-12": {
+        "distance 7-12": {
             "Base_Height": "0.8",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
@@ -54,7 +54,7 @@
             "Value_Change": "1",
             "Wall_Thickness": "0.6"
         },
-        "retracttower speed 10-50": {
+        "speed 10-50": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
@@ -72,7 +72,7 @@
             "Value_Change": "10",
             "Wall_Thickness": "0.6"
         },
-        "retracttower speed 35-75": {
+        "speed 35-75": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
@@ -90,7 +90,7 @@
             "Value_Change": "10",
             "Wall_Thickness": "0.6"
         },
-        "retracttower speed 60-100": {
+        "speed 60-100": {
             "Base_Height": "0.8",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
