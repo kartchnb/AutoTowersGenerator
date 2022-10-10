@@ -12,12 +12,13 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
         "screenshot: circle in square": {
             "Bed_Level_Print_Type": "circle in square",
+            "Fill_Percentage": "100",
             "Grid_Cell_Count": "4",
             "Line_Height": "0.301",
             "Line_Width": "5",
@@ -28,12 +29,13 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
         "screenshot: perimeter": {
             "Bed_Level_Print_Type": "perimeter",
+            "Fill_Percentage": "100",
             "Grid_Cell_Count": "4",
             "Line_Height": "0.301",
             "Line_Width": "5",
@@ -44,12 +46,13 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
         "screenshot: five circles": {
             "Bed_Level_Print_Type": "five circles",
+            "Fill_Percentage": "100",
             "Grid_Cell_Count": "4",
             "Line_Height": "0.301",
             "Line_Width": "5",
@@ -60,12 +63,13 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
         "screenshot: x in square": {
             "Bed_Level_Print_Type": "x in square",
+            "Fill_Percentage": "100",
             "Grid_Cell_Count": "4",
             "Line_Height": "0.301",
             "Line_Width": "5",
@@ -76,12 +80,13 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
         "screenshot: grid": {
             "Bed_Level_Print_Type": "grid",
+            "Fill_Percentage": "100",
             "Grid_Cell_Count": "3",
             "Line_Height": "0.301",
             "Line_Width": "5",
@@ -92,7 +97,7 @@
             "Quality_Value": "128",
             "Screenshot_Vpd": "400",
             "Screenshot_Vpf": "22.5",
-            "Screenshot_Vpr": "[60, 0, 300]",
+            "Screenshot_Vpr": "[65, 0, 300]",
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         }

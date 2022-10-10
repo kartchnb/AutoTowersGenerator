@@ -77,27 +77,44 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "The type of bed level print to generate."
+                text: "The type of bed level print to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level print type will look like."
                 visible: bed_level_print_type_mouse_area.containsMouse
             }
 
             UM.Label
             {
-                text: "Bed Inset %"
+                text: "Bed Fill %"
+                MouseArea 
+                {
+                    id: bed_inset_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
-                text: manager.bedInsetPercentageStr
-                onTextChanged: if (manager.bedInsetPercentageStr != text) manager.bedInsetPercentageStr = text
+                validator: RegularExpressionValidator { regularExpression: /^[1-9][0-9]?$|^100$/ }
+                text: manager.fillPercentageStr
+                onTextChanged: if (manager.fillPercentageStr != text) manager.fillPercentageStr = text
+            }
+            UM.ToolTip
+            {
+                text: "This controls how much of the printer area the bed level print should take up.<p>A value of 100 will result in the entire print area being used and may not work.<p>Values below 75 probably don't make much sense."
+                visible: bed_inset_mouse_area.containsMouse
             }
 
             UM.Label
             {
                 text: "Number of Squares"
                 visible: manager.bedLevelPrintType == "Concentric Squares"
-            }
+                MouseArea 
+                {
+                    id: number_of_squares_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
@@ -106,12 +123,23 @@ UM.Dialog
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
                 visible: manager.bedLevelPrintType == "Concentric Squares"
             }
+            UM.ToolTip
+            {
+                text: "The number of concentric squares to print."
+                visible: number_of_squares_mouse_area.containsMouse
+            }
 
             UM.Label
             {
                 text: "Size in Cells"
                 visible: manager.bedLevelPrintType == "Grid"
-            }
+                MouseArea 
+                {
+                    id: size_in_cells_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+             }
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
@@ -119,6 +147,11 @@ UM.Dialog
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
                 visible: manager.bedLevelPrintType == "Grid"
+            }
+            UM.ToolTip
+            {
+                text: "The size of the grid in cells."
+                visible: size_in_cells_mouse_area.containsMouse
             }
         }
     }
