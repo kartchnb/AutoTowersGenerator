@@ -85,18 +85,18 @@ class BedLevelPrintController(QObject):
 
 
 
-    # The selected bed inset percentage
-    _bedInsetPercentageStr = "10"
+    # The selected bed fill percentage
+    _fillPercentageStr = "90"
 
-    bedInsetPercentageStrChanged = pyqtSignal()
+    fillPercentageStrChanged = pyqtSignal()
 
-    def setBedInsetPercentageStr(self, value)->None:
-        self._bedInsetPercentageStr = value
-        self.bedInsetPercentageStrChanged.emit()
+    def setFillPercentageStr(self, value)->None:
+        self._fillPercentageStr = value
+        self.fillPercentageStrChanged.emit()
 
-    @pyqtProperty(str, notify=bedInsetPercentageStrChanged, fset=setBedInsetPercentageStr)
-    def bedInsetPercentageStr(self)->str:
-        return self._bedInsetPercentageStr
+    @pyqtProperty(str, notify=fillPercentageStrChanged, fset=setFillPercentageStr)
+    def fillPercentageStr(self)->str:
+        return self._fillPercentageStr
 
 
 
@@ -187,7 +187,7 @@ class BedLevelPrintController(QObject):
         bed_width = containerStack.getProperty('machine_width', 'value')
         bed_depth = containerStack.getProperty('machine_depth', 'value')
 
-        # Abort if the bed levl print is bigger than the bed
+        # Abort if the bed level print is bigger than the print area
         if print_width > bed_width or print_depth > bed_depth:
             message = 'This bed level print preset is too large for your printer\n'
             message += f'Printer bed is {bed_width}x{bed_depth}mm, but the preset is {print_width}x{print_depth}mm'
@@ -210,7 +210,7 @@ class BedLevelPrintController(QObject):
  
         containerStack = Application.getInstance().getGlobalContainerStack()
 
-        bed_inset_percent = int(self.bedInsetPercentageStr)
+        fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
 
@@ -231,7 +231,7 @@ class BedLevelPrintController(QObject):
         openScadParameters ['Print_Area_Depth'] = bed_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
-        openScadParameters ['Print_Bed_Inset'] = bed_inset_percent
+        openScadParameters ['Fill_Percentage'] = fill_percentage
         openScadParameters ['Concentric_Ring_Count'] = number_of_squares
         openScadParameters ['Grid_Cell_Count'] = cell_size
 

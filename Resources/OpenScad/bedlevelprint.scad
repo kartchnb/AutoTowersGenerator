@@ -16,8 +16,8 @@ Line_Width = 0.401;
 // The height of the lines to print
 Line_Height = 0.301;
 
-// The percentage to inset each bed level print from the edges of the print bed
-Print_Bed_Inset = 10; // [0 - 50]
+// The percentage of the print area to use for the bed level print
+Fill_Percentage = 90; // [50: 100]
 
 
 
@@ -64,8 +64,8 @@ $fn = Quality_Value;
 module Generate_Model()
 {
     Reference_Size = min(Print_Area_Width, Print_Area_Depth)/Concentric_Ring_Count;
-    Print_Width = Print_Area_Width * (100 - Print_Bed_Inset)/100;
-    Print_Depth = Print_Area_Depth * (100 - Print_Bed_Inset)/100;
+    Print_Width = Print_Area_Width * (Fill_Percentage/100);
+    Print_Depth = Print_Area_Depth * (Fill_Percentage/100);
 
 
 
@@ -205,8 +205,8 @@ module Generate_Model()
 
     module Generate_Concentric_Squares()
     {
-        width_delta = Print_Area_Width/(Concentric_Ring_Count + 1);
-        depth_delta = Print_Area_Depth/(Concentric_Ring_Count + 1);
+        width_delta = Print_Width/Concentric_Ring_Count;
+        depth_delta = Print_Depth/Concentric_Ring_Count;
 
         for (ring_number = [0 : Concentric_Ring_Count - 1])
         {

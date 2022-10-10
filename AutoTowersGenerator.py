@@ -236,6 +236,16 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _cachedControllerTable = {}
+    def _retrieveTowerController(self, ControllerClass):
+        ''' Provides lazy instantiation of the tower controllers '''
+    
+        if not ControllerClass in self._cachedControllerTable:
+            self._cachedControllerTable[ControllerClass] = ControllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+        return self._cachedControllerTable[ControllerClass]
+
+
+
     def _initializeMenu(self)->None:
         # Add a menu for this plugin
         self.setMenuName('Auto Towers')
@@ -292,10 +302,10 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        self._currentController = controllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+        controller = self._retrieveTowerController(controllerClass)
 
         # Allow the tower controller to check Cura's settings to ensure it can be generated
-        errorMessage = self._currentController.settingsAreCompatible()
+        errorMessage = controller.settingsAreCompatible()
         if errorMessage != '':
             Message(errorMessage, title=self._pluginName).show()
             return
@@ -309,7 +319,7 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName).show()
             return
 
-        self._currentController.generate(presetName)
+        controller.generate(presetName)
 
 
 
@@ -497,29 +507,30 @@ class AutoTowersGenerator(QObject, Extension):
         ''' This callback is called just before gcode is generated for the model 
             (this happens when the sliced model is sent to the printer or a file '''
 
-        # Retrieve the g-code from the scene
-        scene = Application.getInstance().getController().getScene()
+        if self._autoTowerGenerated:
+            # Retrieve the g-code from the scene
+            scene = Application.getInstance().getController().getScene()
 
-        try:
-            # Proceed if the g-code is valid
-            gcode_dict = getattr(scene, 'gcode_dict')
-        except AttributeError:
-            # If there is no g-code, there's nothing more to do
-            return
+            try:
+                # Proceed if the g-code is valid
+                gcode_dict = getattr(scene, 'gcode_dict')
+            except AttributeError:
+                # If there is no g-code, there's nothing more to do
+                return
 
-        try:
-            # Retrieve the g-code for the current build plate
-            active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
-            gcode = gcode_dict[active_build_plate_id]
-        except TypeError:
-            # If there is no g-code for the current build plate, there's nothing more to do
-            return
+            try:
+                # Retrieve the g-code for the current build plate
+                active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
+                gcode = gcode_dict[active_build_plate_id]
+            except TypeError:
+                # If there is no g-code for the current build plate, there's nothing more to do
+                return
 
-        # Proceed if the g-code has not already been post-processed
-        if self._gcodeProcessedMarker not in gcode[0]:
+            # Proceed if the g-code has not already been post-processed
+            if self._gcodeProcessedMarker not in gcode[0]:
 
-            # Mark the g-code as having been post-processed
-            gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
+                # Mark the g-code as having been post-processed
+                gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
-            # Call the callback to post-process the g-code
-            gcode = self._towerControllerPostProcessingCallback(gcode)
+                # Call the callback to post-process the g-code
+                gcode = self._towerControllerPostProcessingCallback(gcode)
