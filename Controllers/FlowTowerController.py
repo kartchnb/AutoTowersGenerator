@@ -146,19 +146,29 @@ class FlowTowerController(QObject):
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
-        containerStack = Application.getInstance().getGlobalContainerStack()
+        globalContainerStack = Application.getInstance().getGlobalContainerStack()
 
         # The tower cannot be generated if supports are enabled
-        supportEnabled = containerStack.getProperty('support_enable', 'value')
+        supportEnabled = globalContainerStack.getProperty('support_enable', 'value')
         if supportEnabled:
-            return 'Cannot generate a Flow Tower with supports enabled.\nDisable supports and try again.'
+            setting_label = globalContainerStack.getProperty('support_enable', 'label')
+            return [False, f'A Flow Tower cannot be generated correctly with "{setting_label}" enabled.\nFix this setting and try again.']
 
         # The tower cannot be generated if adaptive layers are enabled
-        adaptive_layers_enabled = containerStack.getProperty('adaptive_layer_height_enabled', 'value')
+        adaptive_layers_enabled = globalContainerStack.getProperty('adaptive_layer_height_enabled', 'value')
         if adaptive_layers_enabled:
-            return 'Cannot generate a Flow Tower with adaptive layers enabled.\nDisable adaptive layers and try again.'
+            setting_label = globalContainerStack.getProperty('adaptive_layer_height_enabled', 'label')
+            return [False, f'A Flow Tower cannot be generated correctly with "{setting_label}" enabled.\nFix this setting and try again.']
 
-        return ''
+        # The tower will not print correctly if "remove all holes" is enabled, but this is not a deal-breaker
+        extruder_stack = CuraApplication.getInstance().getExtruderManager().getActiveExtruderStacks()[0]        
+        extruder = globalContainerStack.extruderList[0]
+        remove_holes_enabled = extruder.getProperty('meshfix_union_all_remove_holes', 'value')
+        if remove_holes_enabled:
+            setting_label = extruder_stack.getProperty('meshfix_union_all_remove_holes', 'label')
+            return [True, f'The Temp Tower will print better with {setting_label} enabled']
+
+        return [True, '']
 
 
 

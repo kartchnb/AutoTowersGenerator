@@ -133,15 +133,15 @@ class BedLevelPrintController(QObject):
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
-        containerStack = Application.getInstance().getGlobalContainerStack()
+        globalContainerStack = Application.getInstance().getGlobalContainerStack()
 
         # The tower cannot be generated if any type of adhesion is selected
-        adhesion_setting = containerStack.getProperty('adhesion_type', 'value')
+        adhesion_setting = globalContainerStack.getProperty('adhesion_type', 'value')
         if adhesion_setting != 'none':
-            setting_label = containerStack.getProperty('adhesion_type', 'label')
-            return f'The Cura setting "{setting_label}" must be set to "none" to print a bed level print.'
+            setting_label = globalContainerStack.getProperty('adhesion_type', 'label')
+            return [False, f'The Cura setting "{setting_label}" must be set to "none" to print a bed level print.\nFix this setting and try again.']
 
-        return ''
+        return [True, '']
 
 
 

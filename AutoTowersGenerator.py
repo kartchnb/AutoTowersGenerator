@@ -305,9 +305,10 @@ class AutoTowersGenerator(QObject, Extension):
         controller = self._retrieveTowerController(controllerClass)
 
         # Allow the tower controller to check Cura's settings to ensure it can be generated
-        errorMessage = controller.settingsAreCompatible()
-        if errorMessage != '':
-            Message(errorMessage, title=self._pluginName).show()
+        [settingsAreCompatible, message] = controller.settingsAreCompatible()
+        if message != '':
+            Message(message, title=self._pluginName).show()
+        if settingsAreCompatible == False:
             return
 
         # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
