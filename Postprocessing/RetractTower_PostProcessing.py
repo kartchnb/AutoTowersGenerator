@@ -66,7 +66,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     currentValue = -1
     save_e = -1
 
-    if towerType == 'speed':
+    if towerType == 'Speed':
         lcd_gcode = f'M117 SPD {startValue:.1f}mm/s'
     else:
         lcd_gcode = f'M117 DST {startValue: .1f}mm'
@@ -105,7 +105,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         if relative_extrusion:
                             # Retracting filament (relative)
                             if current_e<0:
-                                if towerType == 'speed':
+                                if towerType == 'Speed':
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator retracting filament at {currentValue} mm/s (relative)' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
                                 else:
@@ -113,7 +113,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                     lcd_gcode = f'M117 DST {currentValue:.1f}mm ; AutoTowersGenerator added'
                             # Extruding filament (relative)
                             else:
-                                if towerType == 'speed':
+                                if towerType == 'Speed':
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator extruding filament at {currentValue} mm/s (relative)' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
                                 else:
@@ -126,7 +126,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         else:
                             # Retracting filament (absolute)
                             if save_e > current_e:
-                                if towerType == 'speed':
+                                if towerType == 'Speed':
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator retracting filament at {currentValue} mm/s (absolute)' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
                                 else:
@@ -135,7 +135,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                     lcd_gcode = f'M117 DST {currentValue:.1f}mm ; AutoTowersGenerator added'
                             # Resetting the retraction
                             else:
-                                if towerType == 'speed':
+                                if towerType == 'Speed':
                                     lines[lineIndex] = f'G1 F{int(currentValue * 60)} E{current_e:.5f} ; AutoTowersGenerator setting retraction speed to {currentValue} mm/s' # Speed value must be multiplied by 60 for the gcode
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
 
@@ -151,7 +151,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                     first_code = True
                     lines.insert(lineIndex + 1, '; AutoTowersGenerator start of the first section')
                     Logger.log('d', f'Start of first section at layer {layerIndex  - 2} - Setting the retraction {towerType} to {currentValue}')
-                    if towerType == 'speed':
+                    if towerType == 'Speed':
                         lcd_gcode = f'M117 SPD {startValue:.1f}mm/s ; AutoTowersGenerator added'
                     else:
                         lcd_gcode = f'M117 DST {startValue:.1f}mm ; AutoTowersGenerator added'
@@ -161,7 +161,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                     currentValue += valueChange
                     lines.insert(lineIndex + 1, '; AutoTowersGenerator start of the next section')
                     Logger.log('d', f'New section at layer {layerIndex - 2} - Setting the retraction {towerType} to {currentValue}')
-                    if towerType == 'speed':
+                    if towerType == 'Speed':
                         lcd_gcode = f'M117 SPD {startValue:.1f}mm/s ; AutoTowersGenerator added'
                     else:
                         lcd_gcode = f'M117 DST {startValue:.1f}mm ; AutoTowersGenerator added'
