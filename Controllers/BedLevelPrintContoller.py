@@ -224,6 +224,10 @@ class BedLevelPrintController(QObject):
         # Query the current line width
         line_width = containerStack.getProperty('line_width', 'value')
 
+        # Adjust the bed size by the line width to keep the print within the bed volume
+        bed_width -= 2
+        bed_depth -= 2
+
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
         openScadParameters ['Bed_Level_Print_Type'] = self.bedLevelPrintType.lower()
