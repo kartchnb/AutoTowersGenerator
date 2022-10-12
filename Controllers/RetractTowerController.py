@@ -30,14 +30,14 @@ class RetractTowerController(QObject):
     _nominalSectionHeight = 8.0
 
     _presetTables = {
-        'Disance 1-6': {
+        'Distance 1-6': {
             'filename': 'retracttower distance 1-6.stl',
             'start value': 1,
             'change value': 1,
             'tower type': 'Distance',
         },
 
-        'Disance 4-9': {
+        'Distance 4-9': {
             'filename': 'retracttower distance 4-9.stl',
             'start value': 4,
             'change value': 1,
