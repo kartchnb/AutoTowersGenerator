@@ -243,8 +243,8 @@ class BedLevelPatternController(QObject):
         fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
-        circle_diameter = int(self.circleDiameterStr)
-        outline_distance = int(self.outlineDistanceStr)
+        circle_diameter = float(self.circleDiameterStr)
+        outline_distance = float(self.outlineDistanceStr)
 
         # Query the bed size
         bed_width = containerStack.getProperty('machine_width', 'value')
