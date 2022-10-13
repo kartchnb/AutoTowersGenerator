@@ -113,6 +113,36 @@ class FlowTowerController(QObject):
 
 
 
+    # The square size of each tower section (in mm)
+    _sectionSizeStr = '10'
+
+    sectionSizeStrChanged = pyqtSignal()
+    
+    def setSectionSizeStr(self, value)->None:
+        self._sectionSizeStr = value
+        self.sectionSizeStrChanged.emit()
+
+    @pyqtProperty(str, notify=sectionSizeStrChanged, fset=setSectionSizeStr)
+    def sectionSizeStr(self)->str:
+        return self._sectionSizeStr
+
+
+
+    # The diameter of the hole in each section (in mm)
+    _sectionHoleDiameterStr = '5'
+
+    sectionHoleDiameterStrChanged = pyqtSignal()
+    
+    def setSectionHoleDiameterStr(self, value)->None:
+        self._sectionHoleDiameterStr = value
+        self.sectionHoleDiameterStrChanged.emit()
+
+    @pyqtProperty(str, notify=sectionHoleDiameterStrChanged, fset=setSectionHoleDiameterStr)
+    def sectionHoleDiameterStr(self)->str:
+        return self._sectionHoleDiameterStr
+
+
+
     # The label to add to the tower
     _towerLabelStr = 'FLOW'
 
@@ -243,6 +273,8 @@ class FlowTowerController(QObject):
         startValue = float(self.startValueStr)
         endValue = float(self.endValueStr)
         valueChange = float(self.valueChangeStr)
+        sectionSize = float(self.sectionSizeStr)
+        sectionHoleDiameter = float(self.sectionHoleDiameterStr)
         towerLabel = self.towerLabelStr
         temperatureLabel = self.temperatureLabelStr
 
@@ -274,6 +306,8 @@ class FlowTowerController(QObject):
         openScadParameters ['Value_Change'] = valueChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
+        openScadParameters ['Section_Size'] = sectionSize
+        openScadParameters ['Section_Hole_Diameter'] = sectionHoleDiameter
         openScadParameters ['Tower_Label'] = towerLabel
         openScadParameters ['Temperature_Label'] = temperatureLabel
 
