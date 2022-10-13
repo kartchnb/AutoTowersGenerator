@@ -22,7 +22,7 @@ from . import MeshImporter
 from .OpenScadInterface import OpenScadInterface
 from .OpenScadJob import OpenScadJob
 
-from .Controllers.BedLevelPrintContoller import BedLevelPrintController
+from .Controllers.BedLevelPatternContoller import BedLevelPatternController
 from .Controllers.FanTowerController import FanTowerController
 from .Controllers.FlowTowerController import FlowTowerController
 from .Controllers.RetractTowerController import RetractTowerController
@@ -252,10 +252,10 @@ class AutoTowersGenerator(QObject, Extension):
 
         dividerCount = 0;
 
-        # Add menu entries for bed level prints
-        for presetName in BedLevelPrintController.getPresetNames():
-            self.addMenuItem(f'Bed Level Print ({presetName})', lambda presetName=presetName: self._generateAutoTower(BedLevelPrintController, presetName))
-        self.addMenuItem('Bed Level Print (Custom)', lambda: self._generateAutoTower(BedLevelPrintController))
+        # Add menu entries for bed level patterns
+        for presetName in BedLevelPatternController.getPresetNames():
+            self.addMenuItem(f'Bed Level Pattern ({presetName})', lambda presetName=presetName: self._generateAutoTower(BedLevelPatternController, presetName))
+        self.addMenuItem('Bed Level Pattern (Custom)', lambda: self._generateAutoTower(BedLevelPatternController))
 
         # Add menu entries for fan towers
         self.addMenuItem(' ' * dividerCount, lambda: None)
@@ -350,7 +350,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         try:
             CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        except:
+        except Exception as e:
             Logger.log('e', e)
             pass
 
@@ -533,5 +533,5 @@ class AutoTowersGenerator(QObject, Extension):
                 # Mark the g-code as having been post-processed
                 gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
-                # Call the callback to post-process the g-code
+                # Call the tower controller post-processing callback to modify the g-code
                 gcode = self._towerControllerPostProcessingCallback(gcode)

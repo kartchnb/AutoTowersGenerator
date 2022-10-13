@@ -7,7 +7,7 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Bed Level Print"
+    title: "Bed Level Pattern"
 
     minimumWidth: screenScaleFactor * 445
     minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
@@ -36,7 +36,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPrintType.model[selectedBedLevelPrintType.currentIndex]["icon"])
+                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPatternType.model[selectedBedLevelPatternType.currentIndex]["icon"])
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -53,36 +53,24 @@ UM.Dialog
 
             Label
             {
-                text: "Bed Level Print Type"
-                MouseArea 
-                {
-                    id: bed_level_print_type_mouse_area
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
+                text: "Bed Level Pattern Type"
             }
             ComboBox
             {
-                id: selectedBedLevelPrintType
+                id: selectedBedLevelPatternType
                 Layout.fillWidth: true
-                model: manager.bedLevelPrintTypesModel
+                model: manager.bedLevelPatternTypesModel
                 textRole: "value"
 
                 onCurrentIndexChanged: 
                 {
-                    manager.bedLevelPrintType = model[currentIndex]["value"]
+                    manager.bedLevelPatternType = model[currentIndex]["value"]
                 }
             }
 
             Label
             {
                 text: "Bed Fill %"
-                MouseArea 
-                {
-                    id: bed_inset_mouse_area
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
             }
             TextField
             {
@@ -95,13 +83,8 @@ UM.Dialog
             Label
             {
                 text: "Number of Squares"
-                visible: manager.bedLevelPrintType == "Concentric Squares"
-                MouseArea 
-                {
-                    id: number_of_squares_mouse_area
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
+                visible: manager.bedLevelPatternType == "Concentric Squares"
+
              }
             TextField
             {
@@ -109,19 +92,14 @@ UM.Dialog
                 validator: RegExpValidator { regExp: /[0-9]*/ }
                 text: manager.numberOfSquaresStr
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
-                visible: manager.bedLevelPrintType == "Concentric Squares"
+                visible: manager.bedLevelPatternType == "Concentric Squares"
             }
 
             Label
             {
                 text: "Size in Cells"
-                visible: manager.bedLevelPrintType == "Grid"
-                MouseArea 
-                {
-                    id: size_in_cells_mouse_area
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
+                visible: manager.bedLevelPatternType == "Grid"
+
              }
             TextField
             {
@@ -129,7 +107,47 @@ UM.Dialog
                 validator: RegExpValidator { regExp: /[0-9]*/ }
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
-                visible: manager.bedLevelPrintType == "Grid"
+                visible: manager.bedLevelPatternType == "Grid"
+            }
+
+            UM.Label
+            {
+                text: "Circle Diameter"
+                visible: manager.bedLevelPatternType == "Five Circles"
+
+             }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*/ }
+                text: manager.circleDiameterStr
+                onTextChanged: if (manager.circleDiameterStr != text) manager.circleDiameterStr = text
+                visible: manager.bedLevelPatternType == "Five Circles"
+            }
+            UM.ToolTip
+            {
+                text: "The diameter of the five circles."
+                visible: circle_diameter_mouse_area.containsMouse
+            }
+
+            UM.Label
+            {
+                text: "Outline Distance"
+                visible: manager.bedLevelPatternType == "Five Circles"
+
+             }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*/ }
+                text: manager.outlineDistanceStr
+                onTextChanged: if (manager.outlineDistanceStr != text) manager.outlineDistanceStr = text
+                visible: manager.bedLevelPatternType == "Five Circles"
+            }
+            UM.ToolTip
+            {
+                text: "The distance to offset the outline of the five circles pattern."
+                visible: outline_distance_mouse_area.containsMouse
             }
 
         }

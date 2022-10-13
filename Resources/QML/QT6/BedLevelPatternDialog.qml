@@ -8,7 +8,7 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "Bed Level Print"
+    title: "Bed Level Pattern"
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
@@ -38,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPrintType.model[selectedBedLevelPrintType.currentIndex]["icon"])
+                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPatternType.model[selectedBedLevelPatternType.currentIndex]["icon"])
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -55,30 +55,30 @@ UM.Dialog
 
             UM.Label
             {
-                text: "Bed Level Print Type"
+                text: "Bed Level Pattern Type"
                 MouseArea 
                 {
-                    id: bed_level_print_type_mouse_area
+                    id: bed_level_Pattern_type_mouse_area
                     anchors.fill: parent
                     hoverEnabled: true
                 }
             }
             Cura.ComboBox
             {
-                id: selectedBedLevelPrintType
+                id: selectedBedLevelPatternType
                 Layout.fillWidth: true
-                model: manager.bedLevelPrintTypesModel
+                model: manager.bedLevelPatternTypesModel
                 textRole: "value"
 
                 onCurrentIndexChanged: 
                 {
-                    manager.bedLevelPrintType = model[currentIndex]["value"]
+                    manager.bedLevelPatternType = model[currentIndex]["value"]
                 }
             }
             UM.ToolTip
             {
-                text: "The type of bed level print to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level print type will look like."
-                visible: bed_level_print_type_mouse_area.containsMouse
+                text: "The type of bed level Pattern to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level Pattern type will look like."
+                visible: bed_level_Pattern_type_mouse_area.containsMouse
             }
 
             UM.Label
@@ -100,14 +100,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "This controls how much of the printer area the bed level print should take up.<p>A value of 100 will result in the entire print area being used and may not work.<p>Values below 75 probably don't make much sense."
+                text: "This controls how much of the printer area the pattern should take up.<p>A value of 100 will result in the entire print area being used and may not work.<p>Values below 75 probably don't make much sense."
                 visible: bed_inset_mouse_area.containsMouse
             }
 
             UM.Label
             {
                 text: "Number of Squares"
-                visible: manager.bedLevelPrintType == "Concentric Squares"
+                visible: manager.bedLevelPatternType == "Concentric Squares"
                 MouseArea 
                 {
                     id: number_of_squares_mouse_area
@@ -121,18 +121,18 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.numberOfSquaresStr
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
-                visible: manager.bedLevelPrintType == "Concentric Squares"
+                visible: manager.bedLevelPatternType == "Concentric Squares"
             }
             UM.ToolTip
             {
-                text: "The number of concentric squares to print."
+                text: "The number of concentric squares to generate in the pattern."
                 visible: number_of_squares_mouse_area.containsMouse
             }
 
             UM.Label
             {
                 text: "Size in Cells"
-                visible: manager.bedLevelPrintType == "Grid"
+                visible: manager.bedLevelPatternType == "Grid"
                 MouseArea 
                 {
                     id: size_in_cells_mouse_area
@@ -146,12 +146,62 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
-                visible: manager.bedLevelPrintType == "Grid"
+                visible: manager.bedLevelPatternType == "Grid"
             }
             UM.ToolTip
             {
                 text: "The size of the grid in cells."
                 visible: size_in_cells_mouse_area.containsMouse
+            }
+
+            UM.Label
+            {
+                text: "Circle Diameter"
+                visible: manager.bedLevelPatternType == "Five Circles"
+                MouseArea 
+                {
+                    id: circle_diameter_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+             }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.circleDiameterStr
+                onTextChanged: if (manager.circleDiameterStr != text) manager.circleDiameterStr = text
+                visible: manager.bedLevelPatternType == "Five Circles"
+            }
+            UM.ToolTip
+            {
+                text: "The diameter of the five circles."
+                visible: circle_diameter_mouse_area.containsMouse
+            }
+
+            UM.Label
+            {
+                text: "Outline Distance"
+                visible: manager.bedLevelPatternType == "Five Circles"
+                MouseArea 
+                {
+                    id: outline_distance_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+             }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.outlineDistanceStr
+                onTextChanged: if (manager.outlineDistanceStr != text) manager.outlineDistanceStr = text
+                visible: manager.bedLevelPatternType == "Five Circles"
+            }
+            UM.ToolTip
+            {
+                text: "The distance to offset the outline of the five circles pattern."
+                visible: outline_distance_mouse_area.containsMouse
             }
         }
     }

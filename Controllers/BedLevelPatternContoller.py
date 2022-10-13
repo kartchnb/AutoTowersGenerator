@@ -16,17 +16,17 @@ from UM.Message import Message
 
 
 
-class BedLevelPrintController(QObject):
-    _openScadFilename = 'bedlevelprint.scad'
-    _qmlFilename = 'BedLevelPrintDialog.qml'
+class BedLevelPatternController(QObject):
+    _openScadFilename = 'bedlevelpattern.scad'
+    _qmlFilename = 'BedLevelPatternDialog.qml'
 
-    _bedLevelPrintTypesModel = [
-        {'value': 'Concentric Squares', 'icon': 'bedlevelprint_concentric_squares_icon.png'}, 
-        {'value': 'X in Square', 'icon': 'bedlevelprint_x_in_square_icon.png'}, 
-        {'value': 'Circle in Square', 'icon': 'bedlevelprint_circle_in_square_icon.png'}, 
-        {'value': 'Perimeter', 'icon': 'bedlevelprint_perimeter_icon.png'}, 
-        {'value': 'Grid', 'icon': 'bedlevelprint_grid_icon.png'}, 
-        {'value': 'Five Circles', 'icon': 'bedlevelprint_five_circles_icon.png'}, 
+    _bedLevelPatternTypesModel = [
+        {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
+        {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
+        {'value': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
+        {'value': 'Perimeter', 'icon': 'bedlevelpattern_perimeter_icon.png'}, 
+        {'value': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
+        {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
 
     _presetTables = {}
@@ -46,7 +46,7 @@ class BedLevelPrintController(QObject):
 
     @staticmethod
     def getPresetNames()->list:
-        return list(BedLevelPrintController._presetTables.keys())
+        return list(BedLevelPatternController._presetTables.keys())
 
 
 
@@ -65,23 +65,23 @@ class BedLevelPrintController(QObject):
 
     # The available tower types
     @pyqtProperty(list)
-    def bedLevelPrintTypesModel(self):
-        return self._bedLevelPrintTypesModel
+    def bedLevelPatternTypesModel(self):
+        return self._bedLevelPatternTypesModel
 
 
 
-    # The selected bed level print type
-    _bedLevelPrintType = _bedLevelPrintTypesModel[0]['value']
+    # The selected bed level pattern type
+    _bedLevelPatternType = _bedLevelPatternTypesModel[0]['value']
 
-    bedLevelPrintTypeChanged = pyqtSignal()
+    bedLevelPatternTypeChanged = pyqtSignal()
 
-    def setBedLevelPrintType(self, value)->None:
-        self._bedLevelPrintType = value
-        self.bedLevelPrintTypeChanged.emit()
+    def setBedLevelPatternType(self, value)->None:
+        self._bedLevelPatternType = value
+        self.bedLevelPatternTypeChanged.emit()
 
-    @pyqtProperty(str, notify=bedLevelPrintTypeChanged, fset=setBedLevelPrintType)
-    def bedLevelPrintType(self)->str:
-        return self._bedLevelPrintType
+    @pyqtProperty(str, notify=bedLevelPatternTypeChanged, fset=setBedLevelPatternType)
+    def bedLevelPatternType(self)->str:
+        return self._bedLevelPatternType
 
 
 
@@ -130,6 +130,36 @@ class BedLevelPrintController(QObject):
 
 
 
+    # The selected circle diameter for the five circles pattern
+    _circleDiameterStr = "20"
+
+    circleDiameterStrChanged = pyqtSignal()
+
+    def setCircleDiameterStr(self, value)->None:
+        self._circleDiameterStr = value
+        self.circleDiameterStrChanged.emit()
+
+    @pyqtProperty(str, notify=circleDiameterStrChanged, fset=setCircleDiameterStr)
+    def circleDiameterStr(self)->str:
+        return self._circleDiameterStr
+
+
+
+    # The selected outline distance for the five circles pattern
+    _outlineDistanceStr = "5"
+
+    outlineDistanceStrChanged = pyqtSignal()
+
+    def setOutlineDistanceStr(self, value)->None:
+        self._outlineDistanceStr = value
+        self.outlineDistanceStrChanged.emit()
+
+    @pyqtProperty(str, notify=outlineDistanceStrChanged, fset=setOutlineDistanceStr)
+    def outlineDistanceStr(self)->str:
+        return self._outlineDistanceStr
+
+
+
     def settingsAreCompatible(self)->str:
         ''' Check whether Cura's settings are compatible with this tower '''
 
@@ -139,14 +169,14 @@ class BedLevelPrintController(QObject):
         adhesion_setting = globalContainerStack.getProperty('adhesion_type', 'value')
         if adhesion_setting != 'none':
             setting_label = globalContainerStack.getProperty('adhesion_type', 'label')
-            return [False, f'The Cura setting "{setting_label}" must be set to "none" to print a bed level print.\nFix this setting and try again.']
+            return [False, f'The Cura setting "{setting_label}" must be set to "none" to print a bed level pattern.\nFix this setting and try again.']
 
         return [True, '']
 
 
 
     def generate(self, preset='')->None:
-        ''' Generate a bed level print
+        ''' Generate a bed level pattern
             Presets are not supported at this time '''
         self._settingsDialog.show()
             
@@ -168,18 +198,18 @@ class BedLevelPrintController(QObject):
             Logger.log('e', f'The "filename" entry for BedLevel preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's print area width
+        # Load the preset's pattern width
         try:
-            print_width = presetTable['print area width']
+            pattern_width = presetTable['pattern width']
         except KeyError:
-            Logger.log('e', f'The "print area width" for BedLevel preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "pattern width" for BedLevel preset table "{presetName}" has not been defined')
             return
 
-        # Load the preset's print area depth
+        # Load the preset's pattern depth
         try:
-            print_depth = presetTable['print area depth']
+            pattern_depth = presetTable['pattern depth']
         except KeyError:
-            Logger.log('e', f'The "print area depth" for BedLevel preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "pattern depth" for BedLevel preset table "{presetName}" has not been defined')
             return
 
         # Query the bed size
@@ -187,17 +217,17 @@ class BedLevelPrintController(QObject):
         bed_width = containerStack.getProperty('machine_width', 'value')
         bed_depth = containerStack.getProperty('machine_depth', 'value')
 
-        # Abort if the bed level print is bigger than the print area
-        if print_width > bed_width or print_depth > bed_depth:
-            message = 'This bed level print preset is too large for your printer\n'
-            message += f'Printer bed is {bed_width}x{bed_depth}mm, but the preset is {print_width}x{print_depth}mm'
+        # Abort if the bed level pattern is bigger than the print area
+        if pattern_width > bed_width or pattern_depth > bed_depth:
+            message = 'This bed level pattern preset is too large for your printer\n'
+            message += f'Printer bed is {bed_width}x{bed_depth} mm, but the preset is {pattern_width}x{pattern_depth} mm'
             Message(message).show()
 
         # Determine the file path of the preset
         stlFilePath = os.path.join(self._stlPath, stlFileName)
 
         # Determine the tower name
-        towerName = f'Preset Bed Level Print {presetName}'
+        towerName = f'Preset Bed Level Pattern {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(towerName, stlFilePath, self.postProcess)
@@ -213,6 +243,8 @@ class BedLevelPrintController(QObject):
         fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
+        circle_diameter = int(self.circleDiameterStr)
+        outline_distance = int(self.outlineDistanceStr)
 
         # Query the bed size
         bed_width = containerStack.getProperty('machine_width', 'value')
@@ -224,23 +256,25 @@ class BedLevelPrintController(QObject):
         # Query the current line width
         line_width = containerStack.getProperty('line_width', 'value')
 
-        # Adjust the bed size by the line width to keep the print within the bed volume
+        # Adjust the bed size by the line width to keep the pattern within the bed volume
         bed_width -= 2
         bed_depth -= 2
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Bed_Level_Print_Type'] = self.bedLevelPrintType.lower()
-        openScadParameters ['Print_Area_Width'] = bed_width
-        openScadParameters ['Print_Area_Depth'] = bed_depth
+        openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPatternType.lower()
+        openScadParameters ['Pattern_Area_Width'] = bed_width
+        openScadParameters ['Pattern_Area_Depth'] = bed_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
         openScadParameters ['Fill_Percentage'] = fill_percentage
         openScadParameters ['Concentric_Ring_Count'] = number_of_squares
         openScadParameters ['Grid_Cell_Count'] = cell_size
+        #openScadParameters ['Circle Diameter'] = circle_diameter
+        #openScadParameters ['Outline Distance'] = outline_distance
 
         # Determine the tower name
-        towerName = f'Auto-Generated Bed Level Print {bed_width}x{bed_depth}'
+        towerName = f'Auto-Generated Bed Level Pattern {bed_width}x{bed_depth}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -250,5 +284,5 @@ class BedLevelPrintController(QObject):
     def postProcess(self, gcode)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
-        # No post-processing needs to be done for this print
+        # No post-processing needs to be done for this pattern
         return gcode
