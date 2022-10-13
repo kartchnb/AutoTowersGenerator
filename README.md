@@ -40,8 +40,6 @@ You can also print several types of bed level patterns that will be customized f
 
 - I owe a huge debt to 5axes and his [Calibration Shapes plugin](https://marketplace.ultimaker.com/app/cura/plugins/5axes/CalibrationShapes).  The post-processing code was adapted directly from his plugin and I learned a lot from reviewing his code.  If you haven't installed his plugin yet, stop reading and do so now.
 
-- I've done my best with this plugin, but I'm far from understanding everything about Cura and I'm still fairly new to Python.  I'm confident there are many things that are wrong or could be improved and suggestions are heartily welcomed.  There are few things I excel at, but getting things wrong is one of them.
-
 - There have been a lot of questions about how to interpret the flow tower. My intention with this tower was for it to be used as a visual check of how well your flow settings are working. All3DP has a [good article](https://all3dp.com/2/extrusion-multiplier-cura-ways-to-improve-your-prints/) with some visual examples of what good and bad flow might look like. If you want a less subjective way to analyze your flow settings, you can measure the width of each section. By default, each section of the flow tower is 10 mm in size (width, depth, and height) and the holes are intended to be 5 mm in diameter. If your results differ, it may indicate problems with your flow settings.
 
 - Although I've attempted to maintain compatibility with Cura versions older than 5.0, updates for this version have not been tested and may not work correctly. I strongly suggest upgrading your Cura version if you haven't yet.
