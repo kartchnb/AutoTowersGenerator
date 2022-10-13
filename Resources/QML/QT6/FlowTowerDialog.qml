@@ -121,6 +121,52 @@ UM.Dialog
                 text: "The amount to change the flow rate % between sections of the tower.<p>In combination with the start end end flow rates, this determines the number of sections in the tower."
                 visible: flow_rate_change_mouse_area.containsMouse
             }
+
+            UM.Label 
+            { 
+                text: "Section Size" 
+                MouseArea 
+                {
+                    id: section_size_change_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.sectionSizeStr
+                onTextChanged: if (manager.sectionSizeStr != text) manager.sectionSizeStr = text
+            }
+            UM.ToolTip
+            {
+                text: "The size (width, depth, and height) of each section. This can be used to detect flow problems by measuring the dimensions of each section after the tower has been printed."
+                visible: section_size_change_mouse_area.containsMouse
+            }
+
+            UM.Label 
+            { 
+                text: "Section Hole Diameter" 
+                MouseArea 
+                {
+                    id: section_hole_diameter_change_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.sectionHoleDiameterStr
+                onTextChanged: if (manager.sectionHoleDiameterStr != text) manager.sectionHoleDiameterStr = text
+            }
+            UM.ToolTip
+            {
+                text: "The diameter of the holes in each tower section. This can be used to detect flow problems by measuring the diameter of the hole in each section after the tower has been printed"
+                visible: section_hole_diameter_change_mouse_area.containsMouse
+            }
    
             UM.Label 
             { 

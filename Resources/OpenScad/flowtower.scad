@@ -24,7 +24,10 @@ Value_Change = 5;
 Base_Height = 0.801;
 
 // The height of each section of the tower
-Section_Height = 8.001;
+Section_Size = 10.001;
+
+// The diameter of the holes to create in each section
+Section_Hole_Diameter = 5.001;
 
 
 
@@ -88,12 +91,6 @@ Value_Change_Corrected = Ending_Value > Starting_Value
 // Determine how many sections to generate
 Section_Count = ceil(abs(Ending_Value - Starting_Value) / abs(Value_Change) + 1);
 
-// Determine the size (width and length) of each section cube
-Section_Size = Section_Height;
-
-// Determine the diameter of the hole to cut through each section
-Section_Hole_Diameter = min(Section_Height, Section_Size) - Wall_Thickness*4;
-
 // Calculate the amount to expand the base beyond the size of the tower
 Base_Extension = Wall_Thickness*4;
 
@@ -101,7 +98,7 @@ Base_Extension = Wall_Thickness*4;
 Base_Size = Section_Size*2 + Base_Extension*2;
 
 // Calculate the font size
-Section_Label_Font_Size = Section_Height * Section_Label_Height_Multiplier;
+Section_Label_Font_Size = Section_Size * Section_Label_Height_Multiplier;
 Tower_Label_Font_Size = Section_Size * Tower_Label_Height_Multiplier;
 Temperature_Label_Font_Size = Section_Size * Temperature_Label_Height_Multiplier; 
 
@@ -130,7 +127,7 @@ module Generate_Model()
             value = Starting_Value + (Value_Change_Corrected * section);
 
             // Determine the offset of the section
-            z_offset = section*Section_Height;
+            z_offset = section*Section_Size;
 
             // Determine the rotation of the section
             z_rot = -90 * section;
@@ -154,9 +151,9 @@ module Generate_Model()
         {
             // Create the main body of the section
             translate([-Section_Size, -Section_Size, 0])
-                cube([Section_Size, Section_Size, Section_Height]);
+                cube([Section_Size, Section_Size, Section_Size]);
 
-            translate([-Section_Size - Section_Size/2, -Section_Size/2, Section_Height/2])
+            translate([-Section_Size - Section_Size/2, -Section_Size/2, Section_Size/2])
             rotate([0, 90, 0])
                 cylinder(d=Section_Hole_Diameter, Section_Size*2);
 
@@ -174,8 +171,8 @@ module Generate_Model()
         points =
         [
             [0, 0],
-            [Section_Height, Section_Size],
-            [Section_Height, 0],
+            [Section_Size, Section_Size],
+            [Section_Size, 0],
         ];
 
         rotate([0, -90, 0])
@@ -189,7 +186,7 @@ module Generate_Model()
     module Generate_SectionLabel(label)
     {
         full_label = str(Section_Label_Prefix, label, Section_Label_Suffix);
-        translate([-Section_Size/2, -Section_Size, Section_Height/2])
+        translate([-Section_Size/2, -Section_Size, Section_Size/2])
         rotate([90, 0, 0])
         translate([0, 0, -Label_Depth])
         linear_extrude(Label_Depth + Iota)

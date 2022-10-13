@@ -84,6 +84,30 @@ UM.Dialog
                 text: manager.valueChangeStr
                 onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
             }
+
+            UM.Label 
+            { 
+                text: "Section Size" 
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.sectionSizeStr
+                onTextChanged: if (manager.sectionSizeStr != text) manager.sectionSizeStr = text
+            }
+
+            UM.Label 
+            { 
+                text: "Section Hole Diameter" 
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.sectionHoleDiameterStr
+                onTextChanged: if (manager.sectionHoleDiameterStr != text) manager.sectionHoleDiameterStr = text
+            }
     
             Label 
             { 
