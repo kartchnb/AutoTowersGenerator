@@ -12,19 +12,21 @@ from cura.CuraApplication import CuraApplication
 from UM.Application import Application
 from UM.Logger import Logger
 
+from .ControllerBase import ControllerBase
+
 # Import the script that does the actual post-processing
 from ..Postprocessing import FlowTower_PostProcessing
 
 
 
-class FlowTowerController(QObject):
+class FlowTowerController(ControllerBase):
     _openScadFilename = 'flowtower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _nominalBaseHeight = 0.8
     _nominalSectionHeight = 8.0
 
-    _presetTables = {
+    _presetsTable = {
         '115-85': {
             'filename': 'flowtower 115-85.stl',
             'start value': 115,
@@ -32,39 +34,17 @@ class FlowTowerController(QObject):
         },
     }
 
+    _criticalPropertiesTable = {
+        'adaptive_layer_height_enabled': False,
+        'layer_height': None,
+        'meshfix_union_all_remove_holes': False,
+        'support_enable': False,
+    }
+
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__()
-
-        self._loadStlCallback = loadStlCallback
-        self._generateAndLoadStlCallback = generateAndLoadStlCallback
-
-        self._guiPath = guiPath
-        self._stlPath = stlPath
-
-        self._startValue = 0
-        self._valueChange = 0
-        self._baseLayers = 0
-
-
-
-    @staticmethod
-    def getPresetNames()->list:
-        return list(FlowTowerController._presetTables.keys())
-
-
-
-    _cachedSettingsDialog = None
-
-    @property
-    def _settingsDialog(self)->QObject:
-        ''' Lazy instantiation of this tower's settings dialog '''
-        if self._cachedSettingsDialog is None:
-            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
-            self._cachedSettingsDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
-
-        return self._cachedSettingsDialog
+        super().__init__("Flow Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
 
 
 
@@ -173,56 +153,11 @@ class FlowTowerController(QObject):
 
 
 
-    def settingsAreCompatible(self)->str:
-        ''' Check whether Cura's settings are compatible with this tower '''
-
-        globalContainerStack = Application.getInstance().getGlobalContainerStack()
-
-        # The tower cannot be generated if supports are enabled
-        supportEnabled = globalContainerStack.getProperty('support_enable', 'value')
-        if supportEnabled:
-            setting_label = globalContainerStack.getProperty('support_enable', 'label')
-            return [False, f'A Flow Tower cannot be generated correctly with "{setting_label}" enabled.\nFix this setting and try again.']
-
-        # The tower cannot be generated if adaptive layers are enabled
-        adaptive_layers_enabled = globalContainerStack.getProperty('adaptive_layer_height_enabled', 'value')
-        if adaptive_layers_enabled:
-            setting_label = globalContainerStack.getProperty('adaptive_layer_height_enabled', 'label')
-            return [False, f'A Flow Tower cannot be generated correctly with "{setting_label}" enabled.\nFix this setting and try again.']
-
-        # The tower will not print correctly if "remove all holes" is enabled, but this is not a deal-breaker
-        extruder_stack = CuraApplication.getInstance().getExtruderManager().getActiveExtruderStacks()[0]        
-        extruder = globalContainerStack.extruderList[0]
-        remove_holes_enabled = extruder.getProperty('meshfix_union_all_remove_holes', 'value')
-        if remove_holes_enabled:
-            setting_label = extruder_stack.getProperty('meshfix_union_all_remove_holes', 'label')
-            return [True, f'The Temp Tower will print better with {setting_label} enabled']
-
-        return [True, '']
-
-
-
-    def generate(self, preset='')->None:
-        ''' Generate a tower - either a preset tower or a custom tower '''
-        # If a preset was requested, load it
-        if not preset == '':
-            self._loadPreset(preset)
-        
-        # Generate a custom tower
-        else:
-            # Query the current printing temperature
-            printTemperature = Application.getInstance().getGlobalContainerStack().getProperty('material_print_temperature', 'value')
-            self.setTemperatureLabelStr(f'{printTemperature}\u00b0')
-
-            self._settingsDialog.show()
-
-
-
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
         # Load the preset table
         try:
-            presetTable = self._presetTables[presetName]
+            presetTable = self._presetsTable[presetName]
         except KeyError:
             Logger.log('e', f'A SpeedTower preset named "{presetName}" was requested, but has not been defined')
             return

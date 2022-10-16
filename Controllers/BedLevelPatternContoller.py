@@ -14,11 +14,23 @@ from UM.Application import Application
 from UM.Logger import Logger
 from UM.Message import Message
 
+from .ControllerBase import ControllerBase
 
 
-class BedLevelPatternController(QObject):
+
+class BedLevelPatternController(ControllerBase):
     _openScadFilename = 'bedlevelpattern.scad'
     _qmlFilename = 'BedLevelPatternDialog.qml'
+
+    _presetsTable = {}
+
+    _criticalPropertiesTable = {
+        'adhesion_type': 'none',
+        'layer_height': None,
+        'line_width': None,
+        'machine_width': None,
+        'machine_depth': None,
+    }
 
     _bedLevelPatternTypesModel = [
         {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
@@ -29,37 +41,10 @@ class BedLevelPatternController(QObject):
         {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
 
-    _presetTables = {}
-
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__()
-
-        self._loadStlCallback = loadStlCallback
-        self._generateAndLoadStlCallback = generateAndLoadStlCallback
-
-        self._guiPath = guiPath
-        self._stlPath = stlPath
-
-
-
-    @staticmethod
-    def getPresetNames()->list:
-        return list(BedLevelPatternController._presetTables.keys())
-
-
-
-    _cachedSettingsDialog = None
-
-    @property
-    def _settingsDialog(self)->QObject:
-        ''' Lazy instantiation of this tower's settings dialog '''
-        if self._cachedSettingsDialog is None:
-            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
-            self._cachedSettingsDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
-
-        return self._cachedSettingsDialog
+        super().__init__('Bed Level Pattern', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
 
 
 
@@ -157,28 +142,6 @@ class BedLevelPatternController(QObject):
     @pyqtProperty(str, notify=outlineDistanceStrChanged, fset=setOutlineDistanceStr)
     def outlineDistanceStr(self)->str:
         return self._outlineDistanceStr
-
-
-
-    def settingsAreCompatible(self)->str:
-        ''' Check whether Cura's settings are compatible with this tower '''
-
-        globalContainerStack = Application.getInstance().getGlobalContainerStack()
-
-        # The tower cannot be generated if any type of adhesion is selected
-        adhesion_setting = globalContainerStack.getProperty('adhesion_type', 'value')
-        if adhesion_setting != 'none':
-            setting_label = globalContainerStack.getProperty('adhesion_type', 'label')
-            return [False, f'The Cura setting "{setting_label}" must be set to "none" to print a bed level pattern.\nFix this setting and try again.']
-
-        return [True, '']
-
-
-
-    def generate(self, preset='')->None:
-        ''' Generate a bed level pattern
-            Presets are not supported at this time '''
-        self._settingsDialog.show()
             
 
 
@@ -186,7 +149,7 @@ class BedLevelPatternController(QObject):
         ''' Load a preset tower '''
         # Load the preset table
         try:
-            presetTable = self._presetTables[presetName]
+            presetTable = self._presetsTable[presetName]
         except KeyError:
             Logger.log('e', f'A BedLevel preset named "{presetName}" was requested, but has not been defined')
             return

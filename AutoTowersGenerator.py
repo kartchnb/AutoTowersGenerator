@@ -36,6 +36,9 @@ class AutoTowersGenerator(QObject, Extension):
 
     _gcodeProcessedMarker = ';Post-processed by the AutoTowersGenerator plugin'
 
+    # Add additional controller classes to this list
+    _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
+
 
 
     def __init__(self):
@@ -62,6 +65,8 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Finish initializing the plugin after Cura is fully ready
         Application.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
+
+        Application.getInstance().applicationRunning.connect(lambda: Logger.log('d', 'Application Running Callback'))
 
 
 
@@ -250,47 +255,23 @@ class AutoTowersGenerator(QObject, Extension):
         # Add a menu for this plugin
         self.setMenuName('Auto Towers')
 
-        dividerCount = 0;
+        dividerCount = 0
 
-        # Add menu entries for bed level patterns
-        for presetName in BedLevelPatternController.getPresetNames():
-            self.addMenuItem(f'Bed Level Pattern ({presetName})', lambda presetName=presetName: self._generateAutoTower(BedLevelPatternController, presetName))
-        self.addMenuItem('Bed Level Pattern (Custom)', lambda: self._generateAutoTower(BedLevelPatternController))
+        # Add menu entries for each tower controller
+        for controllerClass in self._controllerClasses:
+            controller = self._retrieveTowerController(controllerClass)
 
-        # Add menu entries for fan towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
-        for presetName in FanTowerController.getPresetNames():
-            self.addMenuItem(f'Fan Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(FanTowerController, presetName))
-        self.addMenuItem('Fan Tower (Custom)', lambda: self._generateAutoTower(FanTowerController))
+            # Add a divider
+            if dividerCount >= 0:
+                self.addMenuItem(' ' * dividerCount, lambda:None)
+            dividerCount += 1
 
-        # Add menu entries for flow towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
-        for presetName in FlowTowerController.getPresetNames():
-            self.addMenuItem(f'Flow Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(FlowTowerController, presetName))
-        self.addMenuItem('Flow Tower (Custom)', lambda: self._generateAutoTower(FlowTowerController))
-        
-        # Add menu entries for retraction towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
-        for presetName in RetractTowerController.getPresetNames():
-            self.addMenuItem(f'Retraction Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(RetractTowerController, presetName))
-        self.addMenuItem('Retraction Tower (Custom)', lambda: self._generateAutoTower(RetractTowerController))
-        
-        # Add menu entries for speed towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
-        for presetName in SpeedTowerController.getPresetNames():
-            self.addMenuItem(f'Speed Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(SpeedTowerController, presetName))
-        self.addMenuItem('Speed Tower (Custom)', lambda: self._generateAutoTower(SpeedTowerController))
+            # Iterate over each of the tower controller presets
+            for presetName in controller.getPresetNames():
+                self.addMenuItem(f'{controller.name} ({presetName})', lambda controllerClass=controllerClass, presetName=presetName: self._generateAutoTower(controllerClass, presetName))
 
-        # Add menu entries for temperature towers
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
-        for presetName in TempTowerController.getPresetNames():
-            self.addMenuItem(f'Temperature Tower ({presetName})', lambda presetName=presetName: self._generateAutoTower(TempTowerController, presetName))
-        self.addMenuItem('Temperature Tower (Custom)', lambda: self._generateAutoTower(TempTowerController))
+            # Add a custom tower entry
+            self.addMenuItem(f'{controller.name} (Custom)', lambda controllerClass=controllerClass: self._generateAutoTower(controllerClass))
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ' * dividerCount, lambda: None)
@@ -302,14 +283,9 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        controller = self._retrieveTowerController(controllerClass)
+        self._removeAutoTower()
 
-        # Allow the tower controller to check Cura's settings to ensure it can be generated
-        [settingsAreCompatible, message] = controller.settingsAreCompatible()
-        if message != '':
-            Message(message, title=self._pluginName).show()
-        if settingsAreCompatible == False:
-            return
+        self._currentController = self._retrieveTowerController(controllerClass)
 
         # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
         openscad_path_is_valid = self._openScadInterface.OpenScadPathValid
@@ -320,39 +296,45 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName).show()
             return
 
-        controller.generate(presetName)
+        self._currentController.generate(presetName)
 
 
 
     def _removeAutoTower(self)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
 
-        # Indicate that there is no longer an Auto Tower in the scene
-        self._autoTowerGenerated = False
-        self.autoTowerGeneratedChanged.emit()
+        if self._autoTowerGenerated:
+            # Indicate that there is no longer an Auto Tower in the scene
+            self._autoTowerGenerated = False
+            self.autoTowerGeneratedChanged.emit()
 
-        # Remove the Auto Tower itself
-        self._autoTowerOperation.undo()
+            # Clean up the controller
+            message = self._currentController.cleanupController()
+            if message != '':
+                Message(message, title=self._pluginName).show()
 
-        # Remove the post-processing callback
-        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
-        self._towerControllerPostProcessingCallback = None
+            # Remove the Auto Tower itself
+            self._autoTowerOperation.undo()
 
-        # Clear the job name
-        CuraApplication.getInstance().getPrintInformation().setJobName('')
+            # Remove the post-processing callback
+            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
+            self._towerControllerPostProcessingCallback = None
 
-        # Stop listening for machine changes
-        try:
-            CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        except Exception as e:
-            Logger.log('e', e)
-            pass
+            # Clear the job name
+            CuraApplication.getInstance().getPrintInformation().setJobName('')
 
-        try:
-            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        except Exception as e:
-            Logger.log('e', e)
-            pass
+            # Stop listening for machine changes
+            try:
+                CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
+            except Exception as e:
+                Logger.log('e', e)
+                pass
+
+            try:
+                CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+            except Exception as e:
+                Logger.log('e', e)
+                pass
 
 
 
@@ -388,16 +370,18 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called after plugins have been loaded
             Iniializing here means that Cura is fully ready '''
 
-        # Load plugin settings
         self._loadPluginSettings()
-
-        # Add menus
         self._initializeMenu()
 
 
 
     def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller if a preset tower is requested '''
+
+        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
+        message = self._currentController.correctPrintProperties()
+        if message != '':
+            Message(message, title=self._pluginName).show()
 
         # If the file does not exist, display an error message
         if os.path.isfile(stlFilePath) == False:
@@ -413,6 +397,11 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
+
+        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
+        message = self._currentController.correctPrintProperties()
+        if message != '':
+            Message(message, title=self._pluginName).show()
 
         # This could take up to a couple of minutes...
         self._waitDialog.show()
@@ -497,11 +486,12 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
         # Remove the tower in response to settings changes
-        if self._autoTowerGenerated:
-            self._removeAutoTower()
-            setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
-            Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
-                
+        if self._autoTowerGenerated and not self._currentController is None:
+            if setting_key in self._currentController.getCriticalProperties:
+                self._removeAutoTower()
+                setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
+                Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
+
 
 
     def _postProcess(self, output_device)->None:
