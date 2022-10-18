@@ -377,8 +377,9 @@ class AutoTowersGenerator(QObject, Extension):
         if self._autoTowerGenerated:
             self._removeAutoTower()
 
-        return True
-        
+        application = CuraApplication.getInstance()
+        application.triggerNextExitCheck()
+
 
 
     def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
