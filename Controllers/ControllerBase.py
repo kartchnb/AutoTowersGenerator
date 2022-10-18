@@ -65,6 +65,7 @@ class ControllerBase(QObject):
         ''' Correct property settings that are incompatible with this controller '''
 
         globalContainerStack = Application.getInstance().getGlobalContainerStack()
+        log = ''
         message = ''
 
         # Iterate over each setting in the critical settings table
@@ -78,17 +79,16 @@ class ControllerBase(QObject):
                     compatible_value_name = str(compatible_value)
 
                 # Get the current value of the setting
-                property_value = globalContainerStack.getProperty(property_name, 'value')
                 property_label = globalContainerStack.getProperty(property_name, 'label')
-                options = globalContainerStack.getProperty(property_name, 'options')
-                Logger.log('d', f'options = {options}')
+                original_value = globalContainerStack.getProperty(property_name, 'value')
+                property_options = globalContainerStack.getProperty(property_name, 'options')
 
-                # If the property setting is wrong, backup and modify the setting
-                if property_value != compatible_value:
-                    Logger.log('d', f'changing value of "{property_name}" from "{property_value}" to "{compatible_value}"')
-                    self._originalSettings[property_name] = property_value
+                # If the property setting needs to be corrected, backup and modify the setting
+                if original_value != compatible_value:
+                    self._originalSettings[property_name] = original_value
                     globalContainerStack.setProperty(property_name, 'value', compatible_value)
                     message += f'"{property_label}" was set to "{compatible_value_name}"\n'
+                    Logger.log('d', f'Corrected value of "{property_label}" from "{original_value}" to "{compatible_value}"')
 
         if message != '':
             message = 'The following printing properties were changed for this Auto Tower:\n' + message
@@ -117,7 +117,6 @@ class ControllerBase(QObject):
         if not globalContainerStack is None:
             message = ''
 
-            Logger.log('d', f'original settings = {self._originalSettings}')
             # Iterate over each backed up property
             for property_name in self._originalSettings.keys():
                 # Get the old value
@@ -134,6 +133,7 @@ class ControllerBase(QObject):
                 # Restore the original settings
                 globalContainerStack.setProperty(property_name, 'value', original_value)
                 message = f'"{property_label}" was restored to "{original_value_name}"'
+                Logger.log('d', f'Restored the original value of "{property_name}" "{original_value}"')
 
             if message != '':
                 message = 'The following print properties were restored:\n' + message

@@ -64,9 +64,8 @@ class AutoTowersGenerator(QObject, Extension):
         CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
 
         # Finish initializing the plugin after Cura is fully ready
-        Application.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
-
-        Application.getInstance().applicationRunning.connect(lambda: Logger.log('d', 'Application Running Callback'))
+        CuraApplication.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
+        CuraApplication.getInstance().getOnExitCallbackManager().addCallback(self._onExitCallback)
 
 
 
@@ -194,10 +193,9 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
         # Remove the tower
-        self._removeAutoTower()
-
-        # Notify the user that the Auto Tower has been removed
-        Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
+            Message('The Auto Tower model and its associated post-processing has been removed', title=self._pluginName).show()
 
 
 
@@ -283,7 +281,8 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        self._removeAutoTower()
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
 
         self._currentController = self._retrieveTowerController(controllerClass)
 
@@ -303,38 +302,37 @@ class AutoTowersGenerator(QObject, Extension):
     def _removeAutoTower(self)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
 
-        if self._autoTowerGenerated:
-            # Indicate that there is no longer an Auto Tower in the scene
-            self._autoTowerGenerated = False
-            self.autoTowerGeneratedChanged.emit()
+        # Indicate that there is no longer an Auto Tower in the scene
+        self._autoTowerGenerated = False
+        self.autoTowerGeneratedChanged.emit()
 
-            # Clean up the controller
-            message = self._currentController.cleanupController()
-            if message != '':
-                Message(message, title=self._pluginName).show()
+        # Clean up the controller
+        message = self._currentController.cleanupController()
+        if message != '':
+            Message(message, title=self._pluginName).show()
 
-            # Remove the Auto Tower itself
-            self._autoTowerOperation.undo()
+        # Remove the Auto Tower itself
+        self._autoTowerOperation.undo()
 
-            # Remove the post-processing callback
-            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
-            self._towerControllerPostProcessingCallback = None
+        # Remove the post-processing callback
+        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcess)
+        self._towerControllerPostProcessingCallback = None
 
-            # Clear the job name
-            CuraApplication.getInstance().getPrintInformation().setJobName('')
+        # Clear the job name
+        CuraApplication.getInstance().getPrintInformation().setJobName('')
 
-            # Stop listening for machine changes
-            try:
-                CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-            except Exception as e:
-                Logger.log('e', e)
-                pass
+        # Stop listening for machine changes
+        try:
+            CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
+        except Exception as e:
+            Logger.log('e', e)
+            pass
 
-            try:
-                CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-            except Exception as e:
-                Logger.log('e', e)
-                pass
+        try:
+            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        except Exception as e:
+            Logger.log('e', e)
+            pass
 
 
 
@@ -366,13 +364,21 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _onPluginsLoadedCallback(self):
+    def _onPluginsLoadedCallback(self)->None:
         ''' Called after plugins have been loaded
             Iniializing here means that Cura is fully ready '''
 
         self._loadPluginSettings()
         self._initializeMenu()
 
+
+
+    def _onExitCallback(self)->bool:
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
+
+        return True
+        
 
 
     def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
