@@ -53,8 +53,18 @@ UM.Dialog
             TextField
             {
                 id: openScadPath
-                text: manager.openScadPath
+                text: manager.openScadPathSetting
                 onTextChanged: if (manager.openScadPathSetting != text) manager.openScadPathSetting = text
+            }
+
+            UM.Label 
+            { 
+                text: "Display on LCD" 
+            }
+            Cura.CheckBox
+            {
+                id: displayOnLcd
+                checked: manager.displayOnLcdSetting
             }
         }
     }
@@ -73,7 +83,8 @@ UM.Dialog
 
     onAccepted:
     {
-        manager.openScadPath = openScadPath.text
+        manager.openScadPathSetting = openScadPath.text
+        manager.displayOnLcdSetting = displayOnLcd.checked
         manager.pluginSettingsModified()
     }
 }

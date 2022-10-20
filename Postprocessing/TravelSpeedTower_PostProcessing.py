@@ -24,7 +24,7 @@ def is_travel_speed_line(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, referenceSpeed):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, referenceSpeed, displayOnLcd):
     ''' Post-process gcode sliced by Cura
         startValue = the starting travel speed (mm/s)
         valueChange = the amount to change the travel speed for each section (mm/s)
@@ -85,6 +85,9 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                         new_line = line.replace(f'F{oldSpeedResult.group(1)}', f'F{newSpeed:.1f}') + f' ; AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s to {(newSpeed/60):.1f}mm/s'
 
                         lines[lineIndex] = new_line
+
+                        if displayOnLcd:
+                            lines.insert(lineIndex + 1, f'M117 Speed {(newSpeed/60):.1f}mm/s ; AutoTowersGenerator added')
                                      
             result = '\n'.join(lines)
             gcode[layerIndex] = result

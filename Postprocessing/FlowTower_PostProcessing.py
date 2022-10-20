@@ -17,7 +17,7 @@ def is_start_of_layer(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, displayOnLcd):
     Logger.log('d', 'AutoTowersGenerator beginning FlowTower post-processing')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
@@ -51,14 +51,16 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers):
                 if layerIndex == baseLayers:
                     Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting flow rate to {currentValue}')
                     lines.insert(lineIndex + 1, f'M221 S{currentValue} ; AutoTowersGenerator setting flow rate to {currentValue} for first section')
-                    lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator added')
+                    if displayOnLcd:
+                        lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator added')
 
                 # If the end of a section has been reached, decrease the temperature
                 if ((layerIndex - baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
                     currentValue += valueChange
                     Logger.log('d', f'New section at layer {layerIndex - 2} - setting flow rate to {currentValue}')
                     lines.insert(lineIndex + 1, f'M221 S{currentValue} ; AutoTowersGenerator setting flow rate to {currentValue} for next section')
-                    lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator addeds')
+                    if displayOnLcd:
+                        lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator addeds')
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result

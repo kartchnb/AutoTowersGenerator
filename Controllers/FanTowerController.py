@@ -236,10 +236,10 @@ class FanTowerController(ControllerBase):
 
 
 
-    def postProcess(self, gcode)->list:
+    def postProcess(self, gcode, displayOnLcd=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
         # Call the post-processing script
-        gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers, self.maintainBridgeValue)
+        gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers, self.maintainBridgeValue, displayOnLcd)
 
         return gcode

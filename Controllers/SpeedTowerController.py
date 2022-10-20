@@ -274,15 +274,15 @@ class SpeedTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode)->list:
+    def postProcess(self, gcode, displayOnLcd=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
         if self._towerType == 'Travel Speed':
             # Query the current print speed
             currentPrintSpeed = Application.getInstance().getGlobalContainerStack().getProperty('speed_print', 'value')
-            gcode = TravelSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed)
+            gcode = TravelSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed, displayOnLcd)
         else:
-            gcode = MiscSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType)
+            gcode = MiscSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType, displayOnLcd)
 
         return gcode

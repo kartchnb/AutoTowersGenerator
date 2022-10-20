@@ -244,7 +244,7 @@ class BedLevelPatternController(ControllerBase):
 
 
 
-    def postProcess(self, gcode)->list:
+    def postProcess(self, gcode, displayOnLcd=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
         # No post-processing needs to be done for this pattern

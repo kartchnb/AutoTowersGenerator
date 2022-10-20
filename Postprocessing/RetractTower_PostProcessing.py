@@ -44,7 +44,7 @@ def is_reset_extruder_line(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType, displayOnLcd):
     Logger.log('d', 'AutoTowersGenerator beginning RetractTower post-processing')
     Logger.log('d', f'Starting value = {startValue}')
     Logger.log('d', f'Value change = {valueChange}')
@@ -67,9 +67,9 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
     save_e = -1
 
     if towerType == 'Speed':
-        lcd_gcode = f'M117 SPD {startValue:.1f}mm/s'
+        lcd_gcode = f'M117 SPD {startValue:.1f}mm/s ; AutoTowersGenerator added'
     else:
-        lcd_gcode = f'M117 DST {startValue: .1f}mm'
+        lcd_gcode = f'M117 DST {startValue: .1f}mm ; AutoTowersGenerator added'
     
     current_e = 0
     current_f = 0
@@ -167,7 +167,8 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         lcd_gcode = f'M117 DST {startValue:.1f}mm ; AutoTowersGenerator added'
 
                 # Add M117 to add message on LCD
-                lines.insert(lineIndex + 1, lcd_gcode)
+                if displayOnLcd:
+                    lines.insert(lineIndex + 1, lcd_gcode)
                                             
         result = '\n'.join(lines)
         gcode[layerIndex] = result

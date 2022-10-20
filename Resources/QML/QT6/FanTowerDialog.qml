@@ -181,7 +181,7 @@ UM.Dialog
             {
                 id: maintainBridgeValueCheckBox
                 checked: manager.maintainBridgeValue
-                onClicked: manager.maintainBridgeValue = maintainBridgeValueCheckBox.checked
+                onClicked: manager.maintainBridgeValue = checked
             }
             UM.ToolTip
             {

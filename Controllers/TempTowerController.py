@@ -263,10 +263,10 @@ class TempTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode)->list:
+    def postProcess(self, gcode, displayOnLcd=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = TempTower_PostProcessing.execute(gcode, self._startTemperature, self._temperatureChange, self._sectionLayers, self._baseLayers)
+        gcode = TempTower_PostProcessing.execute(gcode, self._startTemperature, self._temperatureChange, self._sectionLayers, self._baseLayers, displayOnLcd)
 
         return gcode

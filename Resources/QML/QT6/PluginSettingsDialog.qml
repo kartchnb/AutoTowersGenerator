@@ -72,6 +72,27 @@ UM.Dialog
                 text: "The path to the OpenSCAD executable.<p>If it is in the current path or installed in an expected location, the plugin should find it automatically.<p>You can manually set or override the path here.<p>Clearing out this value will cause the plugin to attempt to automatically locate OpenSCAD again."
                 visible: openscad_path_mouse_area.containsMouse
             }
+
+            UM.Label 
+            { 
+                text: "Display on LCD" 
+                MouseArea 
+                {
+                    id: display_on_lcd_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            UM.CheckBox
+            {
+                id: displayOnLcd
+                checked: manager.displayOnLcdSetting
+            }
+            UM.ToolTip
+            {
+                text: "Selects whether tower parameter changes (temperature, speed, etc) are displayed to your printer's LCD.<p>Information is displayed using the M117 command, which can cause issues with some printers (The Dremel 3D45, for instance)<p>Deselect this if you are noticing issues."
+                visible: display_on_lcd_mouse_area.containsMouse
+            }
         }
     }
 
@@ -91,7 +112,8 @@ UM.Dialog
 
     onAccepted:
     {
-        manager.openScadPath = openScadPath.text
+        manager.openScadPathSetting = openScadPath.text
+        manager.displayOnLcdSetting = displayOnLcd.checked
         manager.pluginSettingsModified()
     }
 

@@ -20,7 +20,7 @@ def is_start_of_layer(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType):
+def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType, displayOnLcd):
     Logger.log('d', f'AutoTowersGenerator beginning SpeedTower {towerType} post-processing')
     Logger.log('d', f'Starting speed = {startValue}')
     Logger.log('d', f'Speed change = {valueChange}')
@@ -74,7 +74,8 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         Logger.log('d', f'Setting RepRap pressure value to {float(currentValue):.3f}')
                         
                     lines.insert(lineIndex + 1, command)
-                    lines.insert(lineIndex + 2, lcd_gcode)
+                    if displayOnLcd:
+                        lines.insert(lineIndex + 2, lcd_gcode)
 
                 if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
                     Logger.log('d', f'New section at layer {layerIndex - 2}')
@@ -102,7 +103,8 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                         Logger.log('d', f'Setting RepRap pressure value to {float(currentValue):.3f}')
                         
                     lines.insert(lineIndex + 1, command)
-                    lines.insert(lineIndex + 2, lcd_gcode)                                              
+                    if displayOnLcd:
+                        lines.insert(lineIndex + 2, lcd_gcode)                                              
 
         result = '\n'.join(lines)
         gcode[layerIndex] = result

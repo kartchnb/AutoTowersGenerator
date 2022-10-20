@@ -188,6 +188,20 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
+    _displayOnLcdSetting = True
+
+    _displayOnLcdSettingChanged = pyqtSignal()
+
+    def setDisplayOnLcdSetting(self, value)->None:
+        self._displayOnLcdSetting = value
+        self._displayOnLcdSettingChanged.emit()
+
+    @pyqtProperty(bool, notify=_displayOnLcdSettingChanged, fset=setDisplayOnLcdSetting)
+    def displayOnLcdSetting(self)->bool:
+        return self._displayOnLcdSetting
+
+
+
     @pyqtSlot()
     def removeButtonClicked(self)->None:
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
@@ -213,12 +227,18 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Create a settings dictionary to dump to the settings file
         pluginSettings = {
-            'openscad path': self.openScadPathSetting
+            'openscad path': self.openScadPathSetting,
+            'display on lcd': self.displayOnLcdSetting,
         }
 
         # Save the settings to the settings file
         with open(self._pluginSettingsFilePath, 'w') as settingsFile:
             json.dump(pluginSettings, settingsFile)
+
+        # Remove the tower so it can be generated
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
+            Message('The AutoTower was removed because plugin settings were changed').show()
 
 
 
@@ -233,6 +253,9 @@ class AutoTowersGenerator(QObject, Extension):
             # Forward the OpenScad path to the OpenScadInterface object
             self.setOpenScadPathSetting(pluginSettings['openscad path'])
             self._openScadInterface.SetOpenScadPath(self.openScadPathSetting)
+
+            # Read in the 'display to LCD' setting
+            self.setDisplayOnLcdSetting(pluginSettings['display on lcd'])
 
         except (FileNotFoundError, KeyError):
             pass
@@ -485,7 +508,7 @@ class AutoTowersGenerator(QObject, Extension):
             In this case, the Auto Tower needs to be removed and regenerated '''
         if self._autoTowerGenerated:
             self._removeAutoTower()
-            Message('The Auto Tower has been removed because the active machine was changed', title=self._pluginName).show()        
+            Message('The Auto Tower was removed because the active machine was changed', title=self._pluginName).show()        
 
 
 
@@ -497,14 +520,14 @@ class AutoTowersGenerator(QObject, Extension):
             if setting_key in self._currentController.getCriticalProperties:
                 self._removeAutoTower()
                 setting_label = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(setting_key, 'label')
-                Message(f'The Auto Tower has been removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
+                Message(f'The Auto Tower was removed because the Cura setting "{setting_label}" has changed since the tower was generated', title=self._pluginName).show()
 
 
 
     def _postProcess(self, output_device)->None:
         ''' This callback is called just before gcode is generated for the model 
             (this happens when the sliced model is sent to the printer or a file '''
-
+        
         if self._autoTowerGenerated:
             # Retrieve the g-code from the scene
             scene = Application.getInstance().getController().getScene()
@@ -531,4 +554,4 @@ class AutoTowersGenerator(QObject, Extension):
                 gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
                 # Call the tower controller post-processing callback to modify the g-code
-                gcode = self._towerControllerPostProcessingCallback(gcode)
+                gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
