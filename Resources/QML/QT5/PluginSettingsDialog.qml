@@ -54,7 +54,6 @@ UM.Dialog
             {
                 id: openScadPath
                 text: manager.openScadPathSetting
-                onTextChanged: if (manager.openScadPathSetting != text) manager.openScadPathSetting = text
             }
 
             UM.Label 
