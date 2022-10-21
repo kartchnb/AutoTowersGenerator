@@ -109,47 +109,6 @@ UM.Dialog
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
                 visible: manager.bedLevelPatternType == "Grid"
             }
-
-            UM.Label
-            {
-                text: "Circle Diameter"
-                visible: manager.bedLevelPatternType == "Five Circles"
-
-             }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*/ }
-                text: manager.circleDiameterStr
-                onTextChanged: if (manager.circleDiameterStr != text) manager.circleDiameterStr = text
-                visible: manager.bedLevelPatternType == "Five Circles"
-            }
-            UM.ToolTip
-            {
-                text: "The diameter of the five circles."
-                visible: circle_diameter_mouse_area.containsMouse
-            }
-
-            UM.Label
-            {
-                text: "Outline Distance"
-                visible: manager.bedLevelPatternType == "Five Circles"
-
-             }
-            Cura.TextField
-            {
-                Layout.preferredWidth: numberInputWidth
-                validator: RegExpValidator { regExp: /[0-9]*/ }
-                text: manager.outlineDistanceStr
-                onTextChanged: if (manager.outlineDistanceStr != text) manager.outlineDistanceStr = text
-                visible: manager.bedLevelPatternType == "Five Circles"
-            }
-            UM.ToolTip
-            {
-                text: "The distance to offset the outline of the five circles pattern."
-                visible: outline_distance_mouse_area.containsMouse
-            }
-
         }
     }
 

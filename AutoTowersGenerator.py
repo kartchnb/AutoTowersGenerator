@@ -304,9 +304,6 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        if self._autoTowerGenerated:
-            self._removeAutoTower()
-
         self._currentController = self._retrieveTowerController(controllerClass)
 
         # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
@@ -397,6 +394,8 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     def _onExitCallback(self)->bool:
+        ''' Called as Cura is closing to ensure that any settings that were changed are restored before exiting '''
+
         if self._autoTowerGenerated:
             self._removeAutoTower()
 
@@ -407,6 +406,9 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller if a preset tower is requested '''
+
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
 
         # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
         message = self._currentController.correctPrintProperties()
@@ -427,6 +429,9 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
+
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
 
         # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
         message = self._currentController.correctPrintProperties()
@@ -475,7 +480,6 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Imports an STL file into the scene '''
 
         # Remove all models from the scene
-        self._autoToweradaptive_layers_enabled = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty('adaptive_layer_height_enabled', 'value')
         CuraApplication.getInstance().deleteAll()
         CuraApplication.getInstance().processEvents()
 

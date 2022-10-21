@@ -36,7 +36,8 @@ class BedLevelPatternController(ControllerBase):
         {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
         {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
         {'value': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
-        {'value': 'Perimeter', 'icon': 'bedlevelpattern_perimeter_icon.png'}, 
+        {'value': 'Circle', 'icon': 'bedlevelpattern_circle_icon.png'}, 
+        {'value': 'Square', 'icon': 'bedlevelpattern_square_icon.png'}, 
         {'value': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
         {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
@@ -112,36 +113,6 @@ class BedLevelPatternController(ControllerBase):
     @pyqtProperty(str, notify=cellSizeStrChanged, fset=setCellSizeStr)
     def cellSizeStr(self)->str:
         return self._cellSizeStr
-
-
-
-    # The selected circle diameter for the five circles pattern
-    _circleDiameterStr = "20"
-
-    circleDiameterStrChanged = pyqtSignal()
-
-    def setCircleDiameterStr(self, value)->None:
-        self._circleDiameterStr = value
-        self.circleDiameterStrChanged.emit()
-
-    @pyqtProperty(str, notify=circleDiameterStrChanged, fset=setCircleDiameterStr)
-    def circleDiameterStr(self)->str:
-        return self._circleDiameterStr
-
-
-
-    # The selected outline distance for the five circles pattern
-    _outlineDistanceStr = "5"
-
-    outlineDistanceStrChanged = pyqtSignal()
-
-    def setOutlineDistanceStr(self, value)->None:
-        self._outlineDistanceStr = value
-        self.outlineDistanceStrChanged.emit()
-
-    @pyqtProperty(str, notify=outlineDistanceStrChanged, fset=setOutlineDistanceStr)
-    def outlineDistanceStr(self)->str:
-        return self._outlineDistanceStr
             
 
 
@@ -206,12 +177,22 @@ class BedLevelPatternController(ControllerBase):
         fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
-        circle_diameter = float(self.circleDiameterStr)
-        outline_distance = float(self.outlineDistanceStr)
 
-        # Query the bed size
-        bed_width = containerStack.getProperty('machine_width', 'value')
-        bed_depth = containerStack.getProperty('machine_depth', 'value')
+        # Determine the maximum print area
+        disallowed_areas = containerStack.getProperty('machine_disallowed_areas', 'value')
+        if len(disallowed_areas) > 0:
+            # Calculate the print area based on the disallowed areas
+            flattened_list = [coord for section in disallowed_areas for coord in section]
+            min_x = max([coord[0] for coord in flattened_list if coord[0] < 0])
+            max_x = min([coord[0] for coord in flattened_list if coord[0] >= 0])
+            min_y = max([coord[1] for coord in flattened_list if coord[1] < 0])
+            max_y = min([coord[1] for coord in flattened_list if coord[1] >= 0])
+            print_area_width = max_x - min_x
+            print_area_depth = max_y - min_y
+        else:
+            # Calculate the print area based on the bed size
+            print_area_width = containerStack.getProperty('machine_width', 'value')
+            print_area_depth = containerStack.getProperty('machine_depth', 'value')
 
         # Query the current layer height
         layer_height = containerStack.getProperty("layer_height", "value")
@@ -219,25 +200,23 @@ class BedLevelPatternController(ControllerBase):
         # Query the current line width
         line_width = containerStack.getProperty('line_width', 'value')
 
-        # Adjust the bed size by the line width to keep the pattern within the bed volume
-        bed_width -= 2
-        bed_depth -= 2
+        # Adjust the print_area size by the line width to keep the pattern within the volume
+        corrected_print_area_width = print_area_width - line_width*4
+        corrected_print_area_depth = print_area_depth - line_width*4
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
         openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPatternType.lower()
-        openScadParameters ['Pattern_Area_Width'] = bed_width
-        openScadParameters ['Pattern_Area_Depth'] = bed_depth
+        openScadParameters ['Print_Area_Width'] = corrected_print_area_width
+        openScadParameters ['Print_Area_Depth'] = corrected_print_area_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
         openScadParameters ['Fill_Percentage'] = fill_percentage
         openScadParameters ['Concentric_Ring_Count'] = number_of_squares
         openScadParameters ['Grid_Cell_Count'] = cell_size
-        #openScadParameters ['Circle Diameter'] = circle_diameter
-        #openScadParameters ['Outline Distance'] = outline_distance
 
         # Determine the tower name
-        towerName = f'Auto-Generated Bed Level Pattern {bed_width}x{bed_depth}'
+        towerName = f'Auto-Generated Bed Level Pattern {print_area_width}x{print_area_depth}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)

@@ -2,7 +2,7 @@
 
 /* [General Parameters] */
 // The type of bed level pattern to generate
-Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "x in square", "circle in square", "perimeter", "grid", "five circles"]
+Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "x in square", "circle in square", "circle", "square", "grid", "five circles"]
 
 // The width of the bed print area
 Print_Area_Width = 220.001;
@@ -243,7 +243,14 @@ module Generate_Model()
 
 
 
-    module Generate_Perimeter()
+    module Generate_Circle()
+    {
+        outlined_oval(d=[Pattern_Width, Pattern_Depth], Line_Width);
+    }
+
+
+
+    module Generate_Square()
     {
         outlined_square([Pattern_Width, Pattern_Depth], Line_Width, center=true);
     }
@@ -283,7 +290,7 @@ module Generate_Model()
     {
         width = Pattern_Width;
         height = Pattern_Depth;
-        corner_radius = Circle_Diameter/2 + Outline_Distance;
+        corner_radius = Circle_Diameter/2 + Outline_Distance + Line_Width;
         corner_x = width/2 - corner_radius;
         corner_y = height/2 - corner_radius;
 
@@ -322,9 +329,13 @@ module Generate_Model()
             {
                 Generate_Circle_In_Square();
             }
-            else if (Bed_Level_Pattern_Type == "perimeter")
+            else if (Bed_Level_Pattern_Type == "circle")
             {
-                Generate_Perimeter();
+                Generate_Circle();
+            }
+            else if (Bed_Level_Pattern_Type == "square")
+            {
+                Generate_Square();
             }
             else if (Bed_Level_Pattern_Type == "grid")
             {
