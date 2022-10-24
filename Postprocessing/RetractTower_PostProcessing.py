@@ -20,27 +20,27 @@ __version__ = '2.2'
 
 def is_begin_layer_line(line: str) -> bool:
     '''Check if current line is the start of a layer section.'''
-    return line.strip().startswith(";LAYER:")
+    return line.startswith(";LAYER:")
 
 def is_retract_line(line: str) -> bool:
     '''Check if current line is a retract segment'''
-    return line.strip().startswith('G1') and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
+    return line.startswith('G1') and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
     
 def is_extrusion_line(line: str) -> bool:
     '''Check if current line is a standard printing segment'''
-    return line.strip().startswith('G1') and 'X' in line and 'Y' in line and 'E' in line
+    return line.startswith('G1') and 'X' in line and 'Y' in line and 'E' in line
 
 def is_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M83 / G91 towerType'''
-    return line.strip().startswith('G91') or line.strip().startswith('M83')
+    return line.startswith('G91') or line.strip().startswith('M83')
 
 def is_not_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M82 / G90 towerType'''
-    return line.strip().startswith('G90') or line.strip().startswith('M82')
+    return line.startswith('G90') or line.strip().startswith('M82')
 
 def is_reset_extruder_line(line: str) -> bool:
     '''Check if current line contain a G92 E0'''
-    return line.strip().startswith('G92') and 'E0' in line
+    return line.startswith('G92') and 'E0' in line
 
 
 
@@ -84,6 +84,9 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
         for line in lines:                  
             lineIndex = lines.index(line)
             
+            # Strip leading whitespace from the line
+            line = line.strip()
+
             if is_relative_instruction_line(line):
                 relative_extrusion = True
             if is_not_relative_instruction_line(line):
@@ -95,13 +98,15 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
             # If we have defined a value
             if currentValue >= 0:
                 if is_retract_line(line):
-                    searchF = re.search(r'F(\d*)', line)
+                    searchF = re.search(r'F(\d+)', line.split(';')[0])
+                    string_f = searchF.group(1)
                     if searchF:
-                        current_f=float(searchF.group(1))
+                        current_f=float(string_f)
                         
-                    searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
+                    searchE = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
+                    string_e = searchE.group(1)
                     if searchE:
-                        current_e=float(searchE.group(1))
+                        current_e=float(string_e)
                         if relative_extrusion:
                             # Retracting filament (relative)
                             if current_e<0:
@@ -131,7 +136,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
                                 else:
                                     current_e = save_e - currentValue
-                                    lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; AutoTowersGenerator retracting {currentValue:.1f} mm of filament (absolute)o'
+                                    lines[lineIndex] = f'G1 F{int(current_f)} E{current_e:.5f} ; AutoTowersGenerator retracting {currentValue:.1f} mm of filament (absolute)'
                                     lcd_gcode = f'M117 DST {currentValue:.1f}mm ; AutoTowersGenerator added'
                             # Resetting the retraction
                             else:
@@ -140,9 +145,10 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
                                     lcd_gcode = f'M117 SPD {int(currentValue)}mm/s ; AutoTowersGenerator added'
 
             if is_extrusion_line(line):
-                searchE = re.search(r'E([-+]?\d*\.?\d*)', line)
+                searchE = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
+                string_e = searchE.group(1)
                 if searchE:
-                    save_e=float(searchE.group(1))             
+                    save_e=float(string_e)        
             
             if is_begin_layer_line(line):
                 # Initialize the change
