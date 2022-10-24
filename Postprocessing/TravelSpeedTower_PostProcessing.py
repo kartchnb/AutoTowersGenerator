@@ -72,7 +72,7 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                 # Modify lines specifying travel speed
                 if is_travel_speed_line(line):
                     # Determine the old speed setting in the gcode
-                    oldSpeedResult = re.search(r'F(\d*)', line)
+                    oldSpeedResult = re.search(r'F(\d+)', line.split(';')[0])
                     if oldSpeedResult:
                         oldSpeed = float(oldSpeedResult.group(1))
 

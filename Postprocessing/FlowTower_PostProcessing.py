@@ -7,7 +7,6 @@
 
 from UM.Logger import Logger
 from UM.Application import Application
-import re 
 from enum import Enum
 
 __version__ = '1.0'
