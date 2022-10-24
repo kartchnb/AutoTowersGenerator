@@ -20,27 +20,27 @@ __version__ = '2.2'
 
 def is_begin_layer_line(line: str) -> bool:
     '''Check if current line is the start of a layer section.'''
-    return line.startswith(";LAYER:")
+    return line.strip().startswith(";LAYER:")
 
 def is_retract_line(line: str) -> bool:
     '''Check if current line is a retract segment'''
-    return line.startswith('G1') and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
+    return line.strip().startswith('G1') and 'F' in line and 'E' in line and not 'X' in line and not 'Y' in line and not 'Z' in line
     
 def is_extrusion_line(line: str) -> bool:
     '''Check if current line is a standard printing segment'''
-    return line.startswith('G1') and 'X' in line and 'Y' in line and 'E' in line
+    return line.strip().startswith('G1') and 'X' in line and 'Y' in line and 'E' in line
 
 def is_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M83 / G91 towerType'''
-    return line.startswith('G91') or line.strip().startswith('M83')
+    return line.strip().startswith('G91') or line.strip().startswith('M83')
 
 def is_not_relative_instruction_line(line: str) -> bool:
     '''Check if current line contain a M82 / G90 towerType'''
-    return line.startswith('G90') or line.strip().startswith('M82')
+    return line.strip().startswith('G90') or line.strip().startswith('M82')
 
 def is_reset_extruder_line(line: str) -> bool:
     '''Check if current line contain a G92 E0'''
-    return line.startswith('G92') and 'E0' in line
+    return line.strip().startswith('G92') and 'E0' in line
 
 
 
@@ -83,9 +83,6 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType
         lines = layer.split('\n')
         for line in lines:                  
             lineIndex = lines.index(line)
-            
-            # Strip leading whitespace from the line
-            line = line.strip()
 
             if is_relative_instruction_line(line):
                 relative_extrusion = True
