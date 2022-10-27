@@ -65,6 +65,8 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Finish initializing the plugin after Cura is fully ready
         CuraApplication.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
+
+        # Make sure the plugin gets a chance to clean up after itself before Cura exits
         CuraApplication.getInstance().getOnExitCallbackManager().addCallback(self._onExitCallback)
 
 

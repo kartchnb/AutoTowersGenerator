@@ -74,7 +74,8 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                     # Determine the old speed setting in the gcode
                     oldSpeedResult = re.search(r'F(\d+)', line.split(';')[0])
                     if oldSpeedResult:
-                        oldSpeed = float(oldSpeedResult.group(1))
+                        oldSpeedString = oldSpeedResult.group(1)
+                        oldSpeed = float(oldSpeedString)
 
                         # Determine the new speed to set (converting mm/s to mm/m)
                         # This is done based on the reference speed, or the
@@ -82,7 +83,11 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                         newSpeed = (currentValue * 60) * oldSpeed / (referenceSpeed * 60)
 
                         # Change the speed in the gcode
-                        new_line = line.replace(f'F{oldSpeedResult.group(1)}', f'F{newSpeed:.1f}') + f' ; AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s to {(newSpeed/60):.1f}mm/s'
+                        if f'{oldSpeed:.1f}' != f'{newSpeed:.1f}':
+                            # Change the speed for this line
+                            new_line = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ; AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m) to {(newSpeed/60):.1f}mm/s ({newSpeed:.1f}mm/m)'
+                        else:
+                            new_line = line + f' ; AutoTowersGenerator speed is already at desired {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m)'
 
                         lines[lineIndex] = new_line
 
