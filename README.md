@@ -1,4 +1,4 @@
-[![Github All Releases](https://img.shields.io/github/downloads/kartchnb/AutoTowersGEnerator/total.svg)]()
+[![Github All Releases](https://img.shields.io/github/downloads/kartchnb/AutoTowersGenerator/total.svg)]()
 # AutoTowersGenerator
 
 ### "I ... am rarely happier than when spending an entire day programming my computer to perform automatically a task that would otherwise take me a good ten seconds to do by hand." - Douglas Adams
