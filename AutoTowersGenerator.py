@@ -549,15 +549,21 @@ class AutoTowersGenerator(QObject, Extension):
                 # Retrieve the g-code for the current build plate
                 active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
                 gcode = gcode_dict[active_build_plate_id]
-            except TypeError:
+            except (TypeError, KeyError):
                 # If there is no g-code for the current build plate, there's nothing more to do
                 return
 
-            # Proceed if the g-code has not already been post-processed
-            if self._gcodeProcessedMarker not in gcode[0]:
+            try:
+                # Proceed if the g-code has not already been post-processed
+                if self._gcodeProcessedMarker not in gcode[0]:
 
-                # Mark the g-code as having been post-processed
-                gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
+                    # Mark the g-code as having been post-processed
+                    gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
-                # Call the tower controller post-processing callback to modify the g-code
-                gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
+                    # Call the tower controller post-processing callback to modify the g-code
+                    gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
+            except IndexError:
+                return
+
+            Message('AutoTowersGenerator post-processing completed', title=self._pluginName).show()
+            
