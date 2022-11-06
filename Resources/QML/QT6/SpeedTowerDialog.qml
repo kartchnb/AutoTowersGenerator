@@ -76,7 +76,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "The type of speed to vary across the tower.<p>\"Travel Speed\" towers change the speed at which the nozzle moves while printing (equivalent to Cura's \"print speed\" setting).<p>\"Acceleration\" changes how fast the nozzle accelerates during printing.<p>The other towers are more specialized."
+                text: "The type of speed to vary across the tower.<p>\"Print Speed\" towers change the speed at which the nozzle moves while printing (equivalent to Cura's \"print speed\" setting).<p>\"Acceleration\" changes how fast the nozzle accelerates during printing.<p>The other towers are more specialized."
                 visible: tower_type_mouse_area.containsMouse
             }
 

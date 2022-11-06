@@ -65,7 +65,6 @@ class ControllerBase(QObject):
         ''' Correct property settings that are incompatible with this controller '''
 
         globalContainerStack = Application.getInstance().getGlobalContainerStack()
-        log = ''
         message = ''
 
         # Iterate over each setting in the critical settings table

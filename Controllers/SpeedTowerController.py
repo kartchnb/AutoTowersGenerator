@@ -15,7 +15,7 @@ from UM.Logger import Logger
 from .ControllerBase import ControllerBase
 
 # Import the scripts that do the actual post-processing
-from ..Postprocessing import TravelSpeedTower_PostProcessing
+from ..Postprocessing import PrintSpeedTower_PostProcessing
 from ..Postprocessing import MiscSpeedTower_PostProcessing
 
 
@@ -25,25 +25,25 @@ class SpeedTowerController(ControllerBase):
     _qmlFilename = 'SpeedTowerDialog.qml'
 
     _presetsTable = {
-        'Travel Speed 20-100': {
-            'filename': 'speedtower travel speed 20-100.stl',
+        'Print Speed 20-100': {
+            'filename': 'speedtower print speed 20-100.stl',
             'start value': 20,
             'change value': 20,
-            'tower type': 'Travel Speed'
+            'tower type': 'Print Speed'
         },
 
-        'Travel Speed 50-150': {
-            'filename': 'speedtower travel speed 50-150.stl',
+        'Print Speed 50-150': {
+            'filename': 'speedtower print speed 50-150.stl',
             'start value': 50,
             'change value': 20,
-            'tower type': 'Travel Speed'
+            'tower type': 'Print Speed'
         },
 
-        'Travel Speed 100-200': {
-            'filename': 'speedtower travel speed 100-200.stl',
+        'Print Speed 100-200': {
+            'filename': 'speedtower print speed 100-200.stl',
             'start value': 100,
             'change value': 20,
-            'tower type': 'Travel Speed'
+            'tower type': 'Print Speed'
         },
     }
 
@@ -54,7 +54,7 @@ class SpeedTowerController(ControllerBase):
     }
 
     _towerTypesModel = [
-        {'value': 'Travel Speed', 'label': 'TRAVEL SPEED'}, 
+        {'value': 'Print Speed', 'label': 'PRINT SPEED'}, 
         {'value': 'Acceleration', 'label': 'ACCELERATION'}, 
         {'value': 'Jerk', 'label': 'JERK'}, 
         {'value': 'Junction', 'label': 'JUNCTION'}, 
@@ -278,10 +278,10 @@ class SpeedTowerController(ControllerBase):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        if self._towerType == 'Travel Speed':
+        if self._towerType == 'Print Speed':
             # Query the current print speed
             currentPrintSpeed = Application.getInstance().getGlobalContainerStack().getProperty('speed_print', 'value')
-            gcode = TravelSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed, displayOnLcd)
+            gcode = PrintSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed, displayOnLcd)
         else:
             gcode = MiscSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType, displayOnLcd)
 
