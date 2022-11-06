@@ -11,12 +11,15 @@
 # Version 1.1 - 05 Nov 2022:
 #   Renamed from TravelSpeedTower_PostProcessing.py to PrintSpeedTower_PostProcessing.py 
 #       to better match what it actually does
+# Version 1.2 - 05 Nov 2022:
+#   Fixed an issue with recognizing decimal speeds in gcode
+#   Now only displaying LCD messages for the nominal speed for each layer
 
 import re
 
 from UM.Logger import Logger
 
-__version__ = '1.1'
+__version__ = '1.2'
 
 
 
@@ -68,13 +71,15 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
 
             # Iterate over each command line in the layer
             lines = layer.split('\n')
+            if displayOnLcd:
+                lines.insert(0, f'M117 SPD {currentValue:.1f}mm/s ;AutoTowersGenerator added')
             for line in lines:
                 lineIndex = lines.index(line)
 
                 # Modify lines specifying print speed
                 if is_print_speed_line(line):
                     # Determine the old speed setting in the gcode
-                    oldSpeedResult = re.search(r'F(\d+)', line.split(';')[0])
+                    oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
                     if oldSpeedResult:
                         oldSpeedString = oldSpeedResult.group(1)
                         oldSpeed = float(oldSpeedString)
@@ -87,14 +92,11 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                         # Change the speed in the gcode
                         if f'{oldSpeed:.1f}' != f'{newSpeed:.1f}':
                             # Change the speed for this line
-                            new_line = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ; AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m) to {(newSpeed/60):.1f}mm/s ({newSpeed:.1f}mm/m)'
+                            new_line = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ;AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m) to {(newSpeed/60):.1f}mm/s ({newSpeed:.1f}mm/m)'
                         else:
-                            new_line = line + f' ; AutoTowersGenerator speed is already at desired {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m)'
+                            new_line = line + f' ;AutoTowersGenerator speed is already at desired {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m)'
 
                         lines[lineIndex] = new_line
-
-                        if displayOnLcd:
-                            lines.insert(lineIndex + 1, f'M117 Speed {(newSpeed/60):.1f}mm/s ; AutoTowersGenerator added')
                                      
             result = '\n'.join(lines)
             gcode[layerIndex] = result
