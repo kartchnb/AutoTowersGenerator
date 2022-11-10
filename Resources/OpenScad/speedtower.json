@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "travel speed 20-100": {
+        "print speed 20-100": {
             "Base_Height": "0.8",
             "Ending_Value": "100",
             "Font": "Arial:style=Bold",
@@ -22,12 +22,12 @@
             "Starting_Value": "20",
             "Temperature_Label": "",
             "Temperature_Label_Height_Multiplier": "0.3",
-            "Tower_Label": "TRAVEL SPEED",
+            "Tower_Label": "PRINT SPEED",
             "Tower_Label_Height_Multiplier": "0.6",
             "Value_Change": "20",
             "Wall_Thickness": "0.6"
         },
-        "travel speed 50-150": {
+        "print speed 50-150": {
             "Base_Height": "0.8",
             "Ending_Value": "150",
             "Font": "Arial:style=Bold",
@@ -49,12 +49,12 @@
             "Starting_Value": "50",
             "Temperature_Label": "",
             "Temperature_Label_Height_Multiplier": "0.3",
-            "Tower_Label": "TRAVEL SPEED",
+            "Tower_Label": "PRINT SPEED",
             "Tower_Label_Height_Multiplier": "0.6",
             "Value_Change": "20",
             "Wall_Thickness": "0.6"
         },
-        "travel speed 100-200": {
+        "print speed 100-200": {
             "Base_Height": "0.8",
             "Ending_Value": "200",
             "Font": "Arial:style=Bold",
@@ -76,7 +76,7 @@
             "Starting_Value": "100",
             "Temperature_Label": "",
             "Temperature_Label_Height_Multiplier": "0.3",
-            "Tower_Label": "TRAVEL SPEED",
+            "Tower_Label": "PRINT SPEED",
             "Tower_Label_Height_Multiplier": "0.6",
             "Value_Change": "20",
             "Wall_Thickness": "0.6"
