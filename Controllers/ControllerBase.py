@@ -151,7 +151,7 @@ class ControllerBase(QObject):
 
                 # Restore the original settings
                 source.setProperty(property_name, 'value', original_value)
-                message += f'"{property_label}" was restored to "{original_value_name}\n"'
+                message += f'"{property_label}" was restored to "{original_value_name}"\n'
                 Logger.log('d', f'Restored the original value of "{property_name}" "{original_value}"')
 
             if message != '':

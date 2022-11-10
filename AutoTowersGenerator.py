@@ -11,14 +11,13 @@ except ImportError:
     PYQT_VERSION = 5
 
 from cura.CuraApplication import CuraApplication
-from cura.Scene.CuraSceneNode import CuraSceneNode # BAK: Remove?
+from cura.Scene.CuraSceneNode import CuraSceneNode
 from UM.Application import Application
 from UM.Extension import Extension
 from UM.Logger import Logger
 from UM.Message import Message
 from UM.PluginRegistry import PluginRegistry
 from UM.Scene.Camera import Camera
-from UM.Scene.SceneNode import SceneNode # BAK: Remove?
 
 from . import MeshImporter
 from .OpenScadInterface import OpenScadInterface
@@ -238,7 +237,7 @@ class AutoTowersGenerator(QObject, Extension):
         with open(self._pluginSettingsFilePath, 'w') as settingsFile:
             json.dump(pluginSettings, settingsFile)
 
-        # Remove the tower so it can be generated
+        # Remove the tower to force it to be regenerated
         if self._autoTowerGenerated:
             self._removeAutoTower('The AutoTower was removed because plugin settings were changed')
 
@@ -326,7 +325,6 @@ class AutoTowersGenerator(QObject, Extension):
 
         if message != None:
             Message(message, title=self._pluginName).show()
-            Logger.log('d', message) # BAK: Remove
 
         # Indicate that there is no longer an Auto Tower in the scene
         self._autoTowerGenerated = False
@@ -336,7 +334,6 @@ class AutoTowersGenerator(QObject, Extension):
         message = self._currentController.cleanupController()
         if message != None:
             Message(message, title=self._pluginName).show()
-            Logger.log('d', message) # BAK: Remove
 
         # Remove the Auto Tower itself
         self._autoTowerOperation.undo()
@@ -408,13 +405,16 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _onSceneChangedCallback(self, *args, **kwargs)->None:
         ''' Called if the scene is changed
-            This is intended to cleanup if the autotower is deleted from the scene manually '''
+            This is intended to cleanup if the autotower is deleted from the scene manually 
+            or another object is added '''
 
         message = None
 
+        # Don't proceed unless an auto tower has actually been generated
         if self._autoTowerGenerated:
-            if isinstance(args[0], SceneNode):
-                self._removeAutoTower(f'SceneNode name = {args[0].getName()}, id = {args[0].getId()}')
+            # A CuraSceneNode change seems to indicate that a model has been added to or removed from the scene
+            if isinstance(args[0], CuraSceneNode):
+                self._removeAutoTower(f'kwargs = {kwargs}')
 
 
 
@@ -499,7 +499,8 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Imports an STL file into the scene '''
 
         # Remove all models from the scene
-        self._removeAutoTower('importStl') # BAK: Remove
+        if self._autoTowerGenerated:
+            self._removeAutoTower()
         CuraApplication.getInstance().deleteAll()
         CuraApplication.getInstance().processEvents()
 
@@ -511,6 +512,12 @@ class AutoTowersGenerator(QObject, Extension):
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcess)
         self._towerControllerPostProcessingCallback = postProcessingCallback
 
+        # The dialog is no longer needed
+        self._waitDialog.hide()
+
+        # Rename the current print job
+        CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
+
         # Register that the Auto Tower has been generated
         self._autoTowerGenerated = True
         self.autoTowerGeneratedChanged.emit()
@@ -518,13 +525,7 @@ class AutoTowersGenerator(QObject, Extension):
         # If the machine or applicable print settings are changed, the tower will automatically be removed from the scene
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
         CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
-        #CuraApplication.getInstance().getController().getScene().sceneChanged.connect(self._onSceneChangedCallback)
-
-        # The dialog is no longer needed
-        self._waitDialog.hide()
-
-        # Rename the current print job
-        CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
+        CuraApplication.getInstance().getController().getScene().sceneChanged.connect(self._onSceneChangedCallback)
 
 
 
