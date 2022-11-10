@@ -48,9 +48,10 @@ class SpeedTowerController(ControllerBase):
     }
 
     _criticalPropertiesTable = {
-        'adaptive_layer_height_enabled': False,
-        'layer_height': None,
-        'support_enable': False,
+        'adaptive_layer_height_enabled': ('global', False),
+        'infill_sparse_density': ('extruder', 0),
+        'layer_height': ('global', None),
+        'support_enable': ('global', False),
     }
 
     _towerTypesModel = [
