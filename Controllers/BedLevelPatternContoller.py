@@ -25,11 +25,11 @@ class BedLevelPatternController(ControllerBase):
     _presetsTable = {}
 
     _criticalPropertiesTable = {
-        'adhesion_type': 'none',
-        'layer_height': None,
-        'line_width': None,
-        'machine_width': None,
-        'machine_depth': None,
+        'adhesion_type': ('global', 'none'),
+        'layer_height': ('global', None),
+        'line_width': ('extruder', None),
+        'machine_width': ('global', None),
+        'machine_depth': ('global', None),
     }
 
     _bedLevelPatternTypesModel = [

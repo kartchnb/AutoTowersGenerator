@@ -414,7 +414,7 @@ class AutoTowersGenerator(QObject, Extension):
         if self._autoTowerGenerated:
             # A CuraSceneNode change seems to indicate that a model has been added to or removed from the scene
             if isinstance(args[0], CuraSceneNode):
-                self._removeAutoTower(f'kwargs = {kwargs}')
+                self._removeAutoTower()
 
 
 
@@ -525,7 +525,8 @@ class AutoTowersGenerator(QObject, Extension):
         # If the machine or applicable print settings are changed, the tower will automatically be removed from the scene
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
         CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
-        CuraApplication.getInstance().getController().getScene().sceneChanged.connect(self._onSceneChangedCallback)
+        # BAK: Need to restore this when I get it figured out
+        #CuraApplication.getInstance().getController().getScene().sceneChanged.connect(self._onSceneChangedCallback)
 
 
 

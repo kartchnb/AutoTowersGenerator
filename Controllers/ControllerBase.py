@@ -74,8 +74,8 @@ class ControllerBase(QObject):
             property_data = self._criticalPropertiesTable[property_name]
             property_source = property_data[0]
             compatible_value = property_data[1]
-            #compatible_value = self._criticalPropertiesTable[property_name]
-            if not compatible_value is None:
+
+            if compatible_value != None:
                 if property_source == 'extruder':
                     source = extruder
                 else:
@@ -152,7 +152,7 @@ class ControllerBase(QObject):
                 # Restore the original settings
                 source.setProperty(property_name, 'value', original_value)
                 message += f'"{property_label}" was restored to "{original_value_name}"\n'
-                Logger.log('d', f'Restored the original value of "{property_name}" "{original_value}"')
+                Logger.log('d', f'Restored the original value of "{property_label}" "{original_value}"')
 
             if message != '':
                 message = 'The following print properties were restored:\n' + message

@@ -68,8 +68,9 @@ class RetractTowerController(ControllerBase):
    }
 
     _criticalPropertiesTable = {
-        'adaptive_layer_height_enabled': False,
-        'layer_height': None,
+        'adaptive_layer_height_enabled': ('global', False),
+        'layer_height': ('global', None),
+        'meshfix_union_all_remove_holes': ('extruder', False),
     }
 
     _towerTypesModel = [
