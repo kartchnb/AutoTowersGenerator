@@ -34,10 +34,9 @@ class BedLevelPatternController(ControllerBase):
 
     _bedLevelPatternTypesModel = [
         {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
+        {'value': 'Concentric Circles', 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
         {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
         {'value': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
-        {'value': 'Circle', 'icon': 'bedlevelpattern_circle_icon.png'}, 
-        {'value': 'Square', 'icon': 'bedlevelpattern_square_icon.png'}, 
         {'value': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
         {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
