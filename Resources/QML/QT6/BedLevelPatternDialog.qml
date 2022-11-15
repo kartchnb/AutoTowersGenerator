@@ -106,8 +106,8 @@ UM.Dialog
 
             UM.Label
             {
-                text: "Number of Squares"
-                visible: manager.bedLevelPatternType == "Concentric Squares"
+                text: "Number of Rings"
+                visible: manager.bedLevelPatternType == "Concentric Squares" || manager.bedLevelPatternType == "Concentric Circles"
                 MouseArea 
                 {
                     id: number_of_squares_mouse_area
@@ -125,7 +125,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "The number of concentric squares to generate in the pattern."
+                text: "The number of concentric rings to generate in the pattern."
                 visible: number_of_squares_mouse_area.containsMouse
             }
 

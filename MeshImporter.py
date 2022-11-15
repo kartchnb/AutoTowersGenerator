@@ -19,7 +19,7 @@ from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 # The following comments are part of the original code:
 # Initial Source code from  fieldOfView
 # https://github.com/fieldOfView/Cura-SimpleShapes/blob/bac9133a2ddfbf1ca6a3c27aca1cfdd26e847221/SimpleShapes.py#L70
-def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> None:
+def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> AddSceneNodeOperation:
     # Read in the mesh
     mesh = trimesh.load(meshFilePath)
     mesh_data = _toMeshData(mesh)
@@ -56,8 +56,6 @@ def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> None:
 
     application.getController().getScene().sceneChanged.emit(node)
 
-    _checkAdaptativ(checkAdaptiveValue)
-
     # Modification from 5axes' code to return the AddNodeOperation to allow this operation to be undone later
     return op
 
@@ -93,26 +91,3 @@ def _toMeshData(tri_node: trimesh.base.Trimesh) -> MeshData:
     mesh_data = MeshData(vertices=vertices, indices=indices, normals=normals)
 
     return mesh_data
-
-
-
-#----------------------------------------------------------
-# Check adaptive_layer_height_enabled must be False
-#----------------------------------------------------------
-def _checkAdaptativ(val):
-    global_container_stack = CuraApplication.getInstance().getGlobalContainerStack()
-    adaptive_layer = global_container_stack.getProperty("adaptive_layer_height_enabled", "value")
-    extruder = global_container_stack.extruderList[0]
-
-    if adaptive_layer !=  val :
-        #Message(text=f'Info modification current profile adaptive_layer_height_enabled\nNew value : {val}', title='Warning! Calibration Shapes').show()
-        # Define adaptive_layer
-        global_container_stack.setProperty("adaptive_layer_height_enabled", "value", False)
-
-    nozzle_size = float(extruder.getProperty("machine_nozzle_size", "value"))
-    remove_holes = extruder.getProperty("meshfix_union_all_remove_holes", "value")
-
-    if (nozzle_size >  0.4) and (remove_holes == False) :
-        #Message(text=f'Info modification current profile meshfix_union_all_remove_holes (machine_nozzle_size>0.4\nNew value:', title='Warning! Calibration Shapes').show()
-        # Define adaptive_layer
-        extruder.setProperty("meshfix_union_all_remove_holes", "value", True)

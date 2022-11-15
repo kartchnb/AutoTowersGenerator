@@ -8,6 +8,7 @@ except ImportError:
 
 
 from cura.CuraApplication import CuraApplication
+from cura.Settings.ExtruderManager import ExtruderManager
 
 from UM.Application import Application
 from UM.Logger import Logger
@@ -16,7 +17,7 @@ from UM.Logger import Logger
 
 class ControllerBase(QObject):
 
-    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalPropertiesTable):
+    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable):
         super().__init__()
         
         self.name = name
@@ -30,13 +31,20 @@ class ControllerBase(QObject):
         self._openScadFilename = openScadFilename
         self._qmlFilename = qmlFilename
         self._presetsTable = presetsTable
-        self._criticalPropertiesTable = criticalPropertiesTable
+        self._criticalSettingsTable = criticalSettingsTable
 
-        self._originalSettings = {}
+        self._backedUpSettings = {}
 
 
 
-    def getPresetNames(self)->list:
+    @property
+    def criticalSettingsList(self)->list:
+        return list(self._criticalSettingsTable.keys())
+
+
+
+    @property
+    def presetNames(self)->list:
         return list(self._presetsTable.keys())
 
 
@@ -52,48 +60,34 @@ class ControllerBase(QObject):
 
         return self._cachedDialog
 
+    
 
+    def checkPrintSettings(self)->None:
+        ''' Checks the current print settings and warns if they are not compatible with the tower '''
 
-    @property
-    def getCriticalProperties(self)->list:
-        ''' Return the Cura properties that are critical to this tower '''
-        return self._criticalPropertiesTable.keys()
-
-
-
-    def correctPrintProperties(self)->None:
-        ''' Correct property settings that are incompatible with this controller '''
-
-        globalContainerStack = Application.getInstance().getGlobalContainerStack()
-        message = ''
+        recommendedSettings = []
 
         # Iterate over each setting in the critical settings table
-        for property_name in self._criticalPropertiesTable.keys():
-            compatible_value = self._criticalPropertiesTable[property_name]
-            if not compatible_value is None:
-                property_options = globalContainerStack.getProperty(property_name, 'options')
-                try:
-                    compatible_value_name = property_options[compatible_value]
-                except KeyError:
-                    compatible_value_name = str(compatible_value)
+        for settingName in self._criticalSettingsTable.keys():
+            (settingSource, recommendedValue) = self._criticalSettingsTable[settingName]
 
-                # Get the current value of the setting
-                property_label = globalContainerStack.getProperty(property_name, 'label')
-                original_value = globalContainerStack.getProperty(property_name, 'value')
-                property_options = globalContainerStack.getProperty(property_name, 'options')
+            # Get the source object for this setting
+            settingSource = self._getSettingSource(settingSource)
 
-                # If the property setting needs to be corrected, backup and modify the setting
-                if original_value != compatible_value:
-                    self._originalSettings[property_name] = original_value
-                    globalContainerStack.setProperty(property_name, 'value', compatible_value)
-                    message += f'"{property_label}" was set to "{compatible_value_name}"\n'
-                    Logger.log('d', f'Corrected value of "{property_label}" from "{original_value}" to "{compatible_value}"')
+            # Get the current value of the setting
+            currentValue = settingSource.getProperty(settingName, 'value')
 
-        if message != '':
-            message = 'The following printing properties were changed for this Auto Tower:\n' + message
-            message += 'The original values will be restored when the Tower is removed'
+            # Check if the setting should be changed
+            if recommendedValue != None and currentValue != recommendedValue:
+                # Look up the display name of the setting
+                settingDisplayName = settingSource.getProperty(settingName, 'label')
 
-        return message
+                # Look up the display name of the recommended setting value
+                recommendedValueDisplayName = self._getSettingValueDisplayName(settingName, recommendedValue, settingSource)
+
+                recommendedSettings.append((settingDisplayName, recommendedValueDisplayName))
+
+        return recommendedSettings
 
 
 
@@ -109,35 +103,33 @@ class ControllerBase(QObject):
 
 
 
-    def cleanupController(self)->None:
-        ''' Called when the Auto Tower is removed from the scene'''
+    def _getSettingSource(self, source_description):
+        ''' Retieves and returns a property source based on a description string '''
 
-        globalContainerStack = Application.getInstance().getGlobalContainerStack()
-        if not globalContainerStack is None:
-            message = ''
+        settingSource = None
 
-            # Iterate over each backed up property
-            for property_name in self._originalSettings.keys():
-                # Get the old value
-                original_value = self._originalSettings[property_name]
-                property_options = globalContainerStack.getProperty(property_name, 'options')
-                try:
-                    original_value_name = property_options[original_value]
-                except KeyError:
-                    original_value_name = str(original_value)
+        if source_description == 'global':
+            settingSource = Application.getInstance().getGlobalContainerStack()
+        elif source_description == 'extruder':
+            settingSource = ExtruderManager.getInstance().getActiveExtruderStacks()[0]
+        else:
+            message = f'"{source_description}" is not a recognized property source description'
+            Logger.log('e', message)
+            raise Exception(message)
 
-                # Get the label of the property
-                property_label = globalContainerStack.getProperty(property_name, 'label')
+        return settingSource
 
-                # Restore the original settings
-                globalContainerStack.setProperty(property_name, 'value', original_value)
-                message = f'"{property_label}" was restored to "{original_value_name}"'
-                Logger.log('d', f'Restored the original value of "{property_name}" "{original_value}"')
 
-            if message != '':
-                message = 'The following print properties were restored:\n' + message
 
-        self._originalSettings = {}
+    def _getSettingValueDisplayName(self, settingName, settingValue, settingSource)->str:
+        ''' Looks up and returns the display name for a given setting value '''
 
-        return message
+        try:
+            # Attempt to look up the display name of the value
+            settingOptions = settingSource.getProperty(settingName, 'options')
+            settingValueDisplayName = settingOptions[settingValue]
+        except KeyError:
+            # As a last resort, just convert the setting value to a string
+            settingValueDisplayName = str(settingValue)
 
+        return settingValueDisplayName

@@ -2,7 +2,7 @@
 
 /* [General Parameters] */
 // The type of bed level pattern to generate
-Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "x in square", "circle in square", "circle", "square", "grid", "five circles"]
+Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "concentric circles", "x in square", "circle in square", "grid", "five circles"]
 
 // The width of the bed print area
 Print_Area_Width = 220.001;
@@ -127,6 +127,30 @@ module Generate_Model()
 
 
 
+    // Draws an x shape
+    module x_shape(dimensions=1, thickness=1)
+    {
+        width = is_list(dimensions) ? dimensions.x : x;
+        height = is_list(dimensions) ? dimensions.y : y;
+
+        // Calculate the angle and length of the diagonal lines
+        angle = atan2(height, width);
+        length = sqrt(pow(width, 2) + pow(height, 2));
+
+        intersection()
+        {
+            // Generate each line in the x
+            for (z_rot = [angle, -angle])
+            rotate([0, 0, z_rot])
+                square([length, Line_Width], center=true);
+
+            // Keep the lines within the requested dimensions
+            square([width, height], center=true);
+        }
+    }
+
+
+
     // This is the best name I could come up with for this shape
     // Good luck understanding the code. It's difficult to explain without pictures
     module curved_x_pattern(size=1, thickness=1, cd=1, cr=undef)
@@ -213,46 +237,47 @@ module Generate_Model()
     }
 
 
+
+    module Generate_Concentric_Circles()
+    {
+        width_delta = Pattern_Width/Concentric_Ring_Count;
+        depth_delta = Pattern_Depth/Concentric_Ring_Count;
+
+        for (ring_number = [0 : Concentric_Ring_Count - 1])
+        {
+            ring_width = width_delta * (ring_number + 1);
+            ring_depth = depth_delta * (ring_number + 1);
+
+            outlined_oval(d=[ring_width, ring_depth], Line_Width);
+        }
+    }
+
+
     
     module Generate_X_In_Square()
     {
-        outlined_square([Pattern_Width, Pattern_Depth], Line_Width, center=true);
+        square_width = Pattern_Width;
+        square_depth = Pattern_Depth;
 
-        // Calculate the angle and length of the diagonal lines
-        angle = atan2(Pattern_Depth, Pattern_Width);
-        length = sqrt(pow(Pattern_Width, 2) + pow(Pattern_Depth, 2));
+        x_width = square_width - Line_Width*4;
+        x_depth = square_depth - Line_Width*4;
 
-        intersection()
-        {
-            // Generate each line in the x
-            for (z_rot = [angle, -angle])
-            rotate([0, 0, z_rot])
-                square([length, Line_Width], center=true);
-
-            square([Pattern_Width, Pattern_Depth], center=true);
-        }
+        outlined_square([square_width, square_depth], Line_Width, center=true);
+        x_shape([x_width, x_depth], Line_Width);
     }
 
 
 
     module Generate_Circle_In_Square()
     {
-        outlined_square([Pattern_Width, Pattern_Depth], Line_Width, center=true);
-        outlined_oval(d=[Pattern_Width, Pattern_Depth], Line_Width);
-    }
+        square_width = Pattern_Width;
+        square_depth = Pattern_Depth;
 
+        circle_width = square_width - Line_Width*4;
+        circle_depth = square_depth - Line_Width*4;
 
-
-    module Generate_Circle()
-    {
-        outlined_oval(d=[Pattern_Width, Pattern_Depth], Line_Width);
-    }
-
-
-
-    module Generate_Square()
-    {
-        outlined_square([Pattern_Width, Pattern_Depth], Line_Width, center=true);
+        outlined_square([square_width, square_depth], Line_Width, center=true);
+        outlined_oval(d=[circle_width, circle_depth], Line_Width);
     }
 
 
@@ -321,21 +346,17 @@ module Generate_Model()
             {
                 Generate_Concentric_Squares();
             }
-            else if (Bed_Level_Pattern_Type == "x in square")
+            else if (Bed_Level_Pattern_Type == "concentric circles")
             {
-                Generate_X_In_Square();
+                Generate_Concentric_Circles();
             }
             else if (Bed_Level_Pattern_Type == "circle in square")
             {
                 Generate_Circle_In_Square();
             }
-            else if (Bed_Level_Pattern_Type == "circle")
+            else if (Bed_Level_Pattern_Type == "x in square")
             {
-                Generate_Circle();
-            }
-            else if (Bed_Level_Pattern_Type == "square")
-            {
-                Generate_Square();
+                Generate_X_In_Square();
             }
             else if (Bed_Level_Pattern_Type == "grid")
             {

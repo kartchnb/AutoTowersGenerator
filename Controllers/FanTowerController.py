@@ -33,10 +33,10 @@ class FanTowerController(ControllerBase):
     }
 
     _criticalPropertiesTable = {
-        'adaptive_layer_height_enabled': False,
-        'layer_height': None,
-        'meshfix_union_all_remove_holes': False,
-        'support_enable': False,
+        'adaptive_layer_height_enabled': ('global', False),
+        'layer_height': ('global', None),
+        'meshfix_union_all_remove_holes': ('extruder', False),
+        'support_enable': ('global', False),
     }
 
     _nominalBaseHeight = 0.8

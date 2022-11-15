@@ -82,8 +82,8 @@ UM.Dialog
 
             Label
             {
-                text: "Number of Squares"
-                visible: manager.bedLevelPatternType == "Concentric Squares"
+                text: "Number of Rings"
+                visible: manager.bedLevelPatternType == "Concentric Squares" || manager.bedLevelPatternType == "Concentric Circles"
 
              }
             TextField
