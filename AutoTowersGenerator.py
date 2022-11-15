@@ -10,7 +10,7 @@ except ImportError:
     from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
     PYQT_VERSION = 5
 
-from cura.CuraApplication import CuraApplication # BAK: Remove?
+from cura.CuraApplication import CuraApplication
 from cura.Scene.CuraSceneNode import CuraSceneNode
 from UM.Application import Application
 from UM.Extension import Extension
@@ -18,7 +18,6 @@ from UM.Logger import Logger
 from UM.Message import Message
 from UM.PluginRegistry import PluginRegistry
 from UM.Scene.Camera import Camera
-from UM.Scene.SceneNode import SceneNode # BAK: Remove?
 
 from . import MeshImporter
 from .OpenScadInterface import OpenScadInterface
@@ -55,11 +54,11 @@ class AutoTowersGenerator(QObject, Extension):
         self._importedNode = None
 
         # Keep track of whether a model has been generated and is in the scene
-        self._autoTowerGenerated = False
+        self._autoTowerNode = None
         self._autoTowerOperation = None
 
         # Keep track of the currently active tower controller
-        self._currentController = None
+        self._currentTowerController = None
 
         # Update the view when the main window is changed so the "remove" button is always visible when enabled
         CuraApplication.getInstance().mainWindowChanged.connect(self._displayRemoveAutoTowerButton)
@@ -175,7 +174,7 @@ class AutoTowersGenerator(QObject, Extension):
     def autoTowerGenerated(self)->bool:
         ''' Used to show or hide the button for removing the generated Auto Tower '''
 
-        return self._autoTowerGenerated
+        return not self._autoTowerOperation is None
 
 
 
@@ -220,8 +219,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
         # Remove the tower
-        if self._autoTowerGenerated:
-            self._removeAutoTower('The Auto Tower model and its associated post-processing has been removed')
+        self._removeAutoTower('The Auto Tower model and its associated post-processing has been removed')
 
 
 
@@ -248,8 +246,7 @@ class AutoTowersGenerator(QObject, Extension):
             json.dump(pluginSettings, settingsFile)
 
         # Remove the tower to force it to be regenerated
-        if self._autoTowerGenerated:
-            self._removeAutoTower('The AutoTower was removed because plugin settings were changed')
+        self._removeAutoTower('The AutoTower was removed because plugin settings were changed')
 
 
 
@@ -315,10 +312,10 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        self._currentController = self._retrieveTowerController(controllerClass)
+        self._currentTowerController = self._retrieveTowerController(controllerClass)
 
         # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
-        recommendedSettings = self._currentController.checkPrintSettings()
+        recommendedSettings = self._currentTowerController.checkPrintSettings()
         if len(recommendedSettings) > 0:
             message = '\n'.join([f'\tSet {entry[0]} to {entry[1]}' for entry in recommendedSettings])
             message = 'For best results, the following setting changes are recommended:' + message
@@ -333,42 +330,61 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName).show()
             return
 
-        self._currentController.generate(presetName)
+        self._currentTowerController.generate(presetName)
 
 
 
     def _removeAutoTower(self, message = None)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
 
+        # Display the requested message
         if message != None:
             Message(message, title=self._pluginName).show()
 
-        # Indicate that there is no longer an Auto Tower in the scene
-        self._autoTowerGenerated = False
-        self.autoTowerGeneratedChanged.emit()
-
-        # Remove the Auto Tower itself
-        self._autoTowerOperation.undo()
-
-        # Remove the post-processing callback
-        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
-        self._towerControllerPostProcessingCallback = None
-
-        # Clear the job name
-        CuraApplication.getInstance().getPrintInformation().setJobName('')
-
-        # Stop listening for machine changes
         try:
+            # Remove the Auto Tower itself
+            if not self._autoTowerOperation is None:
+                self._autoTowerOperation.undo()
+        except Exception as e:
+            message = f'Error: {e}'
+            Message(message).show()
+            Logger.log('e', message)
+
+        try:
+            # Remove the post-processing callback
+            self._towerControllerPostProcessingCallback = None
+            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
+        except Exception as e:
+            #Logger.log('e', e)
+            pass
+
+        try:
+            # Stop listening for machine changes
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
         except Exception as e:
             #Logger.log('e', e)
             pass
 
         try:
+            # Stop listening for settings changes
             CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
         except Exception as e:
             #Logger.log('e', e)
             pass
+
+        try:
+            # Stop listening for node changes
+            CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
+        except Exception as e:
+            #Logger.log('e', e)
+            pass
+
+        # Clear the job name
+        CuraApplication.getInstance().getPrintInformation().setJobName('')
+
+        # Indicate that there is no longer an Auto Tower in the scene
+        self._autoTowerOperation = None
+        self.autoTowerGeneratedChanged.emit()
 
 
 
@@ -408,7 +424,6 @@ class AutoTowersGenerator(QObject, Extension):
         CuraApplication.getInstance().processEvents() # Allow Cura to update itself periodically through this method
 
         # Remove all models from the scene
-        self._autoTowerGenerated = False
         CuraApplication.getInstance().deleteAll()
         CuraApplication.getInstance().processEvents()
         
@@ -445,13 +460,12 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Imports an STL file into the scene '''
 
         # Remove all models from the scene
-        if self._autoTowerGenerated:
-            self._removeAutoTower()
+        self._removeAutoTower()
         CuraApplication.getInstance().deleteAll()
         CuraApplication.getInstance().processEvents()
 
         # Import the STL file into the scene
-        self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, False)
+        self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, name=self._pluginName)
         CuraApplication.getInstance().processEvents()
 
         # Register the post-processing callback for this particular tower
@@ -465,7 +479,6 @@ class AutoTowersGenerator(QObject, Extension):
         CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
 
         # Register that the Auto Tower has been generated
-        self._autoTowerGenerated = True
         self.autoTowerGeneratedChanged.emit()
 
         # Remove the model if the selected machine (printer) is changed
@@ -474,13 +487,16 @@ class AutoTowersGenerator(QObject, Extension):
         # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
         CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
 
+        # Remove the model if it is deleted or another model is added to the scene
+        CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.connect(self._onSceneChanged)
+
 
 
     def _onMachineChanged(self)->None:
         ''' Listen for machine changes made after an Auto Tower is generated 
             In this case, the Auto Tower needs to be removed and regenerated '''
-        if self._autoTowerGenerated:
-            self._removeAutoTower('The Auto Tower was removed because the active machine was changed')
+
+        self._removeAutoTower('The Auto Tower was removed because the active machine was changed')
 
 
 
@@ -488,8 +504,8 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Listen for setting changes made after an Auto Tower is generated '''
 
         # Remove the tower in response to changes to critical print settings
-        if self._autoTowerGenerated and not self._currentController is None:
-            if settingKey in self._currentController.criticalSettingsList:
+        if not self._currentTowerController is None:
+            if settingKey in self._currentTowerController.criticalSettingsList:
                 settingLabel = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(settingKey, 'label')
                 self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
 
@@ -501,6 +517,14 @@ class AutoTowersGenerator(QObject, Extension):
 
         self._loadPluginSettings()
         self._initializeMenu()
+
+
+
+    def _onSceneChanged(self, node)->None:
+        # If the AutoTower node no longer exists, then clean up
+        AutoTowerNodes = [child for child in node.getChildren() if child.getName() == self._pluginName]
+        if len(AutoTowerNodes) <= 0:
+            self._removeAutoTower()
 
 
 
@@ -523,37 +547,36 @@ class AutoTowersGenerator(QObject, Extension):
         ''' This callback is called just before gcode is generated for the model 
             (this happens when the sliced model is sent to the printer or a file '''
         
-        if self._autoTowerGenerated:
-            # Retrieve the g-code from the scene
-            scene = Application.getInstance().getController().getScene()
+        # Retrieve the g-code
+        scene = Application.getInstance().getController().getScene()
 
-            try:
-                # Proceed if the g-code is valid
-                gcode_dict = getattr(scene, 'gcode_dict')
-            except AttributeError:
-                # If there is no g-code, there's nothing more to do
-                return
+        try:
+            # Proceed if the g-code is valid
+            gcode_dict = getattr(scene, 'gcode_dict')
+        except AttributeError:
+            # If there is no g-code, there's nothing more to do
+            return
 
-            try:
-                # Retrieve the g-code for the current build plate
-                active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
-                gcode = gcode_dict[active_build_plate_id]
-            except (TypeError, KeyError):
-                # If there is no g-code for the current build plate, there's nothing more to do
-                return
+        try:
+            # Retrieve the g-code for the current build plate
+            active_build_plate_id = CuraApplication.getInstance().getMultiBuildPlateModel().activeBuildPlate
+            gcode = gcode_dict[active_build_plate_id]
+        except (TypeError, KeyError):
+            # If there is no g-code for the current build plate, there's nothing more to do
+            return
 
-            try:
-                # Proceed if the g-code has not already been post-processed
-                if self._gcodeProcessedMarker not in gcode[0]:
+        try:
+            # Proceed if the g-code has not already been post-processed
+            if self._gcodeProcessedMarker not in gcode[0]:
 
-                    # Mark the g-code as having been post-processed
-                    gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
+                # Mark the g-code as having been post-processed
+                gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
 
-                    # Call the tower controller post-processing callback to modify the g-code
-                    gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
+                # Call the tower controller post-processing callback to modify the g-code
+                gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
 
-                    Message('AutoTowersGenerator post-processing completed', title=self._pluginName).show()
+                Message('AutoTowersGenerator post-processing completed', title=self._pluginName).show()
 
-            except IndexError:
-                return
-            
+        except IndexError:
+            return
+        

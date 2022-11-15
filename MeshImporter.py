@@ -19,7 +19,7 @@ from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 # The following comments are part of the original code:
 # Initial Source code from  fieldOfView
 # https://github.com/fieldOfView/Cura-SimpleShapes/blob/bac9133a2ddfbf1ca6a3c27aca1cfdd26e847221/SimpleShapes.py#L70
-def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> AddSceneNodeOperation:
+def ImportMesh(meshFilePath, ext_pos = 0, name='') -> tuple:
     # Read in the mesh
     mesh = trimesh.load(meshFilePath)
     mesh_data = _toMeshData(mesh)
@@ -33,7 +33,7 @@ def ImportMesh(meshFilePath, ext_pos = 0, checkAdaptiveValue = False ) -> AddSce
 
     node.setMeshData(mesh_data)
     node.setSelectable(True)
-    node.setName("TestPart" + str(id(mesh_data)))
+    node.setName(name)
 
     scene = CuraApplication.getInstance().getController().getScene()
     op = AddSceneNodeOperation(node, scene.getRoot())

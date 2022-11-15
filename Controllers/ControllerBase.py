@@ -33,8 +33,6 @@ class ControllerBase(QObject):
         self._presetsTable = presetsTable
         self._criticalSettingsTable = criticalSettingsTable
 
-        self._backedUpSettings = {}
-
 
 
     @property
@@ -103,6 +101,11 @@ class ControllerBase(QObject):
 
 
 
+    def cleanup(self)->None:
+        pass
+
+
+
     def _getSettingSource(self, source_description):
         ''' Retieves and returns a property source based on a description string '''
 
@@ -133,3 +136,51 @@ class ControllerBase(QObject):
             settingValueDisplayName = str(settingValue)
 
         return settingValueDisplayName
+
+
+
+    def _getPrintAreaDimensions(self)->tuple:
+        containerStack = Application.getInstance().getGlobalContainerStack()
+
+        # Determine the maximum print area
+        disallowedAreas = containerStack.getProperty('machine_disallowed_areas', 'value')
+        if len(disallowedAreas) > 0:
+            # Calculate the print area based on the disallowed areas
+            flattenedList = [coord for section in disallowedAreas for coord in section]
+            minX = max([coord[0] for coord in flattenedList if coord[0] < 0])
+            maxX = min([coord[0] for coord in flattenedList if coord[0] >= 0])
+            minY = max([coord[1] for coord in flattenedList if coord[1] < 0])
+            maxY = min([coord[1] for coord in flattenedList if coord[1] >= 0])
+            printAreaWidth = maxX - minX
+            printAreaDepth = maxY - minY
+        else:
+            # Calculate the print area based on the bed size
+            printAreaWidth = containerStack.getProperty('machine_width', 'value')
+            printAreaDepth = containerStack.getProperty('machine_depth', 'value')
+
+        # Query the current line width
+        lineWidth = containerStack.getProperty('line_width', 'value')
+
+        # Adjust for the selected bed adhesion
+        bedAdhesionType = containerStack.getProperty('adhesion_type', 'value')
+        if bedAdhesionType == 'skirt':
+            skirtGap = containerStack.getProperty('skirt_gap', 'value')
+            printAreaWidth -= skirtGap*2
+            printAreaDepth -= skirtGap*2
+
+        elif bedAdhesionType == 'brim':
+            brimWidth = containerStack.getProperty('brim_width', 'value')
+            brimGap = containerStack.getProperty('brim_gap', 'value')
+            printAreaWidth -= (brimWidth*2 + brimGap*2)
+            printAreaDepth -= (brimWidth*2 + brimGap*2)
+
+        elif bedAdhesionType == 'raft':
+            raftMargin = containerStack.getProperty('raft_margin', 'value')
+            printAreaWidth -= raftMargin*2
+            printAreaDepth -= raftMargin*2
+
+        # Adjust the print_area size by the line width to keep the pattern within the volume
+        printAreaWidth -= lineWidth*2
+        printAreaDepth -= lineWidth*2
+
+        return (printAreaWidth, printAreaDepth)

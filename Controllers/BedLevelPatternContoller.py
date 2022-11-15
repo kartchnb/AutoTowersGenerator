@@ -171,27 +171,14 @@ class BedLevelPatternController(ControllerBase):
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
  
-        containerStack = Application.getInstance().getGlobalContainerStack()
-
         fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
 
         # Determine the maximum print area
-        disallowed_areas = containerStack.getProperty('machine_disallowed_areas', 'value')
-        if len(disallowed_areas) > 0:
-            # Calculate the print area based on the disallowed areas
-            flattened_list = [coord for section in disallowed_areas for coord in section]
-            min_x = max([coord[0] for coord in flattened_list if coord[0] < 0])
-            max_x = min([coord[0] for coord in flattened_list if coord[0] >= 0])
-            min_y = max([coord[1] for coord in flattened_list if coord[1] < 0])
-            max_y = min([coord[1] for coord in flattened_list if coord[1] >= 0])
-            print_area_width = max_x - min_x
-            print_area_depth = max_y - min_y
-        else:
-            # Calculate the print area based on the bed size
-            print_area_width = containerStack.getProperty('machine_width', 'value')
-            print_area_depth = containerStack.getProperty('machine_depth', 'value')
+        (print_area_width, print_area_depth) = self._getPrintAreaDimensions()
+
+        containerStack = Application.getInstance().getGlobalContainerStack()
 
         # Query the current layer height
         layer_height = containerStack.getProperty("layer_height", "value")
@@ -199,15 +186,11 @@ class BedLevelPatternController(ControllerBase):
         # Query the current line width
         line_width = containerStack.getProperty('line_width', 'value')
 
-        # Adjust the print_area size by the line width to keep the pattern within the volume
-        corrected_print_area_width = print_area_width - line_width*4
-        corrected_print_area_depth = print_area_depth - line_width*4
-
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
         openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPatternType.lower()
-        openScadParameters ['Print_Area_Width'] = corrected_print_area_width
-        openScadParameters ['Print_Area_Depth'] = corrected_print_area_depth
+        openScadParameters ['Print_Area_Width'] = print_area_width
+        openScadParameters ['Print_Area_Depth'] = print_area_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
         openScadParameters ['Fill_Percentage'] = fill_percentage
