@@ -222,7 +222,7 @@ class FlowTowerController(ControllerBase):
         baseHeight = self._baseLayers * layerHeight
 
         # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = math.ceil(self._nominalSectionHeight / layerHeight) # Round up
+        self._sectionLayers = math.ceil(self.sectionSize / layerHeight) # Round up
         sectionHeight = self._sectionLayers * layerHeight
 
         # Ensure the change amount has the correct sign
