@@ -74,6 +74,27 @@ UM.Dialog
 
             UM.Label 
             { 
+                text: "Correct print settings" 
+                MouseArea 
+                {
+                    id: correct_print_settings_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            UM.CheckBox
+            {
+                id: correctPrintSettings
+                checked: manager.correctPrintSettings
+            }
+            UM.ToolTip
+            {
+                text: "When checked, the plugin will automatically correct print settings for best results when printing the selected tower."
+                visible: correct_print_settings_mouse_area.containsMouse
+            }
+
+            UM.Label 
+            { 
                 text: "Display on LCD" 
                 MouseArea 
                 {
@@ -112,8 +133,8 @@ UM.Dialog
     onAccepted:
     {
         manager.openScadPathSetting = openScadPath.text
+        manager.correctPrintSettings = correctPrintSettings.checked
         manager.displayOnLcdSetting = displayOnLcd.checked
-        manager.pluginSettingsModified()
     }
 
 }

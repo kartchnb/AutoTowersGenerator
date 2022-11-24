@@ -236,7 +236,7 @@ class RetractTowerController(ControllerBase):
         towerName = f'Preset Retraction Value Tower {presetName}'
 
         # Use the callback to load the preset STL file
-        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
+        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
 
 
 
@@ -285,7 +285,7 @@ class RetractTowerController(ControllerBase):
         towerName = f'Auto-Generated Retraction Tower ({self._towerType}) {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 

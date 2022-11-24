@@ -33,6 +33,8 @@ class ControllerBase(QObject):
         self._presetsTable = presetsTable
         self._criticalSettingsTable = criticalSettingsTable
 
+        self._backedUpSettings = {}
+
 
 
     @property
@@ -60,32 +62,59 @@ class ControllerBase(QObject):
 
     
 
-    def checkPrintSettings(self)->None:
-        ''' Checks the current print settings and warns if they are not compatible with the tower '''
+    def checkPrintSettings(self, correctPrintSettings = False)->None:
+        ''' Checks the current print settings and warns or changes them if they are not compatible with the tower '''
 
-        recommendedSettings = []
+        correctedSettings = []
 
         # Iterate over each setting in the critical settings table
         for settingName in self._criticalSettingsTable.keys():
-            (settingSource, recommendedValue) = self._criticalSettingsTable[settingName]
+            (containerStackDescription, recommendedValue) = self._criticalSettingsTable[settingName]
 
-            # Get the source object for this setting
-            settingSource = self._getSettingSource(settingSource)
+            # Continue if there is a recommended value for this setting
+            if not recommendedValue is None:
 
-            # Get the current value of the setting
-            currentValue = settingSource.getProperty(settingName, 'value')
+                # Get the source object for this setting
+                containerStack = self._getcontainerStack(containerStackDescription)
 
-            # Check if the setting should be changed
-            if recommendedValue != None and currentValue != recommendedValue:
-                # Look up the display name of the setting
-                settingDisplayName = settingSource.getProperty(settingName, 'label')
+                # Look up the current value of the setting
+                currentValue = containerStack.getProperty(settingName, 'value')
 
-                # Look up the display name of the recommended setting value
-                recommendedValueDisplayName = self._getSettingValueDisplayName(settingName, recommendedValue, settingSource)
+                # If the current value does not match the recommended value
+                if currentValue != recommendedValue:
 
-                recommendedSettings.append((settingDisplayName, recommendedValueDisplayName))
+                    # Look up the display name of the setting and the current and recommended values
+                    settingDisplayName = containerStack.getProperty(settingName, 'label')
+                    currentValueDisplayName = self._getSettingValueDisplayName(containerStack, settingName, currentValue)
+                    recommendedValueDisplayName = self._getSettingValueDisplayName(containerStack, settingName, recommendedValue)
 
-        return recommendedSettings
+                    # Report the setting as changed or just recommended to be changed
+                    correctedSettings.append((settingDisplayName, currentValueDisplayName, recommendedValueDisplayName))
+
+                    # If the setting should be automatically changed
+                    if correctPrintSettings == True:
+
+                        # Backup and change the setting
+                        self._backedUpSettings[settingName] = (containerStack, currentValue, currentValueDisplayName, settingDisplayName)
+                        containerStack.setProperty(settingName, 'value', recommendedValue)
+
+        return correctedSettings
+
+
+
+    def _lookupStackValue(self, stack, settingName)->list:
+        containerList = []
+
+        # Iterate over each container in the stack
+        for container in stack.getContainers():
+
+            # Check if this container contains the setting
+            result = container.hasProperty(settingName, 'value')
+            if container.hasProperty(settingName, 'value'):
+                currentValue = container.getProperty(settingName, 'value')
+                containerList.append((container, currentValue))
+
+        return containerList
 
 
 
@@ -101,41 +130,56 @@ class ControllerBase(QObject):
 
 
 
-    def cleanup(self)->None:
-        pass
+    def cleanup(self)->tuple:
+        restoredSettings = []
+
+        # Iterate over each backed up setting
+        for settingName in self._backedUpSettings.keys():
+            # Get the backed up setting value
+            (containerStack, originalValue, originalValueDisplayName, settingDisplayName) = self._backedUpSettings[settingName]
+
+            # Restore the original setting
+            containerStack.setProperty(settingName, 'value', originalValue)
+            containerStack.setDirty(False)
+
+            # Report the restored setting
+            restoredSettings.append((settingDisplayName, originalValueDisplayName))
+
+        self._backedUpSettings = {}
+
+        return restoredSettings
+            
 
 
-
-    def _getSettingSource(self, source_description):
+    def _getcontainerStack(self, sourceDescription):
         ''' Retieves and returns a property source based on a description string '''
 
-        settingSource = None
+        containerStack = None
 
-        if source_description == 'global':
-            settingSource = Application.getInstance().getGlobalContainerStack()
-        elif source_description == 'extruder':
-            settingSource = ExtruderManager.getInstance().getActiveExtruderStacks()[0]
+        if sourceDescription == 'global':
+            containerStack = Application.getInstance().getGlobalContainerStack()
+        elif sourceDescription == 'extruder':
+            # BAK: Try getActiveExtruderStack()
+            containerStack = ExtruderManager.getInstance().getActiveExtruderStack()
         else:
-            message = f'"{source_description}" is not a recognized property source description'
             Logger.log('e', message)
-            raise Exception(message)
 
-        return settingSource
-
+        return containerStack
 
 
-    def _getSettingValueDisplayName(self, settingName, settingValue, settingSource)->str:
+
+    def _getSettingValueDisplayName(self, containerStack, settingName, settingValue)->str:
         ''' Looks up and returns the display name for a given setting value '''
 
         try:
             # Attempt to look up the display name of the value
-            settingOptions = settingSource.getProperty(settingName, 'options')
-            settingValueDisplayName = settingOptions[settingValue]
-        except KeyError:
+            settingOptions = containerStack.getProperty(settingName, 'options')
+            displayName = settingOptions[settingValue]
+        except (KeyError, TypeError):
             # As a last resort, just convert the setting value to a string
-            settingValueDisplayName = str(settingValue)
+            displayName = str(settingValue)
 
-        return settingValueDisplayName
+        return displayName
 
 
 

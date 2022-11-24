@@ -1,4 +1,3 @@
-import json
 import os
 import tempfile
 
@@ -11,15 +10,14 @@ except ImportError:
     PYQT_VERSION = 5
 
 from cura.CuraApplication import CuraApplication
-from cura.Scene.CuraSceneNode import CuraSceneNode
 from UM.Application import Application
 from UM.Extension import Extension
 from UM.Logger import Logger
 from UM.Message import Message
 from UM.PluginRegistry import PluginRegistry
-from UM.Scene.Camera import Camera
 
 from . import MeshImporter
+from .PluginSettings import PluginSettings
 from .OpenScadInterface import OpenScadInterface
 from .OpenScadJob import OpenScadJob
 
@@ -46,8 +44,7 @@ class AutoTowersGenerator(QObject, Extension):
         QObject.__init__(self)
         Extension.__init__(self)
 
-        # Initialize the plugin settings
-        self._pluginSettings = {}
+        self._pluginSettings = None
 
         # Keep track of the post-processing callback and the node added by the OpenSCAD import
         self._towerControllerPostProcessingCallback = None
@@ -65,6 +62,9 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Finish initializing the plugin after Cura is fully ready
         CuraApplication.getInstance().pluginsLoaded.connect(self._onPluginsLoadedCallback)
+
+        # Make sure the tower is cleaned up before the application closes
+        CuraApplication.getInstance().getOnExitCallbackManager().addCallback(self._onExitCallback)
 
 
 
@@ -102,9 +102,10 @@ class AutoTowersGenerator(QObject, Extension):
 
     @property
     def _pluginSettingsFilePath(self)->str:
-        ''' Returns the path of the plugins settings file '''
+        ''' Returns the path to the plugin settings file '''
 
-        return os.path.join(self._pluginPath, 'Resources', 'settings.json')
+        return os.path.join(self._pluginPath, 'pluginSettings.json')
+
 
 
 
@@ -186,17 +187,42 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _openScadPathSetting = ''
-
     _openScadPathSettingChanged = pyqtSignal()
     
     def setOpenScadPathSetting(self, value)->None:
-        self._openScadPathSetting = value
+        self._pluginSettings.SetValue('openscad path', value)
+        self._openScadInterface.SetOpenScadPath(value)
+
+        # Warn the user if the OpenScad path is not valid
+        if not self._openScadInterface.OpenScadPathValid:
+            message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
+            Message(message, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
+
         self._openScadPathSettingChanged.emit()
 
     @pyqtProperty(str, notify=_openScadPathSettingChanged, fset=setOpenScadPathSetting)
     def openScadPathSetting(self)->str:
-        return self._openScadPathSetting
+        # If the OpenSCAD path has not been set, use the default from the OpenSCAD interface
+        value = self._pluginSettings.GetValue('openscad path')
+        if value == '':
+            # Update the OpenScad path from the OpenScad interface
+            value = self._openScadInterface.OpenScadPath
+
+        return value
+
+
+
+    _correctPrintSettings = True
+
+    _correctPrintSettingsChanged = pyqtSignal()
+
+    def setCorrectPrintSettings(self, value:bool)->None:
+        self._pluginSettings.SetValue('correct print settings', value)
+        self._correctPrintSettingsChanged.emit()
+
+    @pyqtProperty(bool, notify=_correctPrintSettingsChanged, fset=setCorrectPrintSettings)
+    def correctPrintSettings(self)->bool:
+        return self._pluginSettings.GetValue('correct print settings', True)
 
 
 
@@ -204,13 +230,13 @@ class AutoTowersGenerator(QObject, Extension):
 
     _displayOnLcdSettingChanged = pyqtSignal()
 
-    def setDisplayOnLcdSetting(self, value)->None:
-        self._displayOnLcdSetting = value
+    def setDisplayOnLcdSetting(self, value:bool)->None:
+        self._pluginSettings.SetValue('display on lcd', value)
         self._displayOnLcdSettingChanged.emit()
 
     @pyqtProperty(bool, notify=_displayOnLcdSettingChanged, fset=setDisplayOnLcdSetting)
     def displayOnLcdSetting(self)->bool:
-        return self._displayOnLcdSetting
+        return self._pluginSettings.GetValue('display on lcd', False)
 
 
 
@@ -219,54 +245,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called when the remove button is clicked to remove the generated Auto Tower from the scene'''
 
         # Remove the tower
-        self._removeAutoTower('The Auto Tower model and its associated post-processing has been removed')
-
-
-
-    @pyqtSlot()
-    def pluginSettingsModified(self)->None:
-        ''' Saves plugin settings to a json file so they persist between sessions '''
-
-        # Send the new OpenScad path to the OpenScad Interface
-        self._openScadInterface.SetOpenScadPath(self.openScadPathSetting)
-
-        # Warn the user if the OpenScad path is not valid
-        if not self._openScadInterface.OpenScadPathValid:
-            message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
-            Message(message, title=self._pluginName).show()
-
-        # Create a settings dictionary to dump to the settings file
-        pluginSettings = {
-            'openscad path': self.openScadPathSetting,
-            'display on lcd': self.displayOnLcdSetting,
-        }
-
-        # Save the settings to the settings file
-        with open(self._pluginSettingsFilePath, 'w') as settingsFile:
-            json.dump(pluginSettings, settingsFile)
-
-        # Remove the tower to force it to be regenerated
-        self._removeAutoTower('The AutoTower was removed because plugin settings were changed')
-
-
-
-    def _loadPluginSettings(self)->None:
-        ''' Load plugin settings from the settings.json file  '''
-
-        try:
-            # Load settings from the settings file, if it exists
-            with open(self._pluginSettingsFilePath, 'r') as settingsFile:
-                pluginSettings = json.load(settingsFile)
-
-            # Forward the OpenScad path to the OpenScadInterface object
-            self.setOpenScadPathSetting(pluginSettings['openscad path'])
-            self._openScadInterface.SetOpenScadPath(self.openScadPathSetting)
-
-            # Read in the 'display to LCD' setting
-            self.setDisplayOnLcdSetting(pluginSettings['display on lcd'])
-
-        except (FileNotFoundError, KeyError):
-            pass
+        self._removeAutoTower()
 
 
 
@@ -312,79 +291,61 @@ class AutoTowersGenerator(QObject, Extension):
     def _generateAutoTower(self, controllerClass, presetName=''):
         ''' Verifies print settings and generates the requested auto tower '''
 
-        self._currentTowerController = self._retrieveTowerController(controllerClass)
-
-        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
-        recommendedSettings = self._currentTowerController.checkPrintSettings()
-        if len(recommendedSettings) > 0:
-            message = '\n'.join([f'\tSet {entry[0]} to {entry[1]}' for entry in recommendedSettings])
-            message = 'For best results, the following setting changes are recommended:' + message
-            Message(message).show()
-
         # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
         openscad_path_is_valid = self._openScadInterface.OpenScadPathValid
         if presetName == '' and not openscad_path_is_valid:
             Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is invalid')
             message = 'This functionality relies on OpenSCAD, which is not installed or configured correctly\n'
             message += 'Please ensure OpenSCAD is installed (openscad.org) and that its path has been set correctly in this plugin\'s settings\n'
-            Message(message, title=self._pluginName).show()
+            Message(message, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
             return
 
-        self._currentTowerController.generate(presetName)
+        # Generate the auto tower
+        currentTowerController = self._retrieveTowerController(controllerClass)
+        currentTowerController.generate(presetName)
 
 
 
     def _removeAutoTower(self, message = None)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
-
-        # Display the requested message
-        if message != None:
-            Message(message, title=self._pluginName).show()
-
-        try:
-            # Remove the Auto Tower itself
-            if not self._autoTowerOperation is None:
-                self._autoTowerOperation.undo()
-        except Exception as e:
-            message = f'Error: {e}'
-            Message(message).show()
-            Logger.log('e', message)
-
-        try:
-            # Remove the post-processing callback
-            self._towerControllerPostProcessingCallback = None
-            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
-        except Exception as e:
-            #Logger.log('e', e)
-            pass
-
+            
+        # Stop listening for callbacks
+        self._towerControllerPostProcessingCallback = None
+        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
+        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
         try:
             # Stop listening for machine changes
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
-        except Exception as e:
-            #Logger.log('e', e)
+        except TypeError as e:
+            # This exception is expected during Cura shutdown
             pass
 
-        try:
-            # Stop listening for settings changes
-            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        except Exception as e:
-            #Logger.log('e', e)
-            pass
+        # Clean up after the AutoTower
+        if not self._currentTowerController is None:
+            restoredSettings = self._currentTowerController.cleanup()
+            if len(restoredSettings) > 0:
+                restoredMessage = '\n'.join([f'Restored {entry[0]} to {entry[1]}' for entry in restoredSettings])
+                restoredMessage = 'The following settings were restored:\n' + restoredMessage
+                Message(restoredMessage, title=self._pluginName).show()
+            self._currentTowerController = None
 
-        try:
-            # Stop listening for node changes
-            CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
-        except Exception as e:
-            #Logger.log('e', e)
-            pass
+        # Remove the Auto Tower itself
+        if not self._autoTowerOperation is None:
+            self._autoTowerOperation.undo()
+            self._autoTowerOperation = None
 
         # Clear the job name
         CuraApplication.getInstance().getPrintInformation().setJobName('')
 
         # Indicate that there is no longer an Auto Tower in the scene
-        self._autoTowerOperation = None
         self.autoTowerGeneratedChanged.emit()
+        
+        # Display the requested message
+        if message != None:
+            Message(message, title=self._pluginName).show()
+
+        CuraApplication.getInstance().processEvents()
 
 
 
@@ -409,15 +370,61 @@ class AutoTowersGenerator(QObject, Extension):
     def _displayPluginSettingsDialog(self)->None:
         ''' Prepares and displays the plugin settings dialog '''
 
-        # Update the OpenScad path from the OpenScad interface
-        self.setOpenScadPathSetting(self._openScadInterface.OpenScadPath)
-
         self._pluginSettingsDialog.show()
 
 
 
-    def _generateAndLoadStlCallback(self, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
+    def _correctPrintSettingsForTower(self):
+        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
+        recommendedSettings = self._currentTowerController.checkPrintSettings(self.correctPrintSettings)
+        if len(recommendedSettings) > 0:
+            message = '\n'.join([f'Changed {entry[0]} from {entry[1]} to {entry[2]}' for entry in recommendedSettings])        
+            if self.correctPrintSettings:
+                message = 'The following settings were changed:\n' + message
+                Message(message, title=self._pluginName).show()
+            else:
+                message = 'The following settings changes are recommended\n' + message
+                Message(message, title=self._pluginName, message_type=Message.MessageType.WARNING).show()
+
+        CuraApplication.getInstance().processEvents()
+
+
+
+    def _loadStlCallback(self, controller, towerName, stlFilePath, postProcessingCallback)->None:
+        ''' This callback is called by the tower model controller if a preset tower is requested '''
+
+        # If the file does not exist, display an error message
+        if os.path.isfile(stlFilePath) == False:
+            errorMessage = f'The STL file "{stlFilePath}" does not exist'
+            Logger.log('e', errorMessage)
+            Message(errorMessage, title = self._pluginName, message_type=Message.MessageType.ERROR).show()
+            return
+
+        # Make sure any previous auto towers are removed
+        self._removeAutoTower()
+
+        # Record the new tower controller
+        self._currentTowerController = controller
+
+        # Ensure print settings are correct
+        self._correctPrintSettingsForTower()
+
+        # Import the STL file into the scene
+        self._importStl(towerName, stlFilePath, postProcessingCallback)
+
+
+
+    def _generateAndLoadStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
+
+        # Make sure any previous auto towers are removed
+        self._removeAutoTower()
+
+        # Record the new tower controller
+        self._currentTowerController = controller
+
+        # Ensure print settings are correct
+        self._correctPrintSettingsForTower()
 
         # This could take up to a couple of minutes...
         self._waitDialog.show()
@@ -447,7 +454,7 @@ class AutoTowersGenerator(QObject, Extension):
         if os.path.isfile(stlFilePath) == False:
             errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}":\n{self._openScadInterface.errorMessage}'
             Logger.log('e', errorMessage)
-            Message(errorMessage, title=self._pluginName).show()
+            Message(errorMessage, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
             self._waitDialog.hide()
             return
 
@@ -458,11 +465,6 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _importStl(self, towerName, stlFilePath, postProcessingCallback)->None:
         ''' Imports an STL file into the scene '''
-
-        # Remove all models from the scene
-        self._removeAutoTower()
-        CuraApplication.getInstance().deleteAll()
-        CuraApplication.getInstance().processEvents()
 
         # Import the STL file into the scene
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, name=self._pluginName)
@@ -515,31 +517,36 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called after plugins have been loaded
             Iniializing here means that Cura is fully ready '''
 
-        self._loadPluginSettings()
+
+        self._pluginSettings = PluginSettings(self._pluginSettingsFilePath)
+
         self._initializeMenu()
 
 
 
     def _onSceneChanged(self, node)->None:
-        # If the AutoTower node no longer exists, then clean up
-        AutoTowerNodes = [child for child in node.getChildren() if child.getName() == self._pluginName]
-        if len(AutoTowerNodes) <= 0:
-            self._removeAutoTower()
+        # Only process root node change
+        if node.getName() == 'Root':
+            # If the AutoTower node no longer exists, then clean up
+            AutoTowerNodes = [child for child in node.getChildren() if child.getName() == self._pluginName]
+            if len(AutoTowerNodes) <= 0:
+                self._removeAutoTower()
 
 
 
-    def _loadStlCallback(self, towerName, stlFilePath, postProcessingCallback)->None:
-        ''' This callback is called by the tower model controller if a preset tower is requested '''
+    def _onExitCallback(self)->None:
+        ''' Called as Cura is closing to ensure that any settings that were changed are restored before exiting '''
 
-        # If the file does not exist, display an error message
-        if os.path.isfile(stlFilePath) == False:
-            errorMessage = f'The STL file "{stlFilePath}" does not exist'
-            Logger.log('e', errorMessage)
-            Message(errorMessage, title = self._pluginName).show()
-            return
+        # Remove the tower
+        self._removeAutoTower('Removing the autotower because Cura is closing')
 
-        # Import the STL file into the scene
-        self._importStl(towerName, stlFilePath, postProcessingCallback)
+        # Save the plugin settings
+        try:
+            self._pluginSettings.SaveToFile(self._pluginSettingsFilePath)
+        except AttributeError:
+            pass
+
+        CuraApplication.getInstance().triggerNextExitCheck()        
 
 
 
@@ -574,8 +581,6 @@ class AutoTowersGenerator(QObject, Extension):
 
                 # Call the tower controller post-processing callback to modify the g-code
                 gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
-
-                Message('AutoTowersGenerator post-processing completed', title=self._pluginName).show()
 
         except IndexError:
             return

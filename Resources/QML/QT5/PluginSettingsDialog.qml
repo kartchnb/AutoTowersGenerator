@@ -58,6 +58,16 @@ UM.Dialog
 
             UM.Label 
             { 
+                text: "Correct print settings" 
+            }
+            UM.CheckBox
+            {
+                id: correctPrintSettings
+                checked: manager.correctPrintSettings
+            }
+
+            UM.Label 
+            { 
                 text: "Display on LCD" 
             }
             Cura.CheckBox
@@ -84,6 +94,7 @@ UM.Dialog
     {
         manager.openScadPathSetting = openScadPath.text
         manager.displayOnLcdSetting = displayOnLcd.checked
+        manager.correctPrintSettings = correctPrintSettings
         manager.pluginSettingsModified()
     }
 }

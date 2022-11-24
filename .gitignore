@@ -1,8 +1,9 @@
 # Don't check-in my development files
 my.notes
-settings.json
+pluginSettings.json
 *.sh
 *.xcf
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

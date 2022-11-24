@@ -25,11 +25,13 @@ class BedLevelPatternController(ControllerBase):
     _presetsTable = {}
 
     _criticalPropertiesTable = {
+        'adaptive_layer_height_enabled': ('global', False),
         'adhesion_type': ('global', 'none'),
         'layer_height': ('global', None),
         'line_width': ('extruder', None),
         'machine_width': ('global', None),
         'machine_depth': ('global', None),
+        'meshfix_union_all_remove_holes': ('extruder', False),
     }
 
     _bedLevelPatternTypesModel = [
@@ -163,7 +165,7 @@ class BedLevelPatternController(ControllerBase):
         towerName = f'Preset Bed Level Pattern {presetName}'
 
         # Use the callback to load the preset STL file
-        self._loadStlCallback(towerName, stlFilePath, self.postProcess)
+        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
 
 
 
@@ -201,7 +203,7 @@ class BedLevelPatternController(ControllerBase):
         towerName = f'Auto-Generated Bed Level Pattern {print_area_width}x{print_area_depth}'
 
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(towerName, self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 
