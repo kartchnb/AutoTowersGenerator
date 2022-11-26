@@ -58,7 +58,7 @@ def execute(gcode, start_retract_value, retract_value_change, section_layer_coun
     # Document the settings in the g-code
     gcode[0] += f';RetractTower ({tower_type}) start {tower_type} = {start_retract_value}, {tower_type} change = {retract_value_change}\n'
 
-    extruder = Application.getInstance().getGlobalContainerStack().extruderList[0] # BAK: Try ActiveExtruder
+    extruder = ExtruderManager.getInstance().getActiveExtruderStack()
     relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code

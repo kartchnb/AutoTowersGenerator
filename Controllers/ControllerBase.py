@@ -6,6 +6,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import QObject
 
+from enum import IntEnum
 
 from cura.CuraApplication import CuraApplication
 from cura.Settings.ExtruderManager import ExtruderManager
@@ -16,6 +17,12 @@ from UM.Logger import Logger
 
 
 class ControllerBase(QObject):
+    
+    class ContainerId(IntEnum):
+        GLOBAL_CONTAINER_STACK = 0
+        ACTIVE_EXTRUDER_STACK = 1
+
+
 
     def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable):
         super().__init__()
@@ -38,12 +45,6 @@ class ControllerBase(QObject):
 
 
     @property
-    def criticalSettingsList(self)->list:
-        return list(self._criticalSettingsTable.keys())
-
-
-
-    @property
     def presetNames(self)->list:
         return list(self._presetsTable.keys())
 
@@ -60,7 +61,12 @@ class ControllerBase(QObject):
 
         return self._cachedDialog
 
+
+
+    def settingIsCritical(self, settingKey)->bool:
+        return settingKey in self._criticalSettingsTable.keys()
     
+
 
     def checkPrintSettings(self, correctPrintSettings = False)->None:
         ''' Checks the current print settings and warns or changes them if they are not compatible with the tower '''
@@ -75,7 +81,7 @@ class ControllerBase(QObject):
             if not recommendedValue is None:
 
                 # Get the source object for this setting
-                containerStack = self._getcontainerStack(containerStackDescription)
+                containerStack = self._getContainerStack(containerStackDescription)
 
                 # Look up the current value of the setting
                 currentValue = containerStack.getProperty(settingName, 'value')
@@ -99,22 +105,6 @@ class ControllerBase(QObject):
                         containerStack.setProperty(settingName, 'value', recommendedValue)
 
         return correctedSettings
-
-
-
-    def _lookupStackValue(self, stack, settingName)->list:
-        containerList = []
-
-        # Iterate over each container in the stack
-        for container in stack.getContainers():
-
-            # Check if this container contains the setting
-            result = container.hasProperty(settingName, 'value')
-            if container.hasProperty(settingName, 'value'):
-                currentValue = container.getProperty(settingName, 'value')
-                containerList.append((container, currentValue))
-
-        return containerList
 
 
 
@@ -151,18 +141,18 @@ class ControllerBase(QObject):
             
 
 
-    def _getcontainerStack(self, sourceDescription):
+    def _getContainerStack(self, sourceDescription: ContainerId):
         ''' Retieves and returns a property source based on a description string '''
 
         containerStack = None
 
-        if sourceDescription == 'global':
+        if sourceDescription == ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK:
             containerStack = Application.getInstance().getGlobalContainerStack()
-        elif sourceDescription == 'extruder':
-            # BAK: Try getActiveExtruderStack()
+        elif sourceDescription == ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK:
             containerStack = ExtruderManager.getInstance().getActiveExtruderStack()
         else:
-            Logger.log('e', message)
+            message = f'Unrecognized container stack descriptor "{sourceDescription}"'
+            raise TypeError(message)
 
         return containerStack
 

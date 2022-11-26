@@ -68,10 +68,10 @@ class RetractTowerController(ControllerBase):
    }
 
     _criticalPropertiesTable = {
-        'adaptive_layer_height_enabled': ('global', False),
-        'layer_height': ('global', None),
-        'retraction_enable': ('extruder', True),
-        'meshfix_union_all_remove_holes': ('extruder', False),
+        'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
+        'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
+        'retraction_enable': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, True),
+        'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
     }
 
     _towerTypesModel = [
