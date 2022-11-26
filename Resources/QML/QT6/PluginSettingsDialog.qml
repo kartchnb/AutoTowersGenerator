@@ -95,23 +95,23 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Display on LCD" 
+                text: "Enable LCD messages" 
                 MouseArea 
                 {
-                    id: display_on_lcd_mouse_area
+                    id: enable_lcd_messages_mouse_area
                     anchors.fill: parent
                     hoverEnabled: true
                 }
             }
             UM.CheckBox
             {
-                id: displayOnLcd
-                checked: manager.displayOnLcdSetting
+                id: enableLcdMessages
+                checked: manager.enableLcdMessagesSetting
             }
             UM.ToolTip
             {
                 text: "Selects whether tower parameter changes (temperature, speed, etc) are displayed to your printer's LCD.<p>Information is displayed using the M117 command, which can cause issues with some printers (The Dremel 3D45, for instance)<p>Deselect this if you are noticing issues."
-                visible: display_on_lcd_mouse_area.containsMouse
+                visible: enable_lcd_messages_mouse_area.containsMouse
             }
         }
     }
@@ -133,8 +133,8 @@ UM.Dialog
     onAccepted:
     {
         manager.openScadPathSetting = openScadPath.text
+        manager.enableLcdMessagesSetting = enableLcdMessages.checked
         manager.correctPrintSettings = correctPrintSettings.checked
-        manager.displayOnLcdSetting = displayOnLcd.checked
     }
 
 }

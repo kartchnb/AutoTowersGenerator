@@ -4,65 +4,57 @@
 #
 # Version 1.0 - 21 Sep 2022: 
 #   Based on version 1.1 of 5axes' FlowTower script
+# Version 1.1 - 25 Nov 2022:
+#   Updated to ignore user-specified "End G-Code"
+#   Rearchitected how lines are processed
+__version__ = '1.1'
 
 from UM.Logger import Logger
 from UM.Application import Application
-from enum import Enum
-
-__version__ = '1.0'
-
-def is_start_of_layer(line: str) -> bool:
-    return line.strip().startswith(';LAYER:')
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, displayOnLcd):
+def execute(gcode, start_flow_value, flow_value_change, section_layer_count, base_layer_count, enable_lcd_messages):
     Logger.log('d', 'AutoTowersGenerator beginning FlowTower post-processing')
-    Logger.log('d', f'Starting value = {startValue}')
-    Logger.log('d', f'Value change = {valueChange}')
-    Logger.log('d', f'Base layers = {baseLayers}')
-    Logger.log('d', f'Section layers = {sectionLayers}')
+    Logger.log('d', f'Starting value = {start_flow_value}')
+    Logger.log('d', f'Value change = {flow_value_change}')
+    Logger.log('d', f'Base layers = {base_layer_count}')
+    Logger.log('d', f'Section layers = {section_layer_count}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';FlowTower start flow = {startValue}, flow change = {valueChange}\n'
+    gcode[0] += f';FlowTower start flow = {start_flow_value}, flow change = {flow_value_change}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
     # Layer index 1 is the start g-code?
     # Our code starts at index 2?
-    baseLayers += 2
+    base_layer_count += 2
 
     # Start at the selected starting temperature
-    currentValue = startValue
+    current_flow_value = start_flow_value - flow_value_change # The current flow value will be corrected when the first section is encountered
 
     # Iterate over each layer in the g-code
-    for layer in gcode:
-        layerIndex = gcode.index(layer)
+    for layer_index, layer in enumerate(gcode):
 
-        # Iterate over each command line in the layer
-        lines = layer.split('\n')
-        for line in lines:
-            # If this is the start of the current layer
-            if is_start_of_layer(line):
-                lineIndex = lines.index(line)
+        # The last layer contains user-specified end gcode, which should not be processed
+        if layer_index >= len(gcode) - 1:
+            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            break
 
-                # If the end of the base has been reached, start modifying the temperature
-                if layerIndex == baseLayers:
-                    Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting flow rate to {currentValue}')
-                    lines.insert(lineIndex + 1, f'M221 S{currentValue} ; AutoTowersGenerator setting flow rate to {currentValue} for first section')
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator added')
+        # Handle each new section
+        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
+            
+            # Update the flow value
+            current_flow_value += flow_value_change
+            command_line = f'M221 S{current_flow_value} ;AutoTowersGenerator setting flow rate to {current_flow_value} for next section'
+            lcd_line = f'M117 Flow {current_flow_value} ;AutoTowersGenerator added'
 
-                # If the end of a section has been reached, decrease the temperature
-                if ((layerIndex - baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
-                    currentValue += valueChange
-                    Logger.log('d', f'New section at layer {layerIndex - 2} - setting flow rate to {currentValue}')
-                    lines.insert(lineIndex + 1, f'M221 S{currentValue} ; AutoTowersGenerator setting flow rate to {currentValue} for next section')
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, f'M117 Flow {currentValue} ; AutoTowersGenerator addeds')
-
-        result = '\n'.join(lines)
-        gcode[layerIndex] = result
+            # Insert the new lines into the layer
+            lines = layer.split('\n')
+            lines.insert(1, command_line)
+            if enable_lcd_messages:
+                lines.insert(1, lcd_line)
+            gcode[layer_index] = '\n'.join(lines)
 
     Logger.log('d', 'AutoTowersGenerator completing FlowTower post-processing')
     

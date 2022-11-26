@@ -14,14 +14,19 @@
 # Version 1.2 - 05 Nov 2022:
 #   Fixed an issue with recognizing decimal speeds in gcode
 #   Now only displaying LCD messages for the nominal speed for each layer
-
-import re
+# Version 1.3 - 25 Nov 2022:
+#   Updated to ignore user-specified "End G-Code"
+#   Rearchitected how lines are processed
+__version__ = '1.3'
 
 from UM.Logger import Logger
 
-__version__ = '1.2'
+import re
 
 
+
+def is_already_processed_line(line: str) -> bool:
+    return ';AutoTowersGenerator' in line
 
 def is_print_speed_line(line: str) -> bool:
     ''' Check if a given line changes the print speed '''
@@ -29,55 +34,60 @@ def is_print_speed_line(line: str) -> bool:
 
 
 
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, referenceSpeed, displayOnLcd):
+def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_count, reference_speed, enable_lcd_messages):
     ''' Post-process gcode sliced by Cura
-        startValue = the starting print speed (mm/s)
-        valueChange = the amount to change the print speed for each section (mm/s)
-        sectionLayers = the number of layers in each tower section
-        baseLayers = the number of layers that make up the base of the tower
-        referenceSpeed = the print speed selection when the gcode was generated 
+        start_speed = the starting print speed (mm/s)
+        speed_change = the amount to change the print speed for each section (mm/s)
+        section_layer_count = the number of layers in each tower section
+        base_layer_count = the number of layers that make up the base of the tower
+        reference_speed = the print speed selection when the gcode was generated 
             This value is used to determine how print speed settings in the
             gcode are modified for each level '''
 
     Logger.log('d', 'AutoTowersGenerator beginning SpeedTower (Print Speed) post-processing')
-    Logger.log('d', f'Starting speed = {startValue}')
-    Logger.log('d', f'Speed change = {valueChange}')
-    Logger.log('d', f'Reference speed = {referenceSpeed}')
-    Logger.log('d', f'Base layers = {baseLayers}')
-    Logger.log('d', f'Section layers = {sectionLayers}')
-    Logger.log('d', f'Reference Speed = {referenceSpeed}')
+    Logger.log('d', f'Starting speed = {start_speed}')
+    Logger.log('d', f'Speed change = {speed_change}')
+    Logger.log('d', f'Reference speed = {reference_speed}')
+    Logger.log('d', f'Base layers = {base_layer_count}')
+    Logger.log('d', f'Section layers = {section_layer_count}')
+    Logger.log('d', f'Reference Speed = {reference_speed}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';SpeedTower (Print Speed) start speed = {startValue}, speed change = {valueChange}, reference speed = {referenceSpeed}\n'
+    gcode[0] = gcode[0] + f';SpeedTower (Print Speed) start speed = {start_speed}, speed change = {speed_change}, reference speed = {reference_speed}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the bed adhesion code (skirt, brim, etc)
     # Layer index 1 is the initial layer, which has its own settings
     # Our code starts at index 2
-    baseLayers += 2
+    base_layer_count += 2
 
-    currentValue = startValue - valueChange
+    current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
     
     # Iterate over each layer in the g-code
-    for layer in gcode:
-        layerIndex = gcode.index(layer)
+    for layer_index, layer in enumerate(gcode):
 
-        # Process layers 2+
-        if (layerIndex >= baseLayers) and ((layerIndex - baseLayers) % sectionLayers == 0):
-            currentValue += valueChange
+        # The last layer contains user-specified end gcode, which should not be processed
+        if layer_index >= len(gcode) - 1:
+            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            break
 
-            Logger.log('d', f'Start of next section at layer {layerIndex  - 2}')
-            Logger.log('d', f'Section speed is {currentValue:.1f}mm/s')
+        # If this is the start of a new section (after the base)
+        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
+
+            lines = layer.split('\n')
+
+            # Increment the speed
+            current_speed += speed_change
+            lines.insert(1, f';Start of next section (speed = {current_speed/60:.1f} mm/s ({current_speed:.1f} mm/m) ;AutoTowersGenerator added')
+            if enable_lcd_messages:
+                lines.insert(1, f'M117 SPD {current_speed:.1f} mm/s ;AutoTowersGenerator added\n')
 
             # Iterate over each command line in the layer
-            lines = layer.split('\n')
-            if displayOnLcd:
-                lines.insert(0, f'M117 SPD {currentValue:.1f}mm/s ;AutoTowersGenerator added')
-            for line in lines:
-                lineIndex = lines.index(line)
-
+            for line_index, line in enumerate(lines):
+                
                 # Modify lines specifying print speed
-                if is_print_speed_line(line):
+                if not is_already_processed_line(line) and is_print_speed_line(line):
+
                     # Determine the old speed setting in the gcode
                     oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
                     if oldSpeedResult:
@@ -87,19 +97,12 @@ def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, reference
                         # Determine the new speed to set (converting mm/s to mm/m)
                         # This is done based on the reference speed, or the
                         # "print speed" value when the gcode was generated
-                        newSpeed = (currentValue * 60) * oldSpeed / (referenceSpeed * 60)
+                        newSpeed = (current_speed * 60) * oldSpeed / (reference_speed * 60)
 
                         # Change the speed in the gcode
-                        if f'{oldSpeed:.1f}' != f'{newSpeed:.1f}':
-                            # Change the speed for this line
-                            new_line = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ;AutoTowersGenerator changing speed from {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m) to {(newSpeed/60):.1f}mm/s ({newSpeed:.1f}mm/m)'
-                        else:
-                            new_line = line + f' ;AutoTowersGenerator speed is already at desired {(oldSpeed/60):.1f}mm/s ({oldSpeed:.1f}mm/m)'
-
-                        lines[lineIndex] = new_line
-                                     
-            result = '\n'.join(lines)
-            gcode[layerIndex] = result
+                        lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ;AutoTowersGenerator changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/m) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/m)'
+                                    
+            gcode[layer_index] = '\n'.join(lines)
     
     Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing (Print Speed)')
 

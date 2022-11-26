@@ -6,63 +6,52 @@
 #   Updates as part of the plugin upgrade for Cura 5.1
 # Version 2.1 - 21 Sep 2022: 
 #   Updated to match Version 1.6 of 5axes' TempFanTower processing script
+# Version 2.2 - 25 Nov 2022:
+#   Updated to ignore user-specified "End G-Code"
+#   Rearchitected how lines are processed
+__version__ = '2.2'
 
 from UM.Logger import Logger
 
-__version__ = '2.1'
-
-def is_start_of_layer(line: str) -> bool:
-    return line.strip().startswith(';LAYER:')
 
 
-
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, displayOnLcd):
+def execute(gcode, start_temp, temp_change, section_layer_count, base_layer_count, enable_lcd_messages):
     Logger.log('d', 'AutoTowersGenerator beginning TempTower post-processing')
-    Logger.log('d', f'Starting temperature = {startValue}')
-    Logger.log('d', f'Temperature change = {valueChange}')
-    Logger.log('d', f'Base layers = {baseLayers}')
-    Logger.log('d', f'Section layers = {sectionLayers}')
+    Logger.log('d', f'Starting temperature = {start_temp}')
+    Logger.log('d', f'Temperature change = {temp_change}')
+    Logger.log('d', f'Base layers = {base_layer_count}')
+    Logger.log('d', f'Section layers = {section_layer_count}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';TempTower start temp = {startValue}, temp change = {valueChange}\n'
+    gcode[0] += f';TempTower start temp = {start_temp}, temp change = {temp_change}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
     # Layer index 1 is the start g-code?
     # Our code starts at index 2?
-    baseLayers += 2
+    base_layer_count += 2
 
     # Start at the selected starting temperature
-    currentValue = startValue
+    current_temp = start_temp - temp_change # The current temp will be incremented when the first section is encountered
 
     # Iterate over each layer in the g-code
-    for layer in gcode:
-        layerIndex = gcode.index(layer)
+    for layer_index, layer in enumerate(gcode):
 
-        # Iterate over each command line in the layer
-        lines = layer.split('\n')
-        for line in lines:
-            # If this is the start of the current layer
-            if is_start_of_layer(line):
-                lineIndex = lines.index(line)
+        # The last layer contains user-specified end gcode, which should not be processed
+        if layer_index >= len(gcode) - 1:
+            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            break
 
-                # If the end of the base has been reached, start modifying the temperature
-                if layerIndex == baseLayers:
-                    Logger.log('d', f'Start of first section layer {layerIndex - 2} - setting temp to {currentValue}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for first section')
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, f'M117 Temp {currentValue} ; AutoTowersGenerator added')
+        # Only process layers after the base
+        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
 
-                # If the end of a section has been reached, decrease the temperature
-                if ((layerIndex - baseLayers) % sectionLayers == 0) and (layerIndex > baseLayers):
-                    currentValue += valueChange
-                    Logger.log('d', f'New section at layer {layerIndex - 2} - setting temp to {currentValue}')
-                    lines.insert(lineIndex + 1, f'M104 S{currentValue} ; AutoTowersGenerator setting temperature to {currentValue} for next section')
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, f'M117 Temp {currentValue} ; AutoTowersGenerator added')
+            # Increment the temperature
+            current_temp += temp_change
+            layer = f'M104 S{current_temp} ;AutoTowersGenerator setting temperature to {current_temp} for the next section' + layer
+            if enable_lcd_messages:
+                layer = f'M117 Temp {current_temp} ;AutoTowersGenerator added' + layer
 
-        result = '\n'.join(lines)
-        gcode[layerIndex] = result
+            gcode[layer_index] = layer
 
     Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     

@@ -8,107 +8,84 @@
 #   Updated to match Version 1.7 of 5axes' SpeedTower processing script
 # Version 2.2 - 29 Sep 2022:
 #   Removed travel speed post-processing to TravelSpeedTower_PostProcessing.py
+# Version 2.3 - 25 Nov 2022:
+#   Updated to ignore user-specified "End G-Code"
+#   Rearchitected how lines are processed
+
+__version__ = '2.3'
 
 from UM.Logger import Logger
 
-__version__ = '2.2'
 
 
-
-def is_start_of_layer(line: str) -> bool:
-    return line.strip().startswith(';LAYER:')
-
-
-
-def execute(gcode, startValue, valueChange, sectionLayers, baseLayers, towerType, displayOnLcd):
-    Logger.log('d', f'AutoTowersGenerator beginning SpeedTower {towerType} post-processing')
-    Logger.log('d', f'Starting speed = {startValue}')
-    Logger.log('d', f'Speed change = {valueChange}')
-    Logger.log('d', f'Base layers = {baseLayers}')
-    Logger.log('d', f'Section layers = {sectionLayers}')
+def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_count, tower_type, enable_lcd_messages):
+    Logger.log('d', f'AutoTowersGenerator beginning SpeedTower {tower_type} post-processing')
+    Logger.log('d', f'Starting speed = {start_speed}')
+    Logger.log('d', f'Speed change = {speed_change}')
+    Logger.log('d', f'Base layers = {base_layer_count}')
+    Logger.log('d', f'Section layers = {section_layer_count}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';SpeedTower ({towerType}) start speed = {startValue}, speed change = {valueChange}\n'
+    gcode[0] += f';SpeedTower ({tower_type}) start speed = {start_speed}, speed change = {speed_change}\n'
 
     # The number of base layers needs to be modified to take into account the numbering offset in the g-code
     # Layer index 0 is the initial block?
     # Layer index 1 is the start g-code?
     # Our code starts at index 2?
-    baseLayers += 2
+    base_layer_count += 2
 
-    currentValue = startValue
-    command=''
-    
+    current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
+
     # Iterate over each layer in the g-code
-    for layer in gcode:
-        layerIndex = gcode.index(layer)
+    for layer_index, layer in enumerate(gcode):
 
-        # Iterate over each command line in the layer
-        lines = layer.split('\n')
-        for line in lines:
+        # The last layer contains user-specified end gcode, which should not be processed
+        if layer_index >= len(gcode) - 1:
+            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            break
 
-            if is_start_of_layer(line):
-                lineIndex = lines.index(line)
+        # If this is the start of a new section (after the base)
+        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
 
-                if (layerIndex == baseLayers):
-                    Logger.log('d', f'Start of first section layer {layerIndex  - 2}')
-                    if (towerType == 'Acceleration'):
-                        command = f'M204 S{int(currentValue)} ; AutoTowersGenerator setting acceleration to {int(currentValue)}mm/s/s'
-                        lcd_gcode = f'M117 ACC {int(currentValue)}mm/s/s ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting acceleration to {int(currentValue)}mm/s/s')
-                    if (towerType=='Jerk'):
-                        command = f'M205 X{int(currentValue)} Y{int(currentValue)} ; AutoTowersGenerator setting jerk speed to {int(currentValue)}mm/s'
-                        lcd_gcode = f'M117 JRK {int(currentValue)}mm/s ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting jerk speed to {int(currentValue)}mm/s')
-                    if (towerType=='Junction'):
-                        command = f'M205 J{float(currentValue):.3f} ; AutoTowersGenerator setting junction value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 JCN J{float(currentValue):.3f} ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting junction value to {float(currentValue):.3f}')
-                    if (towerType=='Marlin linear'):
-                        command = f'M900 K{float(currentValue):.3f} ; AutoTowersGenerator setting Marlin linear value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 LIN {float(currentValue):.3f} ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting Marlin linear value to {float(currentValue):.3f}')
-                    if (towerType=='RepRap pressure'):
-                        command = f'M572 D0 S{float(currentValue):.3f} ; AutoTowersGenerator setting RepRap pressure value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 PRS {float(currentValue):.3f} ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting RepRap pressure value to {float(currentValue):.3f}')
-                        
-                    lines.insert(lineIndex + 1, command)
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, lcd_gcode)
+            # Increment the speed for this section
+            current_speed += speed_change
+    
+            # Handle acceleration speed
+            if tower_type == 'Acceleration':
+                command_line = f'M204 S{int(current_speed)} ;AutoTowersGenerator setting acceleration to {int(current_speed)}mm/s/s for section {layer_index - base_layer_count}'
+                lcd_line = f'M117 ACC S{int(current_speed)}mm/s/s ;AutoTowersGenerator added'
 
-                if ((layerIndex-baseLayers) % sectionLayers == 0) and ((layerIndex - baseLayers) > 0):
-                    Logger.log('d', f'New section at layer {layerIndex - 2}')
-                    currentValue += valueChange
-            
-                    if  (towerType == 'Acceleration'):
-                        command = f'M204 S{int(currentValue)} ; AutoTowersGenerator setting acceleration to {int(currentValue)}mm/s/s'
-                        lcd_gcode = f'M117 ACC S{int(currentValue)}mm/s/s ; AutoTowersGenerator added'
-                        Logger.log('d', f'Setting acceleration to {int(currentValue)}mm/s/s')
-                    if  (towerType=='Jerk'):
-                        command = f'M205 X{int(currentValue)} Y{int(currentValue)} ; AutoTowersGenerator setting jerk speed to {int(currentValue)}mm/s'
-                        lcd_gcode = f'M117 JRK X{int(currentValue)} Y{int(currentValue)}'
-                        Logger.log('d', f'Setting jerk speed to {int(currentValue)}mm/s')
-                    if  (towerType=='Junction'):
-                        command = f'M205 J{float(currentValue):.3f} ; AutoTowersGenerator setting junction value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 JCN J{float(currentValue):.3f}'
-                        Logger.log('d', f'Setting junction value to {float(currentValue):.3f}')
-                    if  (towerType=='Marlin linear'):
-                        command = f'M900 K{float(currentValue):.3f} ; AutoTowersGenerator setting Marlin linear value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 LIN {float(currentValue):.3f}'
-                        Logger.log('d', f'Setting Marlin linear value to {float(currentValue):.3f}')
-                    if  (towerType=='RepRap pressure'):
-                        command = f'M572 D0 S{float(currentValue):.3f} ; AutoTowersGenerator setting RepRap pressure value to {float(currentValue):.3f}'
-                        lcd_gcode = f'M117 PRS {float(currentValue):.3f}'
-                        Logger.log('d', f'Setting RepRap pressure value to {float(currentValue):.3f}')
-                        
-                    lines.insert(lineIndex + 1, command)
-                    if displayOnLcd:
-                        lines.insert(lineIndex + 2, lcd_gcode)                                              
+            # Handle jerk speed
+            elif tower_type=='Jerk':
+                command_line = f'M205 X{int(current_speed)} Y{int(current_speed)} ;AutoTowersGenerator setting jerk speed to {int(current_speed)}mm/s'
+                lcd_line = f'M117 JRK X{int(current_speed)} Y{int(current_speed)}'
 
-        result = '\n'.join(lines)
-        gcode[layerIndex] = result
+            # Handle junction speed
+            elif tower_type=='Junction':
+                command_line = f'M205 J{float(current_speed):.3f} ;AutoTowersGenerator setting junction value to {float(current_speed):.3f}'
+                lcd_line = f'M117 JCN J{float(current_speed):.3f}'
 
-    Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing ({towerType})')
+            # Handle Marlin linear speed
+            elif tower_type=='Marlin linear':
+                command_line = f'M900 K{float(current_speed):.3f} ;AutoTowersGenerator setting Marlin linear value to {float(current_speed):.3f}'
+                lcd_line = f'M117 LIN {float(current_speed):.3f}'
+
+            # Handle RepRap pressure speed
+            elif tower_type=='RepRap pressure':
+                command_line = f'M572 D0 S{float(current_speed):.3f} ;AutoTowersGenerator setting RepRap pressure value to {float(current_speed):.3f}'
+                lcd_line = f'M117 PRS {float(current_speed):.3f}'
+
+            # Handle unrecognized tower types
+            else:  
+                Logger.log('e', f'MiscSpeedTower_PostProcessing: unrecognized tower type "{tower_type}"')
+                break
+
+            # Insert the new code into the layer
+            layer = command_line + layer
+            if enable_lcd_messages:
+                layer = lcd_line + layer
+            gcode[layer_index] = layer
+
+    Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing ({tower_type})')
 
     return gcode
