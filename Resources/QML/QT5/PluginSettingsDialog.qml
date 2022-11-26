@@ -68,12 +68,12 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Display on LCD" 
+                text: "Enable LCD messages" 
             }
             Cura.CheckBox
             {
-                id: displayOnLcd
-                checked: manager.displayOnLcdSetting
+                id: enableLcdMessages
+                checked: manager.enableLcdMessagesSetting
             }
         }
     }
@@ -93,8 +93,7 @@ UM.Dialog
     onAccepted:
     {
         manager.openScadPathSetting = openScadPath.text
-        manager.displayOnLcdSetting = displayOnLcd.checked
+        manager.enableLcdMessagesSetting = enableLcdMessages.checked
         manager.correctPrintSettings = correctPrintSettings
-        manager.pluginSettingsModified()
     }
 }

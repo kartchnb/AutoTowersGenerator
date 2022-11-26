@@ -9,12 +9,14 @@ except ImportError:
     from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
     PYQT_VERSION = 5
 
-from cura.CuraApplication import CuraApplication
 from UM.Application import Application
 from UM.Extension import Extension
 from UM.Logger import Logger
 from UM.Message import Message
 from UM.PluginRegistry import PluginRegistry
+
+from cura.CuraApplication import CuraApplication
+from cura.Settings.ExtruderManager import ExtruderManager
 
 from . import MeshImporter
 from .PluginSettings import PluginSettings
@@ -33,7 +35,7 @@ from .Controllers.TempTowerController import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
 
-    _gcodeProcessedMarker = ';Post-processed by the AutoTowersGenerator plugin'
+    _gcodeProcessedMarker = ';AutoTowersGenerator post-processed'
 
     # Add additional controller classes to this list
     _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
@@ -226,17 +228,17 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _displayOnLcdSetting = True
+    _enableLcdMessagesSetting = True
 
-    _displayOnLcdSettingChanged = pyqtSignal()
+    _enableLcdMessagesSettingChanged = pyqtSignal()
 
-    def setDisplayOnLcdSetting(self, value:bool)->None:
-        self._pluginSettings.SetValue('display on lcd', value)
-        self._displayOnLcdSettingChanged.emit()
+    def setEnableLcdMessagesSetting(self, value:bool)->None:
+        self._pluginSettings.SetValue('enable lcd messages', value)
+        self._enableLcdMessagesSettingChanged.emit()
 
-    @pyqtProperty(bool, notify=_displayOnLcdSettingChanged, fset=setDisplayOnLcdSetting)
-    def displayOnLcdSetting(self)->bool:
-        return self._pluginSettings.GetValue('display on lcd', False)
+    @pyqtProperty(bool, notify=_enableLcdMessagesSettingChanged, fset=setEnableLcdMessagesSetting)
+    def enableLcdMessagesSetting(self)->bool:
+        return self._pluginSettings.GetValue('enable lcd messages', False)
 
 
 
@@ -311,9 +313,31 @@ class AutoTowersGenerator(QObject, Extension):
             
         # Stop listening for callbacks
         self._towerControllerPostProcessingCallback = None
-        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
-        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
+        try:
+            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
+        except TypeError:
+            # Thrown if the callback wasn't connected - can be ignored
+            pass
+        try:
+            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        except TypeError:
+            # Thrown if the callback wasn't connected - can be ignored
+            pass
+        try:
+            ExtruderManager.getInstance().activeExtruderChanged.disconnect(self._onActiveExtruderChanged)
+        except TypeError:
+            # Thrown if the callback wasn't connected - can be ignored
+            pass
+        try:
+            ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.disconnect(self._onExtruderPrintSettingChanged)
+        except TypeError:
+            # Thrown if the callback wasn't connected - can be ignored
+            pass
+        try:
+            CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
+        except TypeError:
+            # Thrown if the callback wasn't connected - can be ignored
+            pass
         try:
             # Stop listening for machine changes
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
@@ -470,10 +494,6 @@ class AutoTowersGenerator(QObject, Extension):
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, name=self._pluginName)
         CuraApplication.getInstance().processEvents()
 
-        # Register the post-processing callback for this particular tower
-        Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcessCallback)
-        self._towerControllerPostProcessingCallback = postProcessingCallback
-
         # The dialog is no longer needed
         self._waitDialog.hide()
 
@@ -483,11 +503,20 @@ class AutoTowersGenerator(QObject, Extension):
         # Register that the Auto Tower has been generated
         self.autoTowerGeneratedChanged.emit()
 
-        # Remove the model if the selected machine (printer) is changed
+        # Register the post-processing callback for this particular tower
+        Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcessCallback)
+        self._towerControllerPostProcessingCallback = postProcessingCallback
+
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
 
         # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
         CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
+
+        # Remove the model if the active extruder is changed
+        ExtruderManager.getInstance().activeExtruderChanged.connect(self._onActiveExtruderChanged)
+
+        # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
+        ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.connect(self._onExtruderPrintSettingChanged)
 
         # Remove the model if it is deleted or another model is added to the scene
         CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.connect(self._onSceneChanged)
@@ -509,6 +538,24 @@ class AutoTowersGenerator(QObject, Extension):
         if not self._currentTowerController is None:
             if settingKey in self._currentTowerController.criticalSettingsList:
                 settingLabel = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(settingKey, 'label')
+                self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
+
+
+
+    def _onActiveExtruderChanged(self)->None:
+        ''' Listen for changes to the active extruder '''
+            
+        self._removeAutoTower('The Auto Tower was removed because the active extruder changed')
+
+
+
+    def _onExtruderPrintSettingChanged(self, settingKey, propertyName)->None:
+        ''' Listen for changes to the active extruder print settings '''
+
+        # Remove the tower in response to changes to critical print settings
+        if not self._currentTowerController is None:
+            if settingKey in self._currentTowerController.criticalSettingsList:
+                settingLabel = ExtruderManager.getInstance().getActiveExtruderStack().getProperty(settingKey, 'label')
                 self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
 
 
@@ -577,10 +624,10 @@ class AutoTowersGenerator(QObject, Extension):
             if self._gcodeProcessedMarker not in gcode[0]:
 
                 # Mark the g-code as having been post-processed
-                gcode[0] = gcode[0] + self._gcodeProcessedMarker + '\n'
+                gcode[0] += self._gcodeProcessedMarker + '\n'
 
                 # Call the tower controller post-processing callback to modify the g-code
-                gcode = self._towerControllerPostProcessingCallback(gcode, self.displayOnLcdSetting)
+                gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
 
         except IndexError:
             return
