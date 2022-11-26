@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "flowtower 85-115": {
+        "flowtower 115-85": {
             "Base_Height": "0.8",
             "Ending_Value": "85",
             "Font": "Arial:style=Bold",

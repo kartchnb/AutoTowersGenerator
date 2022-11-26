@@ -50,7 +50,7 @@ class FlowTowerController(ControllerBase):
 
 
     # The starting value for the tower
-    _startValueStr = '85'
+    _startValueStr = '115'
 
     startValueStrChanged = pyqtSignal()
     
@@ -65,7 +65,7 @@ class FlowTowerController(ControllerBase):
 
 
     # The ending value for the tower
-    _endValueStr = '115'
+    _endValueStr = '85'
 
     endValueStrChanged = pyqtSignal()
     
