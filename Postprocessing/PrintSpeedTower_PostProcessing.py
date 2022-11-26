@@ -30,7 +30,8 @@ def is_already_processed_line(line: str) -> bool:
 
 def is_print_speed_line(line: str) -> bool:
     ''' Check if a given line changes the print speed '''
-    return (line.strip().startswith('G0') or line.strip().startswith('G1')) and 'F' in line
+    #return (line.strip().startswith('G0') or line.strip().startswith('G1')) and 'F' in line
+    return line.strip().startswith('G1') and 'F' in line
 
 
 
