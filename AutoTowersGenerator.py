@@ -313,61 +313,38 @@ class AutoTowersGenerator(QObject, Extension):
             
         # Stop listening for callbacks
         self._towerControllerPostProcessingCallback = None
+        Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
+        # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
+        # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
+        # ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.disconnect(self._onExtruderPrintSettingChanged)
+        CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
         try:
-            Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
-        except TypeError:
-            # Thrown if the callback wasn't connected - can be ignored
-            pass
-        try:
-            CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
-        except TypeError:
-            # Thrown if the callback wasn't connected - can be ignored
-            pass
-        try:
-            ExtruderManager.getInstance().activeExtruderChanged.disconnect(self._onActiveExtruderChanged)
-        except TypeError:
-            # Thrown if the callback wasn't connected - can be ignored
-            pass
-        try:
-            ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.disconnect(self._onExtruderPrintSettingChanged)
-        except TypeError:
-            # Thrown if the callback wasn't connected - can be ignored
-            pass
-        try:
-            CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
-        except TypeError:
-            # Thrown if the callback wasn't connected - can be ignored
-            pass
-        try:
-            # Stop listening for machine changes
             CuraApplication.getInstance().getMachineManager().globalContainerChanged.disconnect(self._onMachineChanged)
         except TypeError as e:
             # This exception is expected during Cura shutdown
             pass
 
-        # Clean up after the AutoTower
-        if not self._currentTowerController is None:
-            restoredSettings = self._currentTowerController.cleanup()
-            if len(restoredSettings) > 0:
-                restoredMessage = '\n'.join([f'Restored {entry[0]} to {entry[1]}' for entry in restoredSettings])
-                restoredMessage = 'The following settings were restored:\n' + restoredMessage
-                Message(restoredMessage, title=self._pluginName).show()
-            self._currentTowerController = None
-
         # Remove the Auto Tower itself
         if not self._autoTowerOperation is None:
             self._autoTowerOperation.undo()
             self._autoTowerOperation = None
+            CuraApplication.getInstance().deleteAll()
 
         # Clear the job name
         CuraApplication.getInstance().getPrintInformation().setJobName('')
 
         # Indicate that there is no longer an Auto Tower in the scene
         self.autoTowerGeneratedChanged.emit()
-        
-        # Display the requested message
-        if message != None:
-            Message(message, title=self._pluginName).show()
+
+        # Clean up after the AutoTower
+        if not self._currentTowerController is None:
+            restoredSettings = self._currentTowerController.cleanup()
+            if len(restoredSettings) > 0:
+                restoredMessage = message + '\n' if not message is None else ''
+                restoredMessage += 'The following settings were restored:\n'
+                restoredMessage += '\n'.join([f'Restored {entry[0]} to {entry[1]}' for entry in restoredSettings])
+                Message(restoredMessage, title=self._pluginName).show()
+            self._currentTowerController = None
 
         CuraApplication.getInstance().processEvents()
 
@@ -398,22 +375,6 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _correctPrintSettingsForTower(self):
-        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
-        recommendedSettings = self._currentTowerController.checkPrintSettings(self.correctPrintSettings)
-        if len(recommendedSettings) > 0:
-            message = '\n'.join([f'Changed {entry[0]} from {entry[1]} to {entry[2]}' for entry in recommendedSettings])        
-            if self.correctPrintSettings:
-                message = 'The following settings were changed:\n' + message
-                Message(message, title=self._pluginName).show()
-            else:
-                message = 'The following settings changes are recommended\n' + message
-                Message(message, title=self._pluginName, message_type=Message.MessageType.WARNING).show()
-
-        CuraApplication.getInstance().processEvents()
-
-
-
     def _loadStlCallback(self, controller, towerName, stlFilePath, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller if a preset tower is requested '''
 
@@ -424,39 +385,17 @@ class AutoTowersGenerator(QObject, Extension):
             Message(errorMessage, title = self._pluginName, message_type=Message.MessageType.ERROR).show()
             return
 
-        # Make sure any previous auto towers are removed
-        self._removeAutoTower()
-
-        # Record the new tower controller
-        self._currentTowerController = controller
-
-        # Ensure print settings are correct
-        self._correctPrintSettingsForTower()
-
         # Import the STL file into the scene
-        self._importStl(towerName, stlFilePath, postProcessingCallback)
+        self._importStl(controller, towerName, stlFilePath, postProcessingCallback)
 
 
 
     def _generateAndLoadStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
-        # Make sure any previous auto towers are removed
-        self._removeAutoTower()
-
-        # Record the new tower controller
-        self._currentTowerController = controller
-
-        # Ensure print settings are correct
-        self._correctPrintSettingsForTower()
-
         # This could take up to a couple of minutes...
         self._waitDialog.show()
         CuraApplication.getInstance().processEvents() # Allow Cura to update itself periodically through this method
-
-        # Remove all models from the scene
-        CuraApplication.getInstance().deleteAll()
-        CuraApplication.getInstance().processEvents()
         
         # Compile the STL file name
         openScadFilePath = os.path.join(self._openScadSourcePath, openScadFilename)
@@ -483,12 +422,29 @@ class AutoTowersGenerator(QObject, Extension):
             return
 
         # Import the STL file into the scene
-        self._importStl(towerName, stlFilePath, postProcessingCallback)
+        self._importStl(controller, towerName, stlFilePath, postProcessingCallback)
 
 
 
-    def _importStl(self, towerName, stlFilePath, postProcessingCallback)->None:
+    def _importStl(self, controller, towerName, stlFilePath, postProcessingCallback)->None:
         ''' Imports an STL file into the scene '''
+
+        # Make sure any previous auto towers are removed
+        self._removeAutoTower()
+
+        # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
+        recommendedSettings = controller.checkPrintSettings(self.correctPrintSettings)
+        if len(recommendedSettings) > 0:
+            message = '\n'.join([f'Changed {entry[0]} from {entry[1]} to {entry[2]}' for entry in recommendedSettings])        
+            if self.correctPrintSettings:
+                message = 'The following settings were changed:\n' + message
+                Message(message, title=self._pluginName).show()
+            else:
+                message = 'The following setting changes are recommended\n' + message
+                Message(message, title=self._pluginName, message_type=Message.MessageType.WARNING).show()
+
+        # Record the new tower controller
+        self._currentTowerController = controller
 
         # Import the STL file into the scene
         self._autoTowerOperation = MeshImporter.ImportMesh(stlFilePath, name=self._pluginName)
@@ -507,16 +463,15 @@ class AutoTowersGenerator(QObject, Extension):
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self._postProcessCallback)
         self._towerControllerPostProcessingCallback = postProcessingCallback
 
+        # Remove the model if the machine is changed
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
 
+        # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
         # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
-        CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
+        # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
 
-        # Remove the model if the active extruder is changed
-        ExtruderManager.getInstance().activeExtruderChanged.connect(self._onActiveExtruderChanged)
-
-        # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
-        ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.connect(self._onExtruderPrintSettingChanged)
+        # # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
+        # ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.connect(self._onExtruderPrintSettingChanged)
 
         # Remove the model if it is deleted or another model is added to the scene
         CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.connect(self._onSceneChanged)
@@ -536,7 +491,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Remove the tower in response to changes to critical print settings
         if not self._currentTowerController is None:
-            if settingKey in self._currentTowerController.criticalSettingsList:
+            if self._currentTowerController.settingIsCritical(settingKey):
                 settingLabel = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(settingKey, 'label')
                 self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
 
@@ -554,7 +509,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Remove the tower in response to changes to critical print settings
         if not self._currentTowerController is None:
-            if settingKey in self._currentTowerController.criticalSettingsList:
+            if self._currentTowerController.settingIsCritical(settingKey):
                 settingLabel = ExtruderManager.getInstance().getActiveExtruderStack().getProperty(settingKey, 'label')
                 self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
 

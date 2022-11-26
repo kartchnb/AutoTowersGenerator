@@ -35,11 +35,11 @@ class FlowTowerController(ControllerBase):
     }
 
     _criticalPropertiesTable = {
-        'adaptive_layer_height_enabled': ('global', False),
-        'infill_sparse_density': ('extruder', 0),
-        'layer_height': ('global', None),
-        'meshfix_union_all_remove_holes': ('extruder', False),
-        'support_enable': ('global', False),
+        'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
+        'infill_sparse_density': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 0),
+        'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
+        'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
+        'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
 
 
