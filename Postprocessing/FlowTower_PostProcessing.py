@@ -51,7 +51,6 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
 
         # Handle each new section
         elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
-        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
             
             # Update the flow value
             current_flow_value += flow_value_change
