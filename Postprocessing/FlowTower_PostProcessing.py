@@ -7,10 +7,14 @@
 # Version 1.1 - 25 Nov 2022:
 #   Updated to ignore user-specified "End G-Code"
 #   Rearchitected how lines are processed
-__version__ = '1.1'
+# Version 1.2 - 26 Nov 2022:
+#   Moved common code to PostProcessingCommon.py
+__version__ = '1.2'
 
 from UM.Logger import Logger
 from UM.Application import Application
+
+from . import PostProcessingCommon as Common
 
 
 
@@ -22,13 +26,10 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
     Logger.log('d', f'Section layers = {section_layer_count}')
 
     # Document the settings in the g-code
-    gcode[0] += f';FlowTower start flow = {start_flow_value}, flow change = {flow_value_change}\n'
+    gcode[0] += f'{Common.comment_prefix}: FlowTower start flow = {start_flow_value}, flow change = {flow_value_change}\n'
 
-    # The number of base layers needs to be modified to take into account the numbering offset in the g-code
-    # Layer index 0 is the initial block?
-    # Layer index 1 is the start g-code?
-    # Our code starts at index 2?
-    base_layer_count += 2
+    # Calculate the number of layers before the first tower section
+    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
     # Start at the selected starting temperature
     current_flow_value = start_flow_value - flow_value_change # The current flow value will be corrected when the first section is encountered
@@ -38,16 +39,16 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
 
         # The last layer contains user-specified end gcode, which should not be processed
         if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
             break
 
         # Handle each new section
-        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
+        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
             
             # Update the flow value
             current_flow_value += flow_value_change
-            command_line = f'M221 S{current_flow_value} ;AutoTowersGenerator setting flow rate to {current_flow_value} for next section'
-            lcd_line = f'M117 Flow {current_flow_value} ;AutoTowersGenerator added'
+            command_line = f'M221 S{current_flow_value} {Common.comment_prefix} setting flow rate to {current_flow_value} for next section'
+            lcd_line = f'M117 Flow {current_flow_value} {Common.comment_prefix} added line'
 
             # Insert the new lines into the layer
             lines = layer.split('\n')

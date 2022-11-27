@@ -11,23 +11,13 @@
 # Version 2.3 - 25 Nov 2022:
 #   Updated to ignore user-specified "End G-Code"
 #   Rearchitected how lines are processed
-__version__ = '2.3'
+# Version 2.4 - 26 Nov 2022:
+#   Moved common code to PostProcessingCommon.py
+__version__ = '2.4'
 
 from UM.Logger import Logger
 
-
-
-def is_fan_speed_change_line(line: str) -> bool:
-    return line.strip().startswith('M106 S')
-
-def is_fan_off_line(line: str) -> bool:
-    return line.strip().startswith('M107')
-
-def is_start_of_bridge(line: str) -> bool:
-    return line.strip().startswith(';BRIDGE')
-
-def is_already_processed_line(line: str) -> bool:
-    return ';AutoTowersGenerator' in line
+from . import PostProcessingCommon as Common
 
 
 
@@ -40,13 +30,10 @@ def execute(gcode, start_fan_percent, fan_percent_change, section_layer_count, b
     Logger.log('d', f'Display on LCD = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f';FanTower start fan % = {start_fan_percent}, fan % change = {fan_percent_change}\n'
+    gcode[0] += f'{Common.comment_prefix} FanTower start fan % = {start_fan_percent}, fan % change = {fan_percent_change}\n'
 
-    # The number of base layers needs to be modified to take into account the numbering offset in the g-code
-    # Layer index 0 is the initial block?
-    # Layer index 1 is the start g-code?
-    # Our code starts at index 2?
-    base_layer_count += 2
+    # Calculate the number of layers before the first tower section
+    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
     # Start at the selected starting percentage
     current_fan_percent = start_fan_percent - fan_percent_change # The current fan percent will be corrected when the first section is encountered
@@ -58,42 +45,42 @@ def execute(gcode, start_fan_percent, fan_percent_change, section_layer_count, b
 
         # The last layer contains user-specified end gcode, which should not be processed
         if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
             break
 
         # Only process layers after the base
-        elif layer_index >= base_layer_count:
+        elif layer_index >= skipped_layer_count:
 
             lines = layer.split('\n')
 
             # Process the start of each section
-            if (layer_index - base_layer_count) % section_layer_count == 0:
+            if (layer_index - skipped_layer_count) % section_layer_count == 0:
                 current_fan_percent += fan_percent_change
                 current_fan_value = int((current_fan_percent * 255) / 100)
-                lines.insert(1, f'M106 S{current_fan_value} ;AutoTowersGenerator setting fan speed to {current_fan_percent}% for the next section')
+                lines.insert(1, f'M106 S{current_fan_value} {Common.comment_prefix} setting fan speed to {current_fan_percent}% for the next section')
                 if enable_lcd_messages:
-                    lines.insert(1, f'M117 Speed {current_fan_percent}% ;AutoTowersGenerator added')
+                    lines.insert(1, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} added')
 
             # Iterate over each command line in the layer
             for line_index, line in enumerate(lines):
 
                 # Don't re-process lines
-                if not is_already_processed_line(line):
+                if not Common.is_already_processed_line(line):
 
                     # If the fan speed is being changed after a bridge section was printed
-                    if is_fan_speed_change_line(line):
+                    if Common.is_fan_speed_change_line(line):
                         if after_bridge or not maintain_bridge_value:
-                            lines[line_index] = f'M106 S{current_fan_value} ;AutoTowersGenerator Resuming fan speed of {current_fan_percent}% after bridge (original: {line}'
+                            lines[line_index] = f'M106 S{current_fan_value} {Common.comment_prefix} Resuming fan speed of {current_fan_percent}% after bridge'
                             after_bridge = False
                             if enable_lcd_messages:
-                                lines.insert(line_index + 1, f'M117 Speed {current_fan_percent}%;AutoTowersGenerator added')
+                                lines.insert(line_index + 1, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} added')
                         else:
                             after_bridge = True
 
-                    elif is_fan_off_line(line):
+                    elif Common.is_fan_off_line(line):
                         after_bridge = True
 
-                    elif is_start_of_bridge(line):
+                    elif Common.is_start_of_bridge(line):
                         after_bridge = False
 
             result = '\n'.join(lines)

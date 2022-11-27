@@ -9,9 +9,13 @@
 # Version 2.2 - 25 Nov 2022:
 #   Updated to ignore user-specified "End G-Code"
 #   Rearchitected how lines are processed
-__version__ = '2.2'
+# Version 2.3 - 26 Nov 2022:
+#   Moved common code to PostProcessingCommon.py
+__version__ = '2.3'
 
 from UM.Logger import Logger
+
+from . import PostProcessingCommon as Common
 
 
 
@@ -25,11 +29,8 @@ def execute(gcode, start_temp, temp_change, section_layer_count, base_layer_coun
     # Document the settings in the g-code
     gcode[0] += f';TempTower start temp = {start_temp}, temp change = {temp_change}\n'
 
-    # The number of base layers needs to be modified to take into account the numbering offset in the g-code
-    # Layer index 0 is the initial block?
-    # Layer index 1 is the start g-code?
-    # Our code starts at index 2?
-    base_layer_count += 2
+    # Calculate the number of layers before the first tower section
+    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
     # Start at the selected starting temperature
     current_temp = start_temp - temp_change # The current temp will be incremented when the first section is encountered
@@ -39,17 +40,17 @@ def execute(gcode, start_temp, temp_change, section_layer_count, base_layer_coun
 
         # The last layer contains user-specified end gcode, which should not be processed
         if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
             break
 
         # Only process layers after the base
-        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
+        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
 
             # Increment the temperature
             current_temp += temp_change
-            layer = f'M104 S{current_temp} ;AutoTowersGenerator setting temperature to {current_temp} for the next section' + layer
+            layer = f'M104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} for the next section\n' + layer
             if enable_lcd_messages:
-                layer = f'M117 Temp {current_temp} ;AutoTowersGenerator added' + layer
+                layer = f'M117 Temp {current_temp} {Common.comment_prefix} added line\n' + layer
 
             gcode[layer_index] = layer
 

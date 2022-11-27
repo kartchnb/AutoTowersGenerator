@@ -17,21 +17,15 @@
 # Version 1.3 - 25 Nov 2022:
 #   Updated to ignore user-specified "End G-Code"
 #   Rearchitected how lines are processed
-__version__ = '1.3'
+# Version 1.4 - 26 Nov 2022:
+#   Moved common code to PostProcessingCommon.py
+__version__ = '1.4'
 
 from UM.Logger import Logger
 
 import re
 
-
-
-def is_already_processed_line(line: str) -> bool:
-    return ';AutoTowersGenerator' in line
-
-def is_print_speed_line(line: str) -> bool:
-    ''' Check if a given line changes the print speed '''
-    #return (line.strip().startswith('G0') or line.strip().startswith('G1')) and 'F' in line
-    return line.strip().startswith('G1') and 'F' in line
+from . import PostProcessingCommon as Common
 
 
 
@@ -56,11 +50,8 @@ def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_co
     # Document the settings in the g-code
     gcode[0] = gcode[0] + f';SpeedTower (Print Speed) start speed = {start_speed}, speed change = {speed_change}, reference speed = {reference_speed}\n'
 
-    # The number of base layers needs to be modified to take into account the numbering offset in the g-code
-    # Layer index 0 is the bed adhesion code (skirt, brim, etc)
-    # Layer index 1 is the initial layer, which has its own settings
-    # Our code starts at index 2
-    base_layer_count += 2
+    # Calculate the number of layers before the first tower section
+    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
     
@@ -69,25 +60,25 @@ def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_co
 
         # The last layer contains user-specified end gcode, which should not be processed
         if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = ';AutoTowersGenerator post-processing complete\n' + layer
+            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
             break
 
         # If this is the start of a new section (after the base)
-        elif layer_index >= base_layer_count and (layer_index - base_layer_count) % section_layer_count == 0:
+        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
 
             lines = layer.split('\n')
 
             # Increment the speed
             current_speed += speed_change
-            lines.insert(1, f';Start of next section (speed = {current_speed/60:.1f} mm/s ({current_speed:.1f} mm/m) ;AutoTowersGenerator added')
+            lines.insert(1, f';Start of next section (speed = {current_speed/60:.1f} mm/s ({current_speed:.1f} mm/m) {Common.comment_prefix} added line')
             if enable_lcd_messages:
-                lines.insert(1, f'M117 SPD {current_speed:.1f} mm/s ;AutoTowersGenerator added\n')
+                lines.insert(1, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} added line\n')
 
             # Iterate over each command line in the layer
             for line_index, line in enumerate(lines):
                 
                 # Modify lines specifying print speed
-                if not is_already_processed_line(line) and is_print_speed_line(line):
+                if not Common.is_already_processed_line(line) and Common.is_print_speed_line(line):
 
                     # Determine the old speed setting in the gcode
                     oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
@@ -101,7 +92,7 @@ def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_co
                         newSpeed = (current_speed * 60) * oldSpeed / (reference_speed * 60)
 
                         # Change the speed in the gcode
-                        lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' ;AutoTowersGenerator changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/m) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/m)'
+                        lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' {Common.comment_prefix} changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/m) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/m)'
                                     
             gcode[layer_index] = '\n'.join(lines)
     

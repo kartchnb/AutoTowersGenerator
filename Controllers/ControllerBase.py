@@ -1,5 +1,3 @@
-import os
-
 # Import the correct version of PyQt
 try:
     from PyQt6.QtCore import QObject
@@ -7,6 +5,8 @@ except ImportError:
     from PyQt5.QtCore import QObject
 
 from enum import IntEnum
+import math
+import os
 
 from cura.CuraApplication import CuraApplication
 from cura.Settings.ExtruderManager import ExtruderManager
@@ -60,6 +60,76 @@ class ControllerBase(QObject):
             self._cachedDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
 
         return self._cachedDialog
+
+
+
+    @property
+    def _initialLayerHeight(self)->float:
+        ''' Return the current initial layer height setting '''
+        return Application.getInstance().getGlobalContainerStack().getProperty("layer_height_0", "value")
+
+
+
+    @property
+    def _layerHeight(self)->float:
+        ''' Return the current layer height setting '''
+        return Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")
+
+
+
+    @property
+    def _lineWidth(self)->float:
+        ''' Return the current line width setting '''
+        return Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value")
+
+
+
+    @property
+    def _printArea(self)->tuple:
+        containerStack = Application.getInstance().getGlobalContainerStack()
+
+        # Determine the maximum print area
+        disallowedAreas = containerStack.getProperty('machine_disallowed_areas', 'value')
+        if len(disallowedAreas) > 0:
+            # Calculate the print area based on the disallowed areas
+            flattenedList = [coord for section in disallowedAreas for coord in section]
+            minX = max([coord[0] for coord in flattenedList if coord[0] < 0])
+            maxX = min([coord[0] for coord in flattenedList if coord[0] >= 0])
+            minY = max([coord[1] for coord in flattenedList if coord[1] < 0])
+            maxY = min([coord[1] for coord in flattenedList if coord[1] >= 0])
+            printAreaWidth = maxX - minX
+            printAreaDepth = maxY - minY
+        else:
+            # Calculate the print area based on the bed size
+            printAreaWidth = containerStack.getProperty('machine_width', 'value')
+            printAreaDepth = containerStack.getProperty('machine_depth', 'value')
+
+        # Query the current line width
+        lineWidth = containerStack.getProperty('line_width', 'value')
+
+        # Adjust for the selected bed adhesion
+        bedAdhesionType = containerStack.getProperty('adhesion_type', 'value')
+        if bedAdhesionType == 'skirt':
+            skirtGap = containerStack.getProperty('skirt_gap', 'value')
+            printAreaWidth -= skirtGap*2
+            printAreaDepth -= skirtGap*2
+
+        elif bedAdhesionType == 'brim':
+            brimWidth = containerStack.getProperty('brim_width', 'value')
+            brimGap = containerStack.getProperty('brim_gap', 'value')
+            printAreaWidth -= (brimWidth*2 + brimGap*2)
+            printAreaDepth -= (brimWidth*2 + brimGap*2)
+
+        elif bedAdhesionType == 'raft':
+            raftMargin = containerStack.getProperty('raft_margin', 'value')
+            printAreaWidth -= raftMargin*2
+            printAreaDepth -= raftMargin*2
+
+        # Adjust the print_area size by the line width to keep the pattern within the volume
+        printAreaWidth -= lineWidth*2
+        printAreaDepth -= lineWidth*2
+
+        return (printAreaWidth, printAreaDepth)
 
 
 
@@ -173,48 +243,31 @@ class ControllerBase(QObject):
 
 
 
-    def _getPrintAreaDimensions(self)->tuple:
-        containerStack = Application.getInstance().getGlobalContainerStack()
+    def _calculateBaseLayers(self, base_height)->int:
+        ''' Calculate the number of layers in the base, given its height in mm '''
 
-        # Determine the maximum print area
-        disallowedAreas = containerStack.getProperty('machine_disallowed_areas', 'value')
-        if len(disallowedAreas) > 0:
-            # Calculate the print area based on the disallowed areas
-            flattenedList = [coord for section in disallowedAreas for coord in section]
-            minX = max([coord[0] for coord in flattenedList if coord[0] < 0])
-            maxX = min([coord[0] for coord in flattenedList if coord[0] >= 0])
-            minY = max([coord[1] for coord in flattenedList if coord[1] < 0])
-            maxY = min([coord[1] for coord in flattenedList if coord[1] >= 0])
-            printAreaWidth = maxX - minX
-            printAreaDepth = maxY - minY
+        # The following calculation takes the height of the initial layer into account
+        return math.ceil(base_height - self._initialLayerHeight / self._layerHeight) + 1
+
+
+
+    def _calculateSectionLayers(self, section_height)->int:
+        ''' Calculate the number of layers in each section, given their height in mm '''
+
+        return math.ceil(section_height / self._layerHeight)
+
+
+
+    def _correctChangeValueSign(self, changeValue, startValue, endValue)->float:
+        '''' Ensures the sign of a change value matches the start and end values '''
+        if endValue >= startValue:
+            return abs(changeValue)
         else:
-            # Calculate the print area based on the bed size
-            printAreaWidth = containerStack.getProperty('machine_width', 'value')
-            printAreaDepth = containerStack.getProperty('machine_depth', 'value')
+            return -abs(changeValue)
 
-        # Query the current line width
-        lineWidth = containerStack.getProperty('line_width', 'value')
 
-        # Adjust for the selected bed adhesion
-        bedAdhesionType = containerStack.getProperty('adhesion_type', 'value')
-        if bedAdhesionType == 'skirt':
-            skirtGap = containerStack.getProperty('skirt_gap', 'value')
-            printAreaWidth -= skirtGap*2
-            printAreaDepth -= skirtGap*2
 
-        elif bedAdhesionType == 'brim':
-            brimWidth = containerStack.getProperty('brim_width', 'value')
-            brimGap = containerStack.getProperty('brim_gap', 'value')
-            printAreaWidth -= (brimWidth*2 + brimGap*2)
-            printAreaDepth -= (brimWidth*2 + brimGap*2)
+    def _getStlFilePath(self, filename)->str:
+        ''' Determine the full path to an STL file '''
 
-        elif bedAdhesionType == 'raft':
-            raftMargin = containerStack.getProperty('raft_margin', 'value')
-            printAreaWidth -= raftMargin*2
-            printAreaDepth -= raftMargin*2
-
-        # Adjust the print_area size by the line width to keep the pattern within the volume
-        printAreaWidth -= lineWidth*2
-        printAreaDepth -= lineWidth*2
-
-        return (printAreaWidth, printAreaDepth)
+        return os.path.join(self._stlPath, filename)

@@ -207,15 +207,12 @@ class SpeedTowerController(ControllerBase):
             Logger.log('e', f'The "tower type" for SpeedTower preset table "{presetName}" has not been defined')
             return
 
-        # Query the current layer height
-        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")
-
         # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up
-        self._sectionLayers = math.ceil(self._nominalSectionHeight / layerHeight) # Round up
+        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
+        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
 
         # Determine the file path of the preset
-        stlFilePath = os.path.join(self._stlPath, stlFileName)
+        stlFilePath = self._getStlFilePath(stlFileName)
 
         # Determine the tower name
         towerName = f'Preset Speed Tower ({self._towerType}) {presetName}'
@@ -235,22 +232,16 @@ class SpeedTowerController(ControllerBase):
         towerLabel = self.towerLabelStr
         temperatureLabel = self.temperatureLabelStr
 
-        # Query the current layer height
-        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty('layer_height', 'value')
-
         # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up
-        baseHeight = self._baseLayers * layerHeight
+        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
+        baseHeight = self._baseLayers * self._layerHeight
 
         # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = math.ceil(self._nominalSectionHeight / layerHeight) # Round up
-        sectionHeight = self._sectionLayers * layerHeight
+        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
+        sectionHeight = self._sectionLayers * self._layerHeight
 
         # Ensure the change amount has the correct sign
-        if endSpeed >= startSpeed:
-            speedChange = abs(speedChange)
-        else:
-            speedChange = -abs(speedChange)
+        speedChange = self._correctChangeValueSign(speedChange, startSpeed, endSpeed)
 
         # Record the tower settings that will be needed for post-processing
         self._startValue = startSpeed

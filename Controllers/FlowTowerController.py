@@ -24,13 +24,13 @@ class FlowTowerController(ControllerBase):
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _nominalBaseHeight = 0.8
-    _nominalSectionHeight = 8.0
 
     _presetsTable = {
         '115-85': {
             'filename': 'flowtower 115-85.stl',
             'start value': 115,
             'change value': -5,
+            'section size': 10,
         },
     }
 
@@ -160,39 +160,43 @@ class FlowTowerController(ControllerBase):
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
-            Logger.log('e', f'A SpeedTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A FlowTower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset's file name
         try:
             stlFileName = presetTable['filename']
         except KeyError:
-            Logger.log('e', f'The "filename" entry for SpeedTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "filename" entry for FlowTower preset table "{presetName}" has not been defined')
             return
 
         # Load the preset's starting speed
         try:
             self._startValue = presetTable['start value']
         except KeyError:
-            Logger.log('e', f'The "start value" for SpeedTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "start value" for FlowTower preset table "{presetName}" has not been defined')
             return
 
         # Load the preset's speed change value
         try:
             self._valueChange = presetTable['change value']
         except KeyError:
-            Logger.log('e', f'The "change value" for SpeedTower preset table "{presetName}" has not been defined')
+            Logger.log('e', f'The "change value" for FlowTower preset table "{presetName}" has not been defined')
             return
 
-        # Query the current layer height
-        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty("layer_height", "value")
+        # Load the preset's section size
+        try:
+            sectionSize = presetTable['section size']
+        except KeyError:
+            Logger.log('e', f'The "section size" for FlowTower preset table "{presetName}" has not been defined')
+            return
 
         # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up
-        self._sectionLayers = math.ceil(self._nominalSectionHeight / layerHeight) # Round up
+        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
+        self._sectionLayers = self._calculateSectionLayers(float(self.sectionSizeStr))
 
         # Determine the file path of the preset
-        stlFilePath = os.path.join(self._stlPath, stlFileName)
+        stlFilePath = self._getStlFilePath(stlFileName)
 
         # Determine the tower name
         towerName = f'Preset Flow Tower {presetName}'
@@ -214,22 +218,16 @@ class FlowTowerController(ControllerBase):
         towerLabel = self.towerLabelStr
         temperatureLabel = self.temperatureLabelStr
 
-        # Query the current layer height
-        layerHeight = Application.getInstance().getGlobalContainerStack().getProperty('layer_height', 'value')
-
         # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = math.ceil(self._nominalBaseHeight / layerHeight) # Round up
-        baseHeight = self._baseLayers * layerHeight
+        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
+        baseHeight = self._baseLayers * self._layerHeight
 
-        # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = math.ceil(sectionSize / layerHeight) # Round up
-        sectionHeight = self._sectionLayers * layerHeight
+        # Correct the section size to ensure an integer number of layers per section
+        self._sectionLayers = self._calculateSectionLayers(sectionSize)
+        sectionSize = self._sectionLayers * self._layerHeight
 
         # Ensure the change amount has the correct sign
-        if endValue >= startValue:
-            valueChange = abs(valueChange)
-        else:
-            valueChange = -abs(valueChange)
+        valueChange = self._correctChangeValueSign(valueChange, startValue, endValue)
 
         # Record the tower settings that will be needed for post-processing
         self._startValue = startValue
@@ -241,7 +239,6 @@ class FlowTowerController(ControllerBase):
         openScadParameters ['Ending_Value'] = endValue
         openScadParameters ['Value_Change'] = valueChange
         openScadParameters ['Base_Height'] = baseHeight
-        openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Section_Size'] = sectionSize
         openScadParameters ['Section_Hole_Diameter'] = sectionHoleDiameter
         openScadParameters ['Tower_Label'] = towerLabel
