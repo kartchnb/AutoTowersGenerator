@@ -10,6 +10,9 @@
 # Version 1.2 - 26 Nov 2022:
 #   Moved common code to PostProcessingCommon.py
 __version__ = '1.2'
+# Version 1.2 - 26 Nov 2022:
+#   Moved common code to PostProcessingCommon.py
+__version__ = '1.2'
 
 from UM.Logger import Logger
 from UM.Application import Application
@@ -27,7 +30,10 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix}: FlowTower start flow = {start_flow_value}, flow change = {flow_value_change}\n'
+    gcode[0] += f'{Common.comment_prefix}: FlowTower start flow = {start_flow_value}, flow change = {flow_value_change}\n'
 
+    # Calculate the number of layers before the first tower section
+    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
     # Calculate the number of layers before the first tower section
     skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
@@ -40,13 +46,17 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
         # The last layer contains user-specified end gcode, which should not be processed
         if layer_index >= len(gcode) - 1:
             gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
+            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
             break
 
         # Handle each new section
         elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
+        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
             
             # Update the flow value
             current_flow_value += flow_value_change
+            command_line = f'M221 S{current_flow_value} {Common.comment_prefix} setting flow rate to {current_flow_value} for next section'
+            lcd_line = f'M117 Flow {current_flow_value} {Common.comment_prefix} added line'
             command_line = f'M221 S{current_flow_value} {Common.comment_prefix} setting flow rate to {current_flow_value} for next section'
             lcd_line = f'M117 Flow {current_flow_value} {Common.comment_prefix} added line'
 
