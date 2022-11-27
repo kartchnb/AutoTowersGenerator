@@ -23,7 +23,7 @@ Value_Change = 5;
 // The height of the base
 Base_Height = 0.801;
 
-// The height of each section of the tower
+// The cubic dimensions of each section of the tower
 Section_Size = 10.001;
 
 // The diameter of the holes to create in each section

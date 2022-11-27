@@ -118,54 +118,8 @@ class BedLevelPatternController(ControllerBase):
 
 
     def _loadPreset(self, presetName)->None:
-        ''' Load a preset tower '''
-        # Load the preset table
-        try:
-            presetTable = self._presetsTable[presetName]
-        except KeyError:
-            Logger.log('e', f'A BedLevel preset named "{presetName}" was requested, but has not been defined')
-            return
-
-        # Load the preset's file name
-        try:
-            stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for BedLevel preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's pattern width
-        try:
-            pattern_width = presetTable['pattern width']
-        except KeyError:
-            Logger.log('e', f'The "pattern width" for BedLevel preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's pattern depth
-        try:
-            pattern_depth = presetTable['pattern depth']
-        except KeyError:
-            Logger.log('e', f'The "pattern depth" for BedLevel preset table "{presetName}" has not been defined')
-            return
-
-        # Query the bed size
-        containerStack = Application.getInstance().getGlobalContainerStack()
-        bed_width = containerStack.getProperty('machine_width', 'value')
-        bed_depth = containerStack.getProperty('machine_depth', 'value')
-
-        # Abort if the bed level pattern is bigger than the print area
-        if pattern_width > bed_width or pattern_depth > bed_depth:
-            message = 'This bed level pattern preset is too large for your printer\n'
-            message += f'Printer bed is {bed_width}x{bed_depth} mm, but the preset is {pattern_width}x{pattern_depth} mm'
-            Message(message).show()
-
-        # Determine the file path of the preset
-        stlFilePath = os.path.join(self._stlPath, stlFileName)
-
-        # Determine the tower name
-        towerName = f'Preset Bed Level Pattern {presetName}'
-
-        # Use the callback to load the preset STL file
-        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
+        # No presets for now
+        pass
 
 
 
@@ -178,15 +132,13 @@ class BedLevelPatternController(ControllerBase):
         cell_size = int(self.cellSizeStr)
 
         # Determine the maximum print area
-        (print_area_width, print_area_depth) = self._getPrintAreaDimensions()
-
-        containerStack = Application.getInstance().getGlobalContainerStack()
+        (print_area_width, print_area_depth) = self._printArea
 
         # Query the current layer height
-        layer_height = containerStack.getProperty("layer_height", "value")
+        layer_height = self._layerHeight
 
         # Query the current line width
-        line_width = containerStack.getProperty('line_width', 'value')
+        line_width = self._lineWidth
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
