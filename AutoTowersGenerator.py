@@ -315,6 +315,7 @@ class AutoTowersGenerator(QObject, Extension):
         self._towerControllerPostProcessingCallback = None
         Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
         # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
+        # These callbacks are catching changes they shouldn't and removing towers inappropriately
         # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
         # ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.disconnect(self._onExtruderPrintSettingChanged)
         CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
@@ -467,6 +468,7 @@ class AutoTowersGenerator(QObject, Extension):
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
 
         # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
+        # These callbacks are catching changes they shouldn't and removing towers inappropriately
         # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
         # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
 

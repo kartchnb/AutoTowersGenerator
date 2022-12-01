@@ -10,12 +10,8 @@
 # Version 1.2 - 26 Nov 2022:
 #   Moved common code to PostProcessingCommon.py
 __version__ = '1.2'
-# Version 1.2 - 26 Nov 2022:
-#   Moved common code to PostProcessingCommon.py
-__version__ = '1.2'
 
 from UM.Logger import Logger
-from UM.Application import Application
 
 from . import PostProcessingCommon as Common
 
@@ -34,8 +30,6 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
 
     # Calculate the number of layers before the first tower section
     skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
-    # Calculate the number of layers before the first tower section
-    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
 
     # Start at the selected starting temperature
     current_flow_value = start_flow_value - flow_value_change # The current flow value will be corrected when the first section is encountered
@@ -51,7 +45,6 @@ def execute(gcode, start_flow_value, flow_value_change, section_layer_count, bas
 
         # Handle each new section
         elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
-            
             # Update the flow value
             current_flow_value += flow_value_change
             command_line = f'M221 S{current_flow_value} {Common.comment_prefix} setting flow rate to {current_flow_value} for next section'

@@ -247,7 +247,7 @@ class ControllerBase(QObject):
         ''' Calculate the number of layers in the base, given its height in mm '''
 
         # The following calculation takes the height of the initial layer into account
-        return math.ceil(base_height - self._initialLayerHeight / self._layerHeight) + 1
+        return math.ceil((base_height - self._initialLayerHeight) / self._layerHeight) + 1
 
 
 
