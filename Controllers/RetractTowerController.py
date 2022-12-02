@@ -26,43 +26,43 @@ class RetractTowerController(ControllerBase):
     _presetsTable = {
         'Distance 1-6': {
             'filename': 'retracttower distance 1-6.stl',
-            'start value': 1,
-            'change value': 1,
+            'starting value': 1,
+            'value change': 1,
             'tower type': 'Distance',
-        },
+       },
 
         'Distance 4-9': {
             'filename': 'retracttower distance 4-9.stl',
-            'start value': 4,
-            'change value': 1,
+            'starting value': 4,
+            'value change': 1,
             'tower type': 'Distance',
         },
 
         'Distance 7-12': {
             'filename': 'retracttower distance 7-12.stl',
-            'start value': 7,
-            'change value': 1,
+            'starting value': 7,
+            'value change': 1,
             'tower type': 'Distance',
         },
  
          'Speed 10-50': {
             'filename': 'retracttower speed 10-50.stl',
-            'start value': 10,
-            'change value': 10,
+            'starting value': 10,
+            'value change': 10,
             'tower type': 'Speed',
         },
 
         'Speed 35-75': {
             'filename': 'retracttower speed 35-75.stl',
-            'start value': 35,
-            'change value': 10,
+            'starting value': 35,
+            'value change': 10,
             'tower type': 'Speed',
         },
 
         'Speed 60-100': {
             'filename': 'retracttower speed 60-100.stl',
-            'start value': 60,
-            'change value': 10,
+            'starting value': 60,
+            'value change': 10,
             'tower type': 'Speed',
         },
    }
@@ -78,9 +78,6 @@ class RetractTowerController(ControllerBase):
         {'value': 'Distance', 'label': 'DST'}, 
         {'value': 'Speed', 'label': 'SPD'}, 
     ]
-
-    _nominalBaseHeight = 0.8
-    _nominalSectionHeight = 8.0
 
 
 
@@ -195,37 +192,19 @@ class RetractTowerController(ControllerBase):
             Logger.log('e', f'A RetractTower preset named "{presetName}" was requested, but has not been defined')
             return
 
-        # Load the preset's file name
+        # Load the preset values
         try:
             stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for RetractTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's starting value
-        try:
-            self._startValue = presetTable['start value']
-        except KeyError:
-            Logger.log('e', f'The "start value" for RetractTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's value change value
-        try:
-            self._valueChange = presetTable['change value']
-        except KeyError:
-            Logger.log('e', f'The "change value" for RetractTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's tower type value
-        try:
+            self._startValue = presetTable['starting value']
+            self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']
-        except KeyError:
-            Logger.log('e', f'The "tower type" for RetractTower preset table "{presetName}" has not been defined')
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
             return
 
-        # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
+        # Use the nominal base and section heights for this preset tower
+        self._baseHeight = self._nominalBaseHeight
+        self._sectionHeight = self._nominalSectionHeight
 
         # Determine the file path of the preset
         stlFilePath = self._getStlFilePath(stlFileName)
@@ -248,20 +227,12 @@ class RetractTowerController(ControllerBase):
         towerLabel = self.towerLabelStr
         towerDescription = self.towerDescriptionStr
 
-        # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        baseHeight = self._baseLayers * self._layerHeight
-
-        # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
-        sectionHeight = self._sectionLayers * self._layerHeight
-
         # Ensure the change amount has the correct sign
         valueChange = self._correctChangeValueSign(valueChange, startValue, endValue)
 
-        # Record the tower settings that will be needed for post-processing
-        self._startValue = startValue
-        self._valueChange = valueChange
+        # Calculate the optimal base and section height, given the current printing layer height
+        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
+        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
@@ -273,8 +244,14 @@ class RetractTowerController(ControllerBase):
         openScadParameters ['Tower_Label'] = towerDescription
         openScadParameters ['Column_Label'] = towerLabel
 
+        # Record the tower settings that will be needed for post-processing
+        self._startValue = startValue
+        self._valueChange = valueChange
+        self._baseHeight = baseHeight
+        self._sectionHeight = sectionHeight
+
         # Determine the tower name
-        towerName = f'Auto-Generated Retraction Tower ({self._towerType}) {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Retraction Tower ({self._towerType}) {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -282,10 +259,21 @@ class RetractTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, displayOnLcd=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = RetractTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType, displayOnLcd)
+        gcode = RetractTower_PostProcessing.execute(
+            gcode, 
+            self._baseHeight, 
+            self._sectionHeight, 
+            self._initialLayerHeight, 
+            self._layerHeight, 
+            self._relativeExtrusion,
+            self._startValue, 
+            self._valueChange, 
+            self._towerType, 
+            enable_lcd_messages
+            )
 
         return gcode

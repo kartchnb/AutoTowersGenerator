@@ -13,7 +13,10 @@
 #   Rearchitected how lines are processed
 # Version 2.4 - 26 Nov 2022:
 #   Moved common code to PostProcessingCommon.py
-__version__ = '2.4'
+# Version 3.0 - 1 Dec 2022:
+#   Redesigned post-processing to focus on section *height* rather than section *layers*
+#   This is more accurate if the section height cannot be evenly divided by the printing layer height
+__version__ = '3.0'
 
 from UM.Logger import Logger
 
@@ -21,70 +24,79 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, start_fan_percent, fan_percent_change, section_layer_count, base_layer_count, maintain_bridge_value, enable_lcd_messages):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height: float, layer_height:float, start_fan_percent:float, fan_percent_change:float, maintain_bridge_value:bool, enable_lcd_messages:bool):
+    
+    # Log the post-processing settings
     Logger.log('d', 'AutoTowersGenerator beginning FanTower post-processing')
-    Logger.log('d', f'Start speed = {start_fan_percent}%')
-    Logger.log('d', f'Speed change = {fan_percent_change}%')
-    Logger.log('d', f'Base layers = {base_layer_count}')
-    Logger.log('d', f'Section layers = {section_layer_count}')
-    Logger.log('d', f'Display on LCD = {enable_lcd_messages}')
+    Logger.log('d', f'Base height = {base_height} mm')
+    Logger.log('d', f'Section height = {section_height} mm')
+    Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
+    Logger.log('d', f'Printed layer height = {layer_height} mm')
+    Logger.log('d', f'Starting fan speed = {start_fan_percent}%')
+    Logger.log('d', f'Fan speed change = {fan_percent_change}%')
+    Logger.log('d', f'Maintain bridge value = {maintain_bridge_value}')
+    Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f'{Common.comment_prefix} FanTower start fan % = {start_fan_percent}, fan % change = {fan_percent_change}\n'
+    gcode[0] += f'{Common.comment_prefix} Post-processing a FanTower\n'
+    gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Printed layer height = {layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Starting fan speed = {start_fan_percent}%\n'
+    gcode[0] += f'{Common.comment_prefix} Fan speed change = {fan_percent_change}%\n'
+    gcode[0] += f'{Common.comment_prefix} Maintain bridge value = {maintain_bridge_value}\n'
+    gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
 
-    # Calculate the number of layers before the first tower section
-    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
-
-    # Start at the selected starting percentage
+    # Start at the requested starting fan speed %
     current_fan_percent = start_fan_percent - fan_percent_change # The current fan percent will be corrected when the first section is encountered
 
+    # Keep track of whether a bridge has been completed
     after_bridge = False
 
-    # Iterate over each layer in the g-code
-    for layer_index, layer in enumerate(gcode):
+    # Iterate over each line in the g-code
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
 
-        # The last layer contains user-specified end gcode, which should not be processed
-        if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
-            break
+        # Handle each new tower section
+        if start_of_new_section:
 
-        # Only process layers after the base
-        elif layer_index >= skipped_layer_count:
+            # Increment the fan speed % for this tower section and convert from a range of 0-100 to 0-255
+            current_fan_percent += fan_percent_change
+            current_fan_value = int((current_fan_percent * 255) / 100)
 
-            lines = layer.split('\n')
+            # Configure the new fan speed % in the gcode
+            lines.insert(2, f'M106 S{current_fan_value} {Common.comment_prefix} setting fan speed to {current_fan_percent}% for the this tower section')
 
-            # Process the start of each section
-            if (layer_index - skipped_layer_count) % section_layer_count == 0:
-                current_fan_percent += fan_percent_change
-                current_fan_value = int((current_fan_percent * 255) / 100)
-                lines.insert(1, f'M106 S{current_fan_value} {Common.comment_prefix} setting fan speed to {current_fan_percent}% for the next section')
-                if enable_lcd_messages:
-                    lines.insert(1, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} added')
+            # Display the new the fan speed % on the printer's LCD
+            if enable_lcd_messages:
+                lines.insert(3, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} displaying "Speed {current_fan_percent}%" on the LCD')
 
-            # Iterate over each command line in the layer
-            for line_index, line in enumerate(lines):
+        # Handle fan speed changes in the gcode
+        if Common.IsFanSpeedChangeLine(line):
 
-                # Don't re-process lines
-                if not Common.is_already_processed_line(line):
+            # If this change is coming after a bridge has been printed or we don't need to maintain the bridge value
+            if after_bridge or not maintain_bridge_value:
+                
+                # Resume the tower section fan speed in the gcode
+                lines[line_index] = f'M106 S{current_fan_value} {Common.comment_prefix} Resuming fan speed of {current_fan_percent}% after printing a bridge'
 
-                    # If the fan speed is being changed after a bridge section was printed
-                    if Common.is_fan_speed_change_line(line):
-                        if after_bridge or not maintain_bridge_value:
-                            lines[line_index] = f'M106 S{current_fan_value} {Common.comment_prefix} Resuming fan speed of {current_fan_percent}% after bridge'
-                            after_bridge = False
-                            if enable_lcd_messages:
-                                lines.insert(line_index + 1, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} added')
-                        else:
-                            after_bridge = True
+            # If this is the start of a bridge
+            else:
+                
+                # Mark the next fan speed change as coming after a bridge was printed
+                after_bridge = True
+                
+        # If the fan is being turned off for the start of a bridge
+        elif Common.IsFanOffLine(line):
 
-                    elif Common.is_fan_off_line(line):
-                        after_bridge = True
+            # Mark the next fan speed change as coming after a bridge was printed
+            after_bridge = True
 
-                    elif Common.is_start_of_bridge(line):
-                        after_bridge = False
+        # If this line marks the start of a bridge
+        elif Common.IsStartOfBridge(line):
 
-            result = '\n'.join(lines)
-            gcode[layer_index] = result
+            # Mark the next fan speed change as being the start of a bridge print
+            after_bridge = False
 
     Logger.log('d', 'AutoTowersGenerator completing FanTower post-processing')
 

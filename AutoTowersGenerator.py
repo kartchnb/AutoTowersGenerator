@@ -35,7 +35,7 @@ from .Controllers.TempTowerController import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
     _pluginName = 'AutoTowersGenerator'
 
-    _gcodeProcessedMarker = ';AutoTowersGenerator post-processed'
+    _gcodeProcessedMarker = f';Post-Processed by {_pluginName}'
 
     # Add additional controller classes to this list
     _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]

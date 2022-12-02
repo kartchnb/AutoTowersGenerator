@@ -7,7 +7,6 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSlot, pyqtSignal, pyqtProperty
 
-
 from cura.CuraApplication import CuraApplication
 
 from UM.Application import Application
@@ -27,8 +26,8 @@ class FanTowerController(ControllerBase):
     _presetsTable = {
         '0-100': {
             'filename': 'fantower 0-100.stl',
-            'start value': 0,
-            'change value': 20,
+            'starting value': 0,
+            'value change': 20,
         },
     }
 
@@ -39,9 +38,6 @@ class FanTowerController(ControllerBase):
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
 
-    _nominalBaseHeight = 0.8
-    _nominalSectionHeight = 8.0
-
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
@@ -50,47 +46,47 @@ class FanTowerController(ControllerBase):
 
 
     # The starting percentage value for the tower
-    _startPercentStr = '0'
+    _startFanSpeedStr = '0'
 
-    startPercentStrChanged = pyqtSignal()
+    startFanSpeedStrChanged = pyqtSignal()
     
-    def setStartPercentStr(self, value)->None:
-        self._startPercentStr = value
-        self.startPercentStrChanged.emit()
+    def setstartFanSpeedStr(self, value)->None:
+        self._startFanSpeedStr = value
+        self.startFanSpeedStrChanged.emit()
 
-    @pyqtProperty(str, notify=startPercentStrChanged, fset=setStartPercentStr)
-    def startPercentStr(self)->str:
-        return self._startPercentStr
+    @pyqtProperty(str, notify=startFanSpeedStrChanged, fset=setstartFanSpeedStr)
+    def startFanSpeedStr(self)->str:
+        return self._startFanSpeedStr
 
 
 
     # The ending percentage value for the tower
-    _endPercentStr = '100'
+    _endFanSpeedStr = '100'
 
-    endPercentStrChanged = pyqtSignal()
+    endFanSpeedStrChanged = pyqtSignal()
     
-    def setEndPercentStr(self, value)->None:
-        self._endPercentStr = value
-        self.endPercentStrChanged.emit()
+    def setendFanSpeedStr(self, value)->None:
+        self._endFanSpeedStr = value
+        self.endFanSpeedStrChanged.emit()
 
-    @pyqtProperty(str, notify=endPercentStrChanged, fset=setEndPercentStr)
-    def endPercentStr(self)->str:
-        return self._endPercentStr
+    @pyqtProperty(str, notify=endFanSpeedStrChanged, fset=setendFanSpeedStr)
+    def endFanSpeedStr(self)->str:
+        return self._endFanSpeedStr
 
 
 
     # The amount to change the percentage between tower sections
-    _percentChangeStr = '20'
+    _fanSpeedChangeStr = '20'
 
-    percentChangeStrChanged = pyqtSignal()
+    fanSpeedChangeStrChanged = pyqtSignal()
     
-    def setPercentChangeStr(self, value)->None:
-        self._percentChangeStr = value
-        self.percentChangeStrChanged.emit()
+    def setfanSpeedChangeStr(self, value)->None:
+        self._fanSpeedChangeStr = value
+        self.fanSpeedChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=percentChangeStrChanged, fset=setPercentChangeStr)
-    def percentChangeStr(self)->str:
-        return self._percentChangeStr
+    @pyqtProperty(str, notify=fanSpeedChangeStrChanged, fset=setfanSpeedChangeStr)
+    def fanSpeedChangeStr(self)->str:
+        return self._fanSpeedChangeStr
 
 
 
@@ -148,30 +144,18 @@ class FanTowerController(ControllerBase):
             Logger.log('e', f'A FanTower preset named "{presetName}" was requested, but has not been defined')
             return
 
-        # Load the preset's file name
+        # Load the preset values
         try:
             stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for FanTower preset table "{presetName}" has not been defined')
+            self._startFanSpeed = presetTable['starting value']
+            self._fanSpeedChange = presetTable['value change']
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
             return
 
-        # Load the preset's starting fan percent
-        try:
-            self._startPercent = presetTable['start value']
-        except KeyError:
-            Logger.log('e', f'The "start value" for FanTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's fan change percent
-        try:
-            self._percentChange = presetTable['change value']
-        except KeyError:
-            Logger.log('e', f'The "change value" for FanTower preset table "{presetName}" has not been defined')
-            return
-
-        # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
+        # Use the nominal base and section heights for this preset tower
+        self._baseHeight = self._nominalBaseHeight
+        self._sectionHeight = self._nominalSectionHeight
 
         # Determine the file path of the preset
         stlFilePath = self._getStlFilePath(stlFileName)
@@ -187,50 +171,58 @@ class FanTowerController(ControllerBase):
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
-        # Read the parameters directly from the dialog
-        startPercent = float(self.startPercentStr)
-        endPercent = float(self.endPercentStr)
-        percentChange = float(self.percentChangeStr)
+        # Determine the parameters for the tower
+        startFanSpeed = float(self.startFanSpeedStr)
+        endFanSpeed = float(self.endFanSpeedStr)
+        fanSpeedChange = float(self.fanSpeedChangeStr)
         towerLabel = self.towerLabelStr
         towerDescription = self.towerDescriptionStr
 
-        # Record the tower settings that will be needed for post-processing
-        self._startPercent = startPercent
-        self._percentChange = percentChange
+        # Ensure the fan speed change value has the correct sign
+        fanSpeedChange = self._correctChangeValueSign(fanSpeedChange, startFanSpeed, endFanSpeed)
 
-        # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        baseHeight = self._baseLayers * self._layerHeight
-
-        # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
-        sectionHeight = self._sectionLayers * self._layerHeight
-
-        # Ensure the change amount has the correct sign
-        percentChange = self._correctChangeValueSign(percentChange, startPercent, endPercent)
+        # Calculate the optimal base and section height, given the current printing layer height
+        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
+        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Starting_Value'] = startPercent
-        openScadParameters ['Ending_Value'] = endPercent
-        openScadParameters ['Value_Change'] = percentChange
+        openScadParameters ['Starting_Value'] = startFanSpeed
+        openScadParameters ['Ending_Value'] = endFanSpeed
+        openScadParameters ['Value_Change'] = fanSpeedChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Column_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
+        # Record the tower settings that will be needed for post-processing
+        self._startFanSpeed = startFanSpeed
+        self._fanSpeedChange = fanSpeedChange
+        self._baseHeight = baseHeight
+        self._sectionHeight = sectionHeight
+
         # Determine the tower name
-        towerName = f'Auto-Generated Fan Tower {startPercent}-{endPercent}x{percentChange}'
+        towerName = f'Custom Fan Tower {startFanSpeed}-{endFanSpeed}x{fanSpeedChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 
-    def postProcess(self, gcode, displayOnLcd=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
         # Call the post-processing script
-        gcode = FanTower_PostProcessing.execute(gcode, self._startPercent, self._percentChange, self._sectionLayers, self._baseLayers, self.maintainBridgeValue, displayOnLcd)
+        gcode = FanTower_PostProcessing.execute(
+            gcode, 
+            self._baseHeight, 
+            self._sectionHeight, 
+            self._initialLayerHeight,
+            self._layerHeight, 
+            self._startFanSpeed, 
+            self._fanSpeedChange, 
+            self.maintainBridgeValue, 
+            enable_lcd_messages
+            )
 
         return gcode

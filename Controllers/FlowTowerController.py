@@ -23,14 +23,11 @@ class FlowTowerController(ControllerBase):
     _openScadFilename = 'flowtower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
-    _nominalBaseHeight = 0.8
-
     _presetsTable = {
         '115-85': {
             'filename': 'flowtower 115-85.stl',
-            'start value': 115,
-            'change value': -5,
-            'section size': 10,
+            'starting value': 115,
+            'value change': -5,
         },
     }
 
@@ -94,36 +91,6 @@ class FlowTowerController(ControllerBase):
 
 
 
-    # The square size of each tower section (in mm)
-    _sectionSizeStr = '10'
-
-    sectionSizeStrChanged = pyqtSignal()
-    
-    def setSectionSizeStr(self, value)->None:
-        self._sectionSizeStr = value
-        self.sectionSizeStrChanged.emit()
-
-    @pyqtProperty(str, notify=sectionSizeStrChanged, fset=setSectionSizeStr)
-    def sectionSizeStr(self)->str:
-        return self._sectionSizeStr
-
-
-
-    # The diameter of the hole in each section (in mm)
-    _sectionHoleDiameterStr = '5'
-
-    sectionHoleDiameterStrChanged = pyqtSignal()
-    
-    def setSectionHoleDiameterStr(self, value)->None:
-        self._sectionHoleDiameterStr = value
-        self.sectionHoleDiameterStrChanged.emit()
-
-    @pyqtProperty(str, notify=sectionHoleDiameterStrChanged, fset=setSectionHoleDiameterStr)
-    def sectionHoleDiameterStr(self)->str:
-        return self._sectionHoleDiameterStr
-
-
-
     # The label to add to the tower
     _towerLabelStr = 'FLOW'
 
@@ -163,37 +130,18 @@ class FlowTowerController(ControllerBase):
             Logger.log('e', f'A FlowTower preset named "{presetName}" was requested, but has not been defined')
             return
 
-        # Load the preset's file name
+        # Load the preset values
         try:
             stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for FlowTower preset table "{presetName}" has not been defined')
+            self._startValue = presetTable['starting value']
+            self._valueChange = presetTable['value change']
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
             return
 
-        # Load the preset's starting speed
-        try:
-            self._startValue = presetTable['start value']
-        except KeyError:
-            Logger.log('e', f'The "start value" for FlowTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's speed change value
-        try:
-            self._valueChange = presetTable['change value']
-        except KeyError:
-            Logger.log('e', f'The "change value" for FlowTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's section size
-        try:
-            sectionSize = presetTable['section size']
-        except KeyError:
-            Logger.log('e', f'The "section size" for FlowTower preset table "{presetName}" has not been defined')
-            return
-
-        # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        self._sectionLayers = self._calculateSectionLayers(float(self.sectionSizeStr))
+        # Use the nominal base and section heights for this preset tower
+        self._baseHeight = self._nominalBaseHeight
+        self._sectionHeight = self._nominalSectionHeight
 
         # Determine the file path of the preset
         stlFilePath = self._getStlFilePath(stlFileName)
@@ -213,25 +161,15 @@ class FlowTowerController(ControllerBase):
         startValue = float(self.startValueStr)
         endValue = float(self.endValueStr)
         valueChange = float(self.valueChangeStr)
-        sectionSize = float(self.sectionSizeStr)
-        sectionHoleDiameter = float(self.sectionHoleDiameterStr)
         towerLabel = self.towerLabelStr
         temperatureLabel = self.temperatureLabelStr
 
-        # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        baseHeight = self._baseLayers * self._layerHeight
-
-        # Correct the section size to ensure an integer number of layers per section
-        self._sectionLayers = self._calculateSectionLayers(sectionSize)
-        sectionSize = self._sectionLayers * self._layerHeight
-
-        # Ensure the change amount has the correct sign
+        # Ensure the value change has the correct sign
         valueChange = self._correctChangeValueSign(valueChange, startValue, endValue)
 
-        # Record the tower settings that will be needed for post-processing
-        self._startValue = startValue
-        self._valueChange = valueChange
+        # Calculate the optimal base and section height, given the current printing layer height
+        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
+        sectionSize = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
@@ -240,12 +178,17 @@ class FlowTowerController(ControllerBase):
         openScadParameters ['Value_Change'] = valueChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Size'] = sectionSize
-        openScadParameters ['Section_Hole_Diameter'] = sectionHoleDiameter
         openScadParameters ['Tower_Label'] = towerLabel
         openScadParameters ['Temperature_Label'] = temperatureLabel
 
+        # Record the tower settings that will be needed for post-processing
+        self._startValue = startValue
+        self._valueChange = valueChange
+        self._baseHeight = baseHeight
+        self._sectionHeight = sectionSize
+
         # Determine the tower name
-        towerName = f'Auto-Generated Flow Tower {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Flow Tower {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -253,10 +196,19 @@ class FlowTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, displayOnLcd=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = FlowTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, displayOnLcd)
+        gcode = FlowTower_PostProcessing.execute(
+            gcode, 
+            self._baseHeight, 
+            self._sectionHeight, 
+            self._initialLayerHeight, 
+            self._layerHeight, 
+            self._startValue, 
+            self._valueChange, 
+            enable_lcd_messages
+            )
 
         return gcode

@@ -1,7 +1,7 @@
 {
     "parameterSets": {
         "flowtower 115-85": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "85",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",
@@ -13,8 +13,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 45]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Size": "10",
-            "Section_Hole_Diameter" : "5",
+            "Section_Size": "8.4",
             "Section_Label_Height_Multiplier": "0.4",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -27,7 +26,7 @@
             "Wall_Thickness": "0.6"
         },
         "screenshot": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "4",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",
@@ -40,7 +39,6 @@
             "Screenshot_Vpr": "[75, 0, 45]",
             "Screenshot_Vpt": "[0, 0, 15]",
             "Section_Size": "8",
-            "Section_Hole_Diameter" : "4",
             "Section_Label_Height_Multiplier": "0.4",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",

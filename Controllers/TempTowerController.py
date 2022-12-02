@@ -26,50 +26,50 @@ class TempTowerController(ControllerBase):
     _presetsTable = {
         'ABA': {
             'filename': 'temptower aba.stl',
-            'start value': 260,
-            'change value': -5,
+            'starting value': 260,
+            'value change': -5,
         },
 
         'ABS': {
             'filename': 'temptower abs.stl',
-            'start value': 250,
-            'change value': -5,
+            'starting value': 250,
+            'value change': -5,
         },
 
         'Nylon': {
             'filename': 'temptower nylon.stl',
-            'start value': 260,
-            'change value': -5,
+            'starting value': 260,
+            'value change': -5,
         },
 
         'PC': {
             'filename': 'temptower pc.stl',
-            'start value': 310,
-            'change value': -5,
+            'starting value': 310,
+            'value change': -5,
         },
 
         'PETG': {
             'filename': 'temptower petg.stl',
-            'start value': 250,
-            'change value': -5,
+            'starting value': 250,
+            'value change': -5,
         },
 
         'PLA': {
             'filename': 'temptower pla.stl',
-            'start value': 230,
-            'change value': -5,
+            'starting value': 230,
+            'value change': -5,
         },
 
         'PLA+': {
             'filename': 'temptower pla+.stl',
-            'start value': 230,
-            'change value': -5,
+            'starting value': 230,
+            'value change': -5,
         },
 
         'TPU': {
             'filename': 'temptower tpu.stl',
-            'start value': 230,
-            'change value': -5,
+            'starting value': 230,
+            'value change': -5,
         },
     }
 
@@ -79,9 +79,6 @@ class TempTowerController(ControllerBase):
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
-
-    _nominalBaseHeight = 0.8
-    _nominalSectionHeight = 8.0
 
 
 
@@ -174,30 +171,18 @@ class TempTowerController(ControllerBase):
             Logger.log('e', f'A TempTower preset named "{presetName}" was requested, but has not been defined')
             return
 
-        # Load the preset's file name
+        # Load the preset values
         try:
             stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for TempTower preset table "{presetName}" has not been defined')
+            self._startTemperature = presetTable['starting value']
+            self._temperatureChange = presetTable['value change']
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
             return
 
-        # Load the preset's starting temperature
-        try:
-            self._startTemperature = presetTable['start value']
-        except KeyError:
-            Logger.log('e', f'The "start value" for TempTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's temperature change value
-        try:
-            self._temperatureChange = presetTable['change value']
-        except KeyError:
-            Logger.log('e', f'The "change value" for TempTower preset table "{presetName}" has not been defined')
-            return
-
-        # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
+        # Use the nominal base and section heights for this preset tower
+        self._baseHeight = self._nominalBaseHeight
+        self._sectionHeight = self._nominalSectionHeight
 
         # Determine the file path of the preset
         stlFilePath = self._getStlFilePath(stlFileName)
@@ -220,20 +205,12 @@ class TempTowerController(ControllerBase):
         towerLabel = self.towerLabelStr
         towerDescription = self.towerDescriptionStr
 
-        # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        baseHeight = self._baseLayers * self._layerHeight
-
-        # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
-        sectionHeight = self._sectionLayers * self._layerHeight
-
         # Ensure the change amount has the correct sign
         temperatureChange = self._correctChangeValueSign(temperatureChange, startTemperature, endTemperature)
 
-        # Record the tower settings that will be needed for post-processing
-        self._startTemperature = startTemperature
-        self._temperatureChange = temperatureChange
+        # Calculate the optimal base and section height, given the current printing layer height
+        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
+        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
@@ -245,6 +222,12 @@ class TempTowerController(ControllerBase):
         openScadParameters ['Column_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
+        # Record the tower settings that will be needed for post-processing
+        self._startTemperature = startTemperature
+        self._temperatureChange = temperatureChange
+        self._baseHeight = baseHeight
+        self._sectionHeight = sectionHeight
+
         # Determine the tower name
         towerName = f'Auto-Generated Temperature Tower {startTemperature}-{endTemperature}x{temperatureChange}'
 
@@ -254,10 +237,19 @@ class TempTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, displayOnLcd=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Call the post-processing script
-        gcode = TempTower_PostProcessing.execute(gcode, self._startTemperature, self._temperatureChange, self._sectionLayers, self._baseLayers, displayOnLcd)
+        gcode = TempTower_PostProcessing.execute(
+            gcode, 
+            self._baseHeight, 
+            self._sectionHeight, 
+            self._initialLayerHeight,
+            self._layerHeight, 
+            self._startTemperature, 
+            self._temperatureChange, 
+            enable_lcd_messages
+            )
 
         return gcode

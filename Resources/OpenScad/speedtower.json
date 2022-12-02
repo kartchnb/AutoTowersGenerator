@@ -1,7 +1,7 @@
 {
     "parameterSets": {
         "print speed 20-100": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "100",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",
@@ -14,7 +14,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 45]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.4",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -28,7 +28,7 @@
             "Wall_Thickness": "0.6"
         },
         "print speed 50-150": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "150",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",
@@ -41,7 +41,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 45]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.4",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -55,7 +55,7 @@
             "Wall_Thickness": "0.6"
         },
         "print speed 100-200": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "200",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",
@@ -68,7 +68,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 45]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.4",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -82,7 +82,7 @@
             "Wall_Thickness": "0.6"
         },
         "screenshot": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Ending_Value": "4",
             "Font": "Arial:style=Bold",
             "Iota": "0.001",

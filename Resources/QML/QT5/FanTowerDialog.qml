@@ -51,38 +51,38 @@ UM.Dialog
 
             Label 
             { 
-                text: "Starting Fan Percent"
+                text: "Starting Fan Speed %"
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startPercentStr
-                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
+                text: manager.startFanSpeedStr
+                onTextChanged: if (manager.startFanSpeedStr != text) manager.startFanSpeedStr = text
             }
 
             Label 
             { 
-                text: "Ending Fan Percent" 
+                text: "Ending Fan Speed %" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endPercentStr
-                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
+                text: manager.endFanSpeedStr
+                onTextChanged: if (manager.endFanSpeedStr != text) manager.endFanSpeedStr = text
             }
 
             Label 
             { 
-                text: "Fan Speed Change" 
+                text: "Fan Speed % Change" 
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.percentChangeStr
-                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
+                text: manager.fanSpeedChangeStr
+                onTextChanged: if (manager.fanSpeedChangeStr != text) manager.fanSpeedChangeStr = text
             }
 
             Label 
