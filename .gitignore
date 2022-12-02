@@ -1,6 +1,6 @@
 # Don't check-in my development files
 my.notes
-settings.json
+pluginSettings.json
 *.sh
 *.xcf
 

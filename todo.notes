@@ -1,0 +1,15 @@
+- Improve print speed tower
+
+- Print speed tower should probably leave infill setting alone
+
+- Ensure misc. speed towers function as expected
+
+- Figure out how to remove the tower if *any* print settings are changed
+
+- Remove the tower when objects are added to the scene?
+
+- Documentation
+    Speed tower doesn't actually reach the top speed
+    Preset towers should use common layer heights (0.10, 0.12, 0.20, 0.24, .28, .30) or they may not be entirely accurate
+    How to interpret each tower
+    
