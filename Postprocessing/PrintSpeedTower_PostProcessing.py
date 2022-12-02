@@ -19,7 +19,10 @@
 #   Rearchitected how lines are processed
 # Version 1.4 - 26 Nov 2022:
 #   Moved common code to PostProcessingCommon.py
-__version__ = '1.4'
+# Version 2.0 - 1 Dec 2022:
+#   Redesigned post-processing to focus on section *height* rather than section *layers*
+#   This is more accurate if the section height cannot be evenly divided by the printing layer height
+__version__ = '2.0'
 
 from UM.Logger import Logger
 
@@ -29,72 +32,70 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, start_speed, speed_change, section_layer_count, base_layer_count, reference_speed, enable_lcd_messages):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, reference_speed:float, enable_lcd_messages:bool):
     ''' Post-process gcode sliced by Cura
-        start_speed = the starting print speed (mm/s)
-        speed_change = the amount to change the print speed for each section (mm/s)
-        section_layer_count = the number of layers in each tower section
-        base_layer_count = the number of layers that make up the base of the tower
-        reference_speed = the print speed selection when the gcode was generated 
+        Note that reference_speed is the print speed selection when the gcode was generated 
             This value is used to determine how print speed settings in the
             gcode are modified for each level '''
-
-    Logger.log('d', 'AutoTowersGenerator beginning SpeedTower (Print Speed) post-processing')
-    Logger.log('d', f'Starting speed = {start_speed}')
-    Logger.log('d', f'Speed change = {speed_change}')
-    Logger.log('d', f'Reference speed = {reference_speed}')
-    Logger.log('d', f'Base layers = {base_layer_count}')
-    Logger.log('d', f'Section layers = {section_layer_count}')
-    Logger.log('d', f'Reference Speed = {reference_speed}')
+    
+    # Log the post-processing settings
+    Logger.log('d', 'AutoTowersGenerator beginning print speed SpeedTower post-processing')
+    Logger.log('d', f'Base height = {base_height} mm')
+    Logger.log('d', f'Section height = {section_height} mm')
+    Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
+    Logger.log('d', f'Printed layer height = {layer_height} mm')
+    Logger.log('d', f'Starting speed = {start_speed} mm/s')
+    Logger.log('d', f'Speed change = {speed_change} mm/s')
+    Logger.log('d', f'Reference speed = {reference_speed} mm/s')
+    Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] = gcode[0] + f';SpeedTower (Print Speed) start speed = {start_speed}, speed change = {speed_change}, reference speed = {reference_speed}\n'
+    gcode[0] += f'{Common.comment_prefix} Post-processing a print speed SpeedTower\n'
+    gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Printed layer height = {layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Starting speed = {start_speed} mm/s\n'
+    gcode[0] += f'{Common.comment_prefix} Speed change = {speed_change} mm/s\n'
+    gcode[0] += f'{Common.comment_prefix} Reference speed = {reference_speed} mm/s\n'
+    gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
 
-    # Calculate the number of layers before the first tower section
-    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
-
+    # Start at the requested print speed
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
-    
-    # Iterate over each layer in the g-code
-    for layer_index, layer in enumerate(gcode):
 
-        # The last layer contains user-specified end gcode, which should not be processed
-        if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
-            break
+    # Iterate over each line in the g-code
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
 
-        # If this is the start of a new section (after the base)
-        elif layer_index >= skipped_layer_count and (layer_index - skipped_layer_count) % section_layer_count == 0:
+        # Handle each new section
+        if start_of_new_section:
 
-            lines = layer.split('\n')
-
-            # Increment the speed
+            # Increment the speed for the new tower section
             current_speed += speed_change
-            lines.insert(1, f';Start of next section (speed = {current_speed/60:.1f} mm/s ({current_speed:.1f} mm/m) {Common.comment_prefix} added line')
+
+            # Document the new speed in the gcode
+            lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s ({current_speed*60:.1f} mm/min)')
+
+            # Display the new print speed on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(1, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} added line\n')
+                lines.insert(3, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_speed:.1f} mm/s" on the LCD')
+        
+        # Modify lines specifying print speed
+        if Common.IsPrintSpeedLine(line):
 
-            # Iterate over each command line in the layer
-            for line_index, line in enumerate(lines):
-                
-                # Modify lines specifying print speed
-                if not Common.is_already_processed_line(line) and Common.is_print_speed_line(line):
+            # Determine the old speed setting in the gcode
+            oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
+            if oldSpeedResult:
+                oldSpeedString = oldSpeedResult.group(1)
+                oldSpeed = float(oldSpeedString)
 
-                    # Determine the old speed setting in the gcode
-                    oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
-                    if oldSpeedResult:
-                        oldSpeedString = oldSpeedResult.group(1)
-                        oldSpeed = float(oldSpeedString)
+                # Determine the new speed to set (converting mm/s to mm/m)
+                # This is done based on the reference speed, or the
+                # "print speed" value when the gcode was generated
+                # Note that Cura specifies print speed as mm/s, but gcode needs it as mm/min
+                newSpeed = (current_speed * 60) * oldSpeed / (reference_speed * 60)
 
-                        # Determine the new speed to set (converting mm/s to mm/m)
-                        # This is done based on the reference speed, or the
-                        # "print speed" value when the gcode was generated
-                        newSpeed = (current_speed * 60) * oldSpeed / (reference_speed * 60)
-
-                        # Change the speed in the gcode
-                        lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' {Common.comment_prefix} changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/m) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/m)'
-                                    
-            gcode[layer_index] = '\n'.join(lines)
+                # Change the speed in the gcode
+                lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' {Common.comment_prefix} changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/min) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/min)'
     
     Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing (Print Speed)')
 

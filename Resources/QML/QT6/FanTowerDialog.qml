@@ -55,7 +55,7 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Starting Fan Percent" 
+                text: "Starting Fan Speed %" 
                 MouseArea 
                 {
                     id: starting_fan_percent_mouse_area
@@ -67,8 +67,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startPercentStr
-                onTextChanged: if (manager.startPercentStr != text) manager.startPercentStr = text
+                text: manager.startFanSpeedStr
+                onTextChanged: if (manager.startFanSpeedStr != text) manager.startFanSpeedStr = text
             }
             UM.ToolTip
             {
@@ -78,7 +78,7 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Ending Fan Percent" 
+                text: "Ending Fan Speed %" 
                 MouseArea 
                 {
                     id: ending_fan_percent_mouse_area
@@ -90,8 +90,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endPercentStr
-                onTextChanged: if (manager.endPercentStr != text) manager.endPercentStr = text
+                text: manager.endFanSpeedStr
+                onTextChanged: if (manager.endFanSpeedStr != text) manager.endFanSpeedStr = text
             }
             UM.ToolTip
             {
@@ -101,7 +101,7 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Fan Speed Change" 
+                text: "Fan Speed % Change" 
                 MouseArea 
                 {
                     id: fan_speed_change_mouse_area
@@ -113,8 +113,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.percentChangeStr
-                onTextChanged: if (manager.percentChangeStr != text) manager.percentChangeStr = text
+                text: manager.fanSpeedChangeStr
+                onTextChanged: if (manager.fanSpeedChangeStr != text) manager.fanSpeedChangeStr = text
             }
             UM.ToolTip
             {

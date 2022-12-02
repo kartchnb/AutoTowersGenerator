@@ -1,7 +1,7 @@
 {
     "parameterSets": {
         "fantower 0-100": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "100",
@@ -15,7 +15,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -27,7 +27,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower aba": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "ABA",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "240",
@@ -41,7 +41,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -53,7 +53,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower abs": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "ABS",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "210",
@@ -67,7 +67,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -79,7 +79,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower nylon": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "NYL",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "240",
@@ -93,7 +93,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -105,7 +105,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower pc": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "PC",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "270",
@@ -119,7 +119,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -131,7 +131,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower petg": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "PETG",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "220",
@@ -145,7 +145,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -157,7 +157,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower pla": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "PLA",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "180",
@@ -171,7 +171,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -183,7 +183,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower pla+": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "PLA+",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "200",
@@ -197,7 +197,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -209,7 +209,7 @@
             "Wall_Thickness": "0.6"
         },
         "temptower tpu": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "TPU",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "210",
@@ -223,7 +223,7 @@
             "Screenshot_Vpf": "22.5",
             "Screenshot_Vpr": "[75, 0, 300]",
             "Screenshot_Vpt": "[0, 0, 15]",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Section_Label_Prefix": "",
             "Section_Label_Suffix": "",
@@ -235,7 +235,7 @@
             "Wall_Thickness": "0.6"
         },
         "screenshot": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "4",

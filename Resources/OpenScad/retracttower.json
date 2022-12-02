@@ -1,7 +1,7 @@
 {
     "parameterSets": {
         "distance 1-6": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -9,7 +9,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "1",
             "Tower_Label": "RETRACTION",
@@ -19,7 +19,7 @@
             "Wall_Thickness": "0.6"
         },
         "distance 4-9": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -27,7 +27,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "4",
             "Tower_Label": "RETRACTION",
@@ -37,7 +37,7 @@
             "Wall_Thickness": "0.6"
         },
         "distance 7-12": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "DST",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -45,7 +45,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "7",
             "Tower_Label": "RETRACTION",
@@ -55,7 +55,7 @@
             "Wall_Thickness": "0.6"
         },
         "speed 10-50": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -63,7 +63,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "10",
             "Tower_Label": "RETRACTION",
@@ -73,7 +73,7 @@
             "Wall_Thickness": "0.6"
         },
         "speed 35-75": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -81,7 +81,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "35",
             "Tower_Label": "RETRACTION",
@@ -91,7 +91,7 @@
             "Wall_Thickness": "0.6"
         },
         "speed 60-100": {
-            "Base_Height": "0.8",
+            "Base_Height": "0.84",
             "Column_Label": "SPD",
             "Column_Label_Height_Multiplier": "0.3",
             "Column_Label_Letter_Spacing_Multiplier": "1.0",
@@ -99,7 +99,7 @@
             "Font": "Arial:style=Bold",
             "Preview_Quality_Value": "24",
             "Render_Quality_Value": "24",
-            "Section_Height": "8",
+            "Section_Height": "8.4",
             "Section_Label_Height_Multiplier": "0.3",
             "Starting_Value": "60",
             "Tower_Label": "RETRACTION",
