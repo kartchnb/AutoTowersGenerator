@@ -14,139 +14,142 @@
 #   Rearchitected how lines are processed
 # Version 2.4 - 26 Nov 2022:
 #   Moved common code to PostProcessingCommon.py
-__version__ = '2.4'
+# Version 3.0 - 1 Dec 2022:
+#   Redesigned post-processing to focus on section *height* rather than section *layers*
+#   This is more accurate if the section height cannot be evenly divided by the printing layer height
+__version__ = '3.0'
 
 import re 
 
 from UM.Logger import Logger
 from UM.Application import Application
 
-from cura.Settings.ExtruderManager import ExtruderManager
-
 from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, start_retract_value, retract_value_change, section_layer_count, base_layer_count, tower_type, enable_lcd_messages):
-    Logger.log('d', 'AutoTowersGenerator beginning RetractTower post-processing')
-    Logger.log('d', f'Starting value = {start_retract_value}')
-    Logger.log('d', f'Value change = {retract_value_change}')
-    Logger.log('d', f'Base layers = {base_layer_count}')
-    Logger.log('d', f'Section layers = {section_layer_count}')
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_retract_value:float, retract_value_change:float, tower_type:str, enable_lcd_messages:bool):
+    
+    # Log the post-processing settings
+    Logger.log('d', f'AutoTowersGenerator beginning {tower_type} RetractTower post-processing')
+    Logger.log('d', f'Base height = {base_height} mm')
+    Logger.log('d', f'Section height = {section_height} mm')
+    Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
+    Logger.log('d', f'Printed layer height = {layer_height} mm')
+    Logger.log('d', f'Relative extrusion = {relative_extrusion}')
+    Logger.log('d', f'Starting retraction {tower_type.lower()} = {start_retract_value}')
+    Logger.log('d', f'Retraction {tower_type.lower()} change = {retract_value_change}')
+    Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f';RetractTower ({tower_type}) start {tower_type} = {start_retract_value}, {tower_type} change = {retract_value_change}\n'
+    gcode[0] += f'{Common.comment_prefix} Post-processing a {tower_type} RetractTower\n'
+    gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Printed layer height = {layer_height} mm\n'
+    gcode[0] += f'{Common.comment_prefix} Relative extrusion = {relative_extrusion}\n'
+    gcode[0] += f'{Common.comment_prefix} Starting retraction {tower_type.lower()} = {start_retract_value}\n'
+    gcode[0] += f'{Common.comment_prefix} Retraction {tower_type.lower()} change = {retract_value_change}\n'
+    gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
 
-    extruder = ExtruderManager.getInstance().getActiveExtruderStack()
-    relative_extrusion = bool(extruder.getProperty('relative_extrusion', 'value'))
-
-    # Calculate the number of layers before the first tower section
-    skipped_layer_count = Common.CalculateSkippedLayerCount(base_layer_count)
-
+    # Start at the requested starting retraction value
     current_retract_value = start_retract_value - retract_value_change # The current retract value will be corrected when the first section is encountered
-    save_e = -1
-    current_e = 0
-    current_f = 0
-    first_code = False
+    
+    # Keep track of values throughout the script
+    saved_extrusion_position = -1
+    current_extrusion_position = 0
+    current_extrusion_speed = 0
+    first_code = True
 
-    # Iterate over each layer in the g-code
-    for layer_index, layer in enumerate(gcode):
+    # Iterate over each line in the g-code
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
 
-        # The last layer contains user-specified end gcode, which should not be processed
-        if layer_index >= len(gcode) - 1:
-            gcode[layer_index] = f'{Common.comment_prefix} post-processing complete\n' + layer
-            break
+        # Handle each new section
+        if start_of_new_section:
 
-        # Only process layers after the base
-        elif layer_index >= skipped_layer_count:
-
-            # Process the start of the each section
-            if (layer_index - skipped_layer_count) % section_layer_count == 0:
-
-                # Handle the start of the first section
-                if layer_index == skipped_layer_count:
-                    first_code = True
-
+                # Update the retraction value for the new tower section
                 current_retract_value += retract_value_change
-                layer = f'{Common.comment_prefix} start of the next section (retraction {tower_type} = {current_retract_value})\n' + layer
-                Logger.log('d', f'New section at layer {layer_index - 2} - Setting the retraction {tower_type} to {current_retract_value}')
 
+                # Document the new retraction value in the gcode
+                if tower_type == 'Speed':
+                    lines.insert(2, f'{Common.comment_prefix} Using retraction speed {current_retract_value} mm/s for this tower section')
+                else:
+                    lines.insert(2, f'{Common.comment_prefix} Using retraction distance {current_retract_value} mm for this tower section')
+
+                # Display the new retraction value on the printer's LCD
                 if enable_lcd_messages:
                     if tower_type == 'Speed':
-                        layer = f'M117 SPD {current_retract_value:.1f}mm/s {Common.comment_prefix} added line\n' + layer
+                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_value:.1f} mm/s" on the LCD')
                     else:
-                        layer = f'M117 DST {current_retract_value:.1f}mm {Common.comment_prefix} added line\n' + layer
+                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_value:.1f} mm" on the LCD')
 
-            # Iterate over each command line in the layer
-            lines = layer.split('\n')
-            for line_index, line in enumerate(lines):
+        # Record if relative extrusion is now being used
+        if Common.IsRelativeInstructionLine(line):
+            relative_extrusion = True
 
-                if Common.is_already_processed_line(line):
-                    Logger.log('d', f'Found line: {line}')
+        # Record if absolute extrusion is now being used
+        elif Common.IsAbsoluteInstructionLine(line):
+            relative_extrusion = False
 
-                if not Common.is_already_processed_line(line):
-                    if Common.is_relative_instruction_line(line):
-                        relative_extrusion = True
+        # Handle reseting the extruder position
+        elif Common.IsResetExtruderLine(line):
+            current_extrusion_position = 0
+            saved_extrusion_position = 0
 
-                    elif Common.is_absolute_instruction_line(line):
-                        relative_extrusion = False
+        # Handle extrusion commands
+        elif Common.IsExtrusionLine(line):
+            # Record the new extrusion position
+            position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
+            if position_search_results:
+                extrusion_position_string_value = position_search_results.group(1)
+                saved_extrusion_position=float(extrusion_position_string_value)        
 
-                    elif Common.is_reset_extruder_line(line):
-                        current_e = 0
-                        save_e = 0
+        # Handle retraction commands
+        elif Common.IsRetractLine(line):
+            speed_search_results = re.search(r'F([-+]?\d*\.?\d+)', line.split(';')[0])
+            position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
+            if speed_search_results and position_search_results:
+                current_extrusion_speed=float(speed_search_results.group(1))
+                current_extrusion_position=float(position_search_results.group(1))
 
-                    elif Common.is_extrusion_line(line):
-                        search_e = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
-                        string_e = search_e.group(1)
-                        if search_e:
-                            save_e=float(string_e)        
+                # Handle relative extrusion
+                if relative_extrusion:
 
-                    elif Common.is_retract_line(line):
-                        search_f = re.search(r'F([-+]?\d*\.?\d+)', line.split(';')[0])
-                        search_e = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
-
-                        if search_f and search_e:
-                            current_f=float(search_f.group(1))
-                            current_e=float(search_e.group(1))
-
-                            # Handle relative extrusion
-                            if relative_extrusion:
-                                # Retracting filament (relative)
-                                if current_e<0:
-                                    if tower_type == 'Speed':
-                                        lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_e:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/m) (relative)' # Speed value must be multiplied by 60 for the gcode
-                                    else:
-                                        lines[line_index] = f'G1 F{int(current_f)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (relative)'
-                                
-                                 # Extruding filament (relative)
-                                else:
-                                    if tower_type == 'Speed':
-                                        lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_e:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/m) (relative)' # Speed value must be multiplied by 60 for the gcode
-                                    else:
-                                        if first_code:
-                                            lines[line_index] = f'G1 F{int(current_f)} E{current_e:.5f} {Common.comment_prefix} extruding {current_e:.1f} mm of filament (relative)'
-                                            first_code = False
-                                        else:
-                                            lines[line_index] = f'G1 F{int(current_f)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (relative)'
-                            
-                            # Handle absolute extrusion
+                    # Retracting filament (relative)
+                    if current_extrusion_position < 0:
+                        if tower_type == 'Speed':
+                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
+                        else:
+                            lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (relative)'
+                    
+                    # Extruding filament (relative)
+                    else:
+                        if tower_type == 'Speed':
+                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
+                        else:
+                            if first_code:
+                                lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (relative)'
+                                first_code = False
                             else:
-                                # Retracting filament (absolute)
-                                if save_e > current_e:
-                                    if tower_type == 'Speed':
-                                        lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_e:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/m) (absolute)' # Speed value must be multiplied by 60 for the gcode
-                                    else:
-                                        current_e = save_e - current_retract_value
-                                        lines[line_index] = f'G1 F{int(current_f)} E{current_e:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (absolute)'
-                                
-                                # Resetting the retraction
-                                else:
-                                    if tower_type == 'Speed':
-                                        lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_e:.5f} {Common.comment_prefix} setting retraction speed to {current_retract_value} mm/s ({current_retract_value * 60} mm/m)' # Speed value must be multiplied by 60 for the gcode
-                                    else:
-                                        lines[line_index] = line
+                                lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (relative)'
+                
+                # Handle absolute extrusion
+                else:
 
-            gcode[layer_index] = '\n'.join(lines)
+                    # Retracting filament (absolute)
+                    if saved_extrusion_position > current_extrusion_position:
+                        if tower_type == 'Speed':
+                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (absolute)' # Speed value must be specified as mm/min for the gcode
+                        else:
+                            current_extrusion_position = saved_extrusion_position - current_retract_value
+                            lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (absolute)'
+                    
+                    # Resetting the retraction
+                    else:
+                        if tower_type == 'Speed':
+                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} setting retraction speed to {current_retract_value} mm/s ({current_retract_value * 60} mm/min)' # Speed value must be specified as mm/min for the gcode
+                        else:
+                            lines[line_index] = line
 
     Logger.log('d', f'AutoTowersGenerator completing RetractTower post-processing ({tower_type})')
 

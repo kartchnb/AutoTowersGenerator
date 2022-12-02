@@ -26,9 +26,6 @@ Base_Height = 0.801;
 // The cubic dimensions of each section of the tower
 Section_Size = 10.001;
 
-// The diameter of the holes to create in each section
-Section_Hole_Diameter = 5.001;
-
 
 
 /* [Advanced Parameters] */
@@ -96,6 +93,9 @@ Base_Extension = Wall_Thickness*4;
 
 // Calculate the horizontal size of the base of the tower
 Base_Size = Section_Size*2 + Base_Extension*2;
+
+// Calculate the diameter of the holes to create in each section
+Section_Hole_Diameter = Section_Size - Wall_Thickness*2;
 
 // Calculate the font size
 Section_Label_Font_Size = Section_Size * Section_Label_Height_Multiplier;

@@ -27,23 +27,23 @@ class SpeedTowerController(ControllerBase):
     _presetsTable = {
         'Print Speed 20-100': {
             'filename': 'speedtower print speed 20-100.stl',
-            'start value': 20,
-            'change value': 20,
-            'tower type': 'Print Speed'
+            'starting value': 20,
+            'value change': 20,
+            'tower type': 'Print Speed',
         },
 
         'Print Speed 50-150': {
             'filename': 'speedtower print speed 50-150.stl',
-            'start value': 50,
-            'change value': 20,
-            'tower type': 'Print Speed'
+            'starting value': 50,
+            'value change': 20,
+            'tower type': 'Print Speed',
         },
 
         'Print Speed 100-200': {
             'filename': 'speedtower print speed 100-200.stl',
-            'start value': 100,
-            'change value': 20,
-            'tower type': 'Print Speed'
+            'starting value': 100,
+            'value change': 20,
+            'tower type': 'Print Speed',
         },
     }
 
@@ -62,9 +62,6 @@ class SpeedTowerController(ControllerBase):
         {'value': 'Marlin Linear', 'label': 'MARLIN LINEAR'}, 
         {'value': 'RepRap Pressure', 'label': 'REPRAP PRESSURE'},
     ]
-
-    _nominalBaseHeight = 0.8
-    _nominalSectionHeight = 8.0
 
 
 
@@ -179,37 +176,19 @@ class SpeedTowerController(ControllerBase):
             Logger.log('e', f'A SpeedTower preset named "{presetName}" was requested, but has not been defined')
             return
 
-        # Load the preset's file name
+        # Load the preset values
         try:
             stlFileName = presetTable['filename']
-        except KeyError:
-            Logger.log('e', f'The "filename" entry for SpeedTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's starting speed
-        try:
-            self._startValue = presetTable['start value']
-        except KeyError:
-            Logger.log('e', f'The "start value" for SpeedTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's speed change value
-        try:
-            self._valueChange = presetTable['change value']
-        except KeyError:
-            Logger.log('e', f'The "change value" for SpeedTower preset table "{presetName}" has not been defined')
-            return
-
-        # Load the preset's tower type value
-        try:
+            self._startValue = presetTable['starting value']
+            self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']
-        except KeyError:
-            Logger.log('e', f'The "tower type" for SpeedTower preset table "{presetName}" has not been defined')
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
             return
 
-        # Calculate the number of layers in the base and each section of the tower
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
+        # Use the nominal base and section heights for this preset tower
+        self._baseHeight = self._nominalBaseHeight
+        self._sectionHeight = self._nominalSectionHeight
 
         # Determine the file path of the preset
         stlFilePath = self._getStlFilePath(stlFileName)
@@ -225,27 +204,19 @@ class SpeedTowerController(ControllerBase):
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
-        # Read the parameters directly from the dialog
+        # Determine the parameters for the tower
         startSpeed = float(self.startSpeedStr)
         endSpeed = float(self.endSpeedStr)
         speedChange = float(self.speedChangeStr)
         towerLabel = self.towerLabelStr
         temperatureLabel = self.temperatureLabelStr
 
-        # Correct the base height to ensure an integer number of layers in the base
-        self._baseLayers = self._calculateBaseLayers(self._nominalBaseHeight)
-        baseHeight = self._baseLayers * self._layerHeight
-
-        # Correct the section height to ensure an integer number of layers per section
-        self._sectionLayers = self._calculateSectionLayers(self._nominalSectionHeight)
-        sectionHeight = self._sectionLayers * self._layerHeight
-
         # Ensure the change amount has the correct sign
         speedChange = self._correctChangeValueSign(speedChange, startSpeed, endSpeed)
 
-        # Record the tower settings that will be needed for post-processing
-        self._startValue = startSpeed
-        self._valueChange = speedChange
+        # Calculate the optimal base and section height, given the current printing layer height
+        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
+        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
@@ -257,8 +228,14 @@ class SpeedTowerController(ControllerBase):
         openScadParameters ['Tower_Label'] = towerLabel
         openScadParameters ['Temperature_Label'] = temperatureLabel
 
+        # Record the tower settings that will be needed for post-processing
+        self._startValue = startSpeed
+        self._valueChange = speedChange
+        self._baseHeight = baseHeight
+        self._sectionHeight = sectionHeight
+
         # Determine the tower name
-        towerName = f'Auto-Generated Speed Tower ({self._towerType}) {startSpeed}-{endSpeed}x{speedChange}'
+        towerName = f'Custom Speed Tower ({self._towerType}) {startSpeed}-{endSpeed}x{speedChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -266,15 +243,35 @@ class SpeedTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, displayOnLcd=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
-        # Call the post-processing script
+        # Call the post-processing script for print speed towers
         if self._towerType == 'Print Speed':
-            # Query the current print speed
-            currentPrintSpeed = Application.getInstance().getGlobalContainerStack().getProperty('speed_print', 'value')
-            gcode = PrintSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, currentPrintSpeed, displayOnLcd)
+            gcode = PrintSpeedTower_PostProcessing.execute(
+                gcode, 
+                self._baseHeight, 
+                self._sectionHeight, 
+                self._initialLayerHeight, 
+                self._layerHeight, 
+                self._startValue, 
+                self._valueChange, 
+                self._printSpeed,
+                enable_lcd_messages
+                )
+        
+        # Call the post-processing script for non print speed towers
         else:
-            gcode = MiscSpeedTower_PostProcessing.execute(gcode, self._startValue, self._valueChange, self._sectionLayers, self._baseLayers, self._towerType, displayOnLcd)
+            gcode = MiscSpeedTower_PostProcessing.execute(
+                gcode, 
+                self._baseHeight, 
+                self._sectionHeight, 
+                self._initialLayerHeight, 
+                self._layerHeight, 
+                self._startValue, 
+                self._valueChange, 
+                self._towerType, 
+                enable_lcd_messages
+                )
 
         return gcode

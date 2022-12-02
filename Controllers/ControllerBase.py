@@ -24,6 +24,12 @@ class ControllerBase(QObject):
 
 
 
+    # The initial values used for the base and section heights of the tower
+    _nominalBaseHeight = 0.84
+    _nominalSectionHeight = 8.4
+
+
+
     def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable):
         super().__init__()
         
@@ -81,6 +87,20 @@ class ControllerBase(QObject):
     def _lineWidth(self)->float:
         ''' Return the current line width setting '''
         return Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value")
+
+
+
+    @property
+    def _printSpeed(self)->float:
+        ''' Return the current print speed setting '''
+        return ExtruderManager.getInstance().getActiveExtruderStack().getProperty('speed_print', 'value')
+
+
+
+    @property
+    def _relativeExtrusion(self)->bool:
+        ''' Returns whether relative extrusion is being used (True or False) '''
+        return bool(ExtruderManager.getInstance().getActiveExtruderStack().getProperty('relative_extrusion', 'value'))
 
 
 
@@ -243,23 +263,18 @@ class ControllerBase(QObject):
 
 
 
-    def _calculateBaseLayers(self, base_height)->int:
-        ''' Calculate the number of layers in the base, given its height in mm '''
-
-        # The following calculation takes the height of the initial layer into account
-        return math.ceil((base_height - self._initialLayerHeight) / self._layerHeight) + 1
-
-
-
-    def _calculateSectionLayers(self, section_height)->int:
-        ''' Calculate the number of layers in each section, given their height in mm '''
-
-        return math.ceil(section_height / self._layerHeight)
+    def _calculateOptimalHeight(self, nominal_height)->int:
+        ''' Calculates an optimal height from a nominal height, based on the current printed layer height 
+            For example, given a nominal height of 1 mm and a current printed layer height of 0.12 mm, 
+            this function will return 9 mm
+            The optimal height will always be equal to or larger than the nominal height '''
+        optimal_height = self._layerHeight * math.ceil(nominal_height / self._layerHeight)
+        return optimal_height
 
 
 
     def _correctChangeValueSign(self, changeValue, startValue, endValue)->float:
-        '''' Ensures the sign of a change value matches the start and end values '''
+        '''' Ensure the sign of a change value matches the start and end values '''
         if endValue >= startValue:
             return abs(changeValue)
         else:
