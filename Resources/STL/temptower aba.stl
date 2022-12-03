@@ -2878,83 +2878,6 @@ solid OpenSCAD_Model
   endfacet
   facet normal 0 -1 0
     outer loop
-      vertex 19.2868 -4.2 5.02365
-      vertex 19.3329 -4.2 4.94332
-      vertex 19.297 -4.2 5.06125
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.2778 -4.2 4.99181
-      vertex 19.3329 -4.2 4.94332
-      vertex 19.2868 -4.2 5.02365
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.268 -4.2 4.95784
-      vertex 19.3329 -4.2 4.94332
-      vertex 19.2778 -4.2 4.99181
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.2573 -4.2 4.92174
-      vertex 19.3329 -4.2 4.94332
-      vertex 19.268 -4.2 4.95784
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.2458 -4.2 4.88352
-      vertex 19.3329 -4.2 4.94332
-      vertex 19.2573 -4.2 4.92174
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.4064 -4.2 4.71091
-      vertex 19.2458 -4.2 4.88352
-      vertex 19.2184 -4.2 4.79999
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.2458 -4.2 4.88352
-      vertex 19.4064 -4.2 4.71091
-      vertex 19.3329 -4.2 4.94332
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.1603 -4.2 4.62804
-      vertex 19.4064 -4.2 4.71091
-      vertex 19.2184 -4.2 4.79999
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.0715 -4.2 4.36765
-      vertex 19.4064 -4.2 4.71091
-      vertex 19.1603 -4.2 4.62804
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.6439 -4.2 4.01883
-      vertex 19.0715 -4.2 4.36765
-      vertex 18.9518 -4.2 4.01883
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.0715 -4.2 4.36765
-      vertex 19.6439 -4.2 4.01883
-      vertex 19.4064 -4.2 4.71091
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
       vertex 16.8817 -4.2 4.46141
       vertex 16.8782 -4.2 5.05782
       vertex 16.3041 -4.2 5.05782
@@ -3070,6 +2993,83 @@ solid OpenSCAD_Model
       vertex 17.1362 -4.2 4.50322
       vertex 17.2823 -4.2 4.68907
       vertex 17.066 -4.2 4.48
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.2868 -4.2 5.02365
+      vertex 19.3329 -4.2 4.94332
+      vertex 19.297 -4.2 5.06125
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.2778 -4.2 4.99181
+      vertex 19.3329 -4.2 4.94332
+      vertex 19.2868 -4.2 5.02365
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.268 -4.2 4.95784
+      vertex 19.3329 -4.2 4.94332
+      vertex 19.2778 -4.2 4.99181
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.2573 -4.2 4.92174
+      vertex 19.3329 -4.2 4.94332
+      vertex 19.268 -4.2 4.95784
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.2458 -4.2 4.88352
+      vertex 19.3329 -4.2 4.94332
+      vertex 19.2573 -4.2 4.92174
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.4064 -4.2 4.71091
+      vertex 19.2458 -4.2 4.88352
+      vertex 19.2184 -4.2 4.79999
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.2458 -4.2 4.88352
+      vertex 19.4064 -4.2 4.71091
+      vertex 19.3329 -4.2 4.94332
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.1603 -4.2 4.62804
+      vertex 19.4064 -4.2 4.71091
+      vertex 19.2184 -4.2 4.79999
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.0715 -4.2 4.36765
+      vertex 19.4064 -4.2 4.71091
+      vertex 19.1603 -4.2 4.62804
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.6439 -4.2 4.01883
+      vertex 19.0715 -4.2 4.36765
+      vertex 18.9518 -4.2 4.01883
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.0715 -4.2 4.36765
+      vertex 19.6439 -4.2 4.01883
+      vertex 19.4064 -4.2 4.71091
     endloop
   endfacet
   facet normal 1 -0 0

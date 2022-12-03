@@ -1,6 +1,6 @@
 {
     "parameterSets": {
-        "print speed 20-100": {
+        "speedtower print speed 20-100": {
             "Base_Height": "0.84",
             "Ending_Value": "100",
             "Font": "Arial:style=Bold",
@@ -27,7 +27,7 @@
             "Value_Change": "20",
             "Wall_Thickness": "0.6"
         },
-        "print speed 50-150": {
+        "speedtower print speed 50-150": {
             "Base_Height": "0.84",
             "Ending_Value": "150",
             "Font": "Arial:style=Bold",
@@ -54,7 +54,7 @@
             "Value_Change": "20",
             "Wall_Thickness": "0.6"
         },
-        "print speed 100-200": {
+        "speedtower print speed 100-200": {
             "Base_Height": "0.84",
             "Ending_Value": "200",
             "Font": "Arial:style=Bold",
