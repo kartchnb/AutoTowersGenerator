@@ -102,7 +102,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 lines.insert(1, f'M220 B {Common.comment_prefix} Backing up the current feedrate percentage')
     
     # Restore the backed-up feedrate percentage
-    last_layer_index = len(gcode) - Common.trailing_inserted_layer_count
+    last_layer_index = len(gcode) - Common.trailing_inserted_layer_count - 1
+    gcode[last_layer_index] += f'M220 S100 {Common.comment_prefix} Setting the feedrate percentage to 100% in case the restore command does not work\n'
     gcode[last_layer_index] += f'M220 R {Common.comment_prefix} Restoring the backed-up feedrate percentage\n'
 
     Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing (Print Speed)')
