@@ -112,26 +112,28 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 current_extrusion_speed=float(speed_search_results.group(1))
                 current_extrusion_position=float(position_search_results.group(1))
 
+                new_line = ''
+
                 # Handle relative extrusion
                 if relative_extrusion:
 
                     # Retracting filament (relative)
                     if current_extrusion_position < 0:
                         if tower_type == 'Speed':
-                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)'  # Speed value must be specified as mm/min for the gcode
                         else:
-                            lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (relative)'
+                            new_line = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (relative)'
                     
                     # Extruding filament (relative)
                     else:
                         if tower_type == 'Speed':
-                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
                         else:
                             if first_code:
-                                lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (relative)'
+                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (relative)'
                                 first_code = False
                             else:
-                                lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (relative)'
+                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (relative)'
                 
                 # Handle absolute extrusion
                 else:
@@ -139,17 +141,26 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                     # Retracting filament (absolute)
                     if saved_extrusion_position > current_extrusion_position:
                         if tower_type == 'Speed':
-                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (absolute)' # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (absolute)' # Speed value must be specified as mm/min for the gcode
                         else:
                             current_extrusion_position = saved_extrusion_position - current_retract_value
-                            lines[line_index] = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (absolute)'
+                            new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (absolute)'
                     
-                    # Resetting the retraction
+                    # Resetting the retraction 
                     else:
                         if tower_type == 'Speed':
-                            lines[line_index] = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} setting retraction speed to {current_retract_value} mm/s ({current_retract_value * 60} mm/min)' # Speed value must be specified as mm/min for the gcode
-                        else:
-                            lines[line_index] = line
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} setting retraction speed to {current_retract_value} mm/s ({current_retract_value * 60} mm/min)' # Speed value must be specified as mm/min for the gcode
+
+                # If the current line needs to be modified
+                if new_line != '':
+
+                    # Keep the original line in the gcode, but comment it out
+                    lines[line_index] = f';{line} {Common.comment_prefix} This is the original line before being modified'
+
+                    # Insert the new line
+                    lines.insert(line_index, new_line)
+
+
 
     Logger.log('d', f'AutoTowersGenerator completing RetractTower post-processing ({tower_type})')
 
