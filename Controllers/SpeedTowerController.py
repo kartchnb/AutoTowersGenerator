@@ -49,7 +49,6 @@ class SpeedTowerController(ControllerBase):
 
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
-        'infill_sparse_density': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 0),
         'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
@@ -194,7 +193,7 @@ class SpeedTowerController(ControllerBase):
         stlFilePath = self._getStlFilePath(stlFileName)
 
         # Determine the tower name
-        towerName = f'Preset Speed Tower ({self._towerType}) {presetName}'
+        towerName = f'Preset Speed Tower {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -235,7 +234,7 @@ class SpeedTowerController(ControllerBase):
         self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Custom Speed Tower ({self._towerType}) {startSpeed}-{endSpeed}x{speedChange}'
+        towerName = f'Custom Speed Tower {startSpeed}-{endSpeed}x{speedChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

@@ -22,7 +22,13 @@
 # Version 2.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-__version__ = '2.0'
+# Version 2.1 - 2 Dec 2022:
+#   Changed back to using the M220 feedrate percentage command to adjust the print speed
+#   Ideally, this script would change all movement speeds to match how Cura would generate the gcode
+#   However, it's not that simple and is going to take a lot more work to figure out how to do this right
+#   So, for now, M220 is used to simulate print speed changes
+#   Unfortunately, this is still not a completely accurate demonstration of the different print speeds
+__version__ = '2.1'
 
 from UM.Logger import Logger
 
@@ -63,6 +69,9 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     # Start at the requested print speed
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
 
+    # Keep track of when the first section is encountered
+    first_section = True
+
     # Iterate over each line in the g-code
     for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
 
@@ -72,31 +81,30 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             # Increment the speed for the new tower section
             current_speed += speed_change
 
+            # Calculate the new feedrate percentage
+            feedrate_percentage = current_speed / reference_speed * 100
+
             # Document the new speed in the gcode
-            lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s ({current_speed*60:.1f} mm/min)')
+            lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s')
+
+            # Command the new feedrate percentage in the gcode
+            lines.insert(3, f'M220 S{feedrate_percentage:.2f} {Common.comment_prefix} Setting the feedrate percentage to {feedrate_percentage:.2f}% to mimic a speed change from {reference_speed}mm/s to {current_speed} mm/s')
 
             # Display the new print speed on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_speed:.1f} mm/s" on the LCD')
-        
-        # Modify lines specifying print speed
-        if Common.IsPrintSpeedLine(line):
+                lines.insert(4, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_speed:.1f} mm/s" on the LCD')
 
-            # Determine the old speed setting in the gcode
-            oldSpeedResult = re.search(r'F(\d+(?:\.\d*)?)', line.split(';')[0])
-            if oldSpeedResult:
-                oldSpeedString = oldSpeedResult.group(1)
-                oldSpeed = float(oldSpeedString)
+            # Handle the first tower section
+            if first_section:
+                first_section = False
 
-                # Determine the new speed to set (converting mm/s to mm/m)
-                # This is done based on the reference speed, or the
-                # "print speed" value when the gcode was generated
-                # Note that Cura specifies print speed as mm/s, but gcode needs it as mm/min
-                newSpeed = (current_speed * 60) * oldSpeed / (reference_speed * 60)
-
-                # Change the speed in the gcode
-                lines[line_index] = line.replace(f'F{oldSpeedString}', f'F{newSpeed:.1f}') + f' {Common.comment_prefix} changing speed from {(oldSpeed/60):.1f} mm/s ({oldSpeed:.1f} mm/min) to {(newSpeed/60):.1f} mm/s ({newSpeed:.1f} mm/min)'
+                # Backup the feedrate percentage
+                lines.insert(1, f'M220 B {Common.comment_prefix} Backing up the current feedrate percentage')
     
+    # Restore the backed-up feedrate percentage
+    last_layer_index = len(gcode) - Common.trailing_inserted_layer_count
+    gcode[last_layer_index] += f'M220 R {Common.comment_prefix} Restoring the backed-up feedrate percentage\n'
+
     Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing (Print Speed)')
 
     return gcode
