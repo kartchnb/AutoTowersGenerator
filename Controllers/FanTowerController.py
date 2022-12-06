@@ -24,8 +24,7 @@ class FanTowerController(ControllerBase):
     _qmlFilename = 'FanTowerDialog.qml'
 
     _presetsTable = {
-        '0-100': {
-            'filename': 'fantower 0-100.stl',
+        'Fan Tower - Fan Speed 0-100': {
             'starting value': 0,
             'value change': 20,
         },
@@ -40,8 +39,8 @@ class FanTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__("Fan Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__("Fan Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -137,31 +136,32 @@ class FanTowerController(ControllerBase):
 
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
-            Logger.log('e', f'A FanTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A Fan Tower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset values
         try:
-            stlFileName = presetTable['filename']
             self._startFanSpeed = presetTable['starting value']
             self._fanSpeedChange = presetTable['value change']
         except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return
 
         # Use the nominal base and section heights for this preset tower
         self._baseHeight = self._nominalBaseHeight
         self._sectionHeight = self._nominalSectionHeight
 
-        # Determine the file path of the preset
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Determine the tower name
-        towerName = f'Preset Fan Tower {presetName}'
+        towerName = f'Preset {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -202,7 +202,7 @@ class FanTowerController(ControllerBase):
         self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Custom Fan Tower {startFanSpeed}-{endFanSpeed}x{fanSpeedChange}'
+        towerName = f'Custom Fan Tower - Fan Speed {startFanSpeed}-{endFanSpeed}x{fanSpeedChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

@@ -25,22 +25,19 @@ class SpeedTowerController(ControllerBase):
     _qmlFilename = 'SpeedTowerDialog.qml'
 
     _presetsTable = {
-        'Print Speed 20-100': {
-            'filename': 'speedtower print speed 20-100.stl',
+        'Speed Tower - Print Speed 20-100': {
             'starting value': 20,
             'value change': 20,
             'tower type': 'Print Speed',
         },
 
-        'Print Speed 50-150': {
-            'filename': 'speedtower print speed 50-150.stl',
+        'Speed Tower - Print Speed 50-150': {
             'starting value': 50,
             'value change': 20,
             'tower type': 'Print Speed',
         },
 
-        'Print Speed 100-200': {
-            'filename': 'speedtower print speed 100-200.stl',
+        'Speed Tower - Print Speed 100-200': {
             'starting value': 100,
             'value change': 20,
             'tower type': 'Print Speed',
@@ -64,8 +61,8 @@ class SpeedTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__("Speed Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__("Speed Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -168,6 +165,11 @@ class SpeedTowerController(ControllerBase):
 
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -177,7 +179,6 @@ class SpeedTowerController(ControllerBase):
 
         # Load the preset values
         try:
-            stlFileName = presetTable['filename']
             self._startValue = presetTable['starting value']
             self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']
@@ -189,11 +190,8 @@ class SpeedTowerController(ControllerBase):
         self._baseHeight = self._nominalBaseHeight
         self._sectionHeight = self._nominalSectionHeight
 
-        # Determine the file path of the preset
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Determine the tower name
-        towerName = f'Preset Speed Tower {presetName}'
+        towerName = f'Custom {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -234,7 +232,7 @@ class SpeedTowerController(ControllerBase):
         self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Custom Speed Tower {startSpeed}-{endSpeed}x{speedChange}'
+        towerName = f'Custom Speed Tower - {self._towerType} {startSpeed}-{endSpeed}x{speedChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

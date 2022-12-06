@@ -24,50 +24,42 @@ class TempTowerController(ControllerBase):
     _qmlFilename = 'TempTowerDialog.qml'
 
     _presetsTable = {
-        'ABA': {
-            'filename': 'temptower aba.stl',
+        'Temperature Tower - ABA': {
             'starting value': 260,
             'value change': -5,
         },
 
-        'ABS': {
-            'filename': 'temptower abs.stl',
+        'Temperature Tower - ABS': {
             'starting value': 250,
             'value change': -5,
         },
 
-        'Nylon': {
-            'filename': 'temptower nylon.stl',
+        'Temperature Tower - Nylon': {
             'starting value': 260,
             'value change': -5,
         },
 
-        'PC': {
-            'filename': 'temptower pc.stl',
+        'Temperature Tower - PC': {
             'starting value': 310,
             'value change': -5,
         },
 
-        'PETG': {
-            'filename': 'temptower petg.stl',
+        'Temperature Tower - PETG': {
             'starting value': 250,
             'value change': -5,
         },
 
-        'PLA': {
-            'filename': 'temptower pla.stl',
+        'Temperature Tower - PLA': {
             'starting value': 230,
             'value change': -5,
         },
 
-        'PLA+': {
-            'filename': 'temptower pla+.stl',
+        'Temperature Tower - PLA+': {
             'starting value': 230,
             'value change': -5,
         },
 
-        'TPU': {
-            'filename': 'temptower tpu.stl',
+        'Temperature Tower - TPU': {
             'starting value': 230,
             'value change': -5,
         },
@@ -82,8 +74,8 @@ class TempTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__("Temp Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__("Temp Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -164,31 +156,32 @@ class TempTowerController(ControllerBase):
 
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
-            Logger.log('e', f'A TempTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A Temp Tower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset values
         try:
-            stlFileName = presetTable['filename']
             self._startTemperature = presetTable['starting value']
             self._temperatureChange = presetTable['value change']
         except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Temp Tower preset "{presetName}"')
             return
 
         # Use the nominal base and section heights for this preset tower
         self._baseHeight = self._nominalBaseHeight
         self._sectionHeight = self._nominalSectionHeight
 
-        # Determine the file path of the preset
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Determine the tower name
-        towerName = f'Preset Temperature Tower {presetName}'
+        towerName = f'Preset {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -229,7 +222,7 @@ class TempTowerController(ControllerBase):
         self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Auto-Generated Temperature Tower {startTemperature}-{endTemperature}x{temperatureChange}'
+        towerName = f'Custom Temp Tower - {startTemperature}-{endTemperature}x{temperatureChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

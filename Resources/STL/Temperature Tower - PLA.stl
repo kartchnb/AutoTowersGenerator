@@ -2675,83 +2675,6 @@ solid OpenSCAD_Model
   endfacet
   facet normal 0 -1 0
     outer loop
-      vertex 19.0022 -4.2 5.02365
-      vertex 19.0484 -4.2 4.94332
-      vertex 19.0125 -4.2 5.06125
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.9933 -4.2 4.99181
-      vertex 19.0484 -4.2 4.94332
-      vertex 19.0022 -4.2 5.02365
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.9834 -4.2 4.95784
-      vertex 19.0484 -4.2 4.94332
-      vertex 18.9933 -4.2 4.99181
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.9727 -4.2 4.92174
-      vertex 19.0484 -4.2 4.94332
-      vertex 18.9834 -4.2 4.95784
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.9612 -4.2 4.88352
-      vertex 19.0484 -4.2 4.94332
-      vertex 18.9727 -4.2 4.92174
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.1218 -4.2 4.71091
-      vertex 18.9612 -4.2 4.88352
-      vertex 18.9339 -4.2 4.79999
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.9612 -4.2 4.88352
-      vertex 19.1218 -4.2 4.71091
-      vertex 19.0484 -4.2 4.94332
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.8758 -4.2 4.62804
-      vertex 19.1218 -4.2 4.71091
-      vertex 18.9339 -4.2 4.79999
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.7869 -4.2 4.36765
-      vertex 19.1218 -4.2 4.71091
-      vertex 18.8758 -4.2 4.62804
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 19.3594 -4.2 4.01883
-      vertex 18.7869 -4.2 4.36765
-      vertex 18.6673 -4.2 4.01883
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex 18.7869 -4.2 4.36765
-      vertex 19.3594 -4.2 4.01883
-      vertex 19.1218 -4.2 4.71091
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
       vertex 14.1203 -4.2 4.25975
       vertex 14.6415 -4.2 5.04073
       vertex 14.1203 -4.2 5.04073
@@ -2839,6 +2762,83 @@ solid OpenSCAD_Model
       vertex 15.061 -4.2 4.4894
       vertex 14.914 -4.2 4.31792
       vertex 15.0258 -4.2 4.42057
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.0022 -4.2 5.02365
+      vertex 19.0484 -4.2 4.94332
+      vertex 19.0125 -4.2 5.06125
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.9933 -4.2 4.99181
+      vertex 19.0484 -4.2 4.94332
+      vertex 19.0022 -4.2 5.02365
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.9834 -4.2 4.95784
+      vertex 19.0484 -4.2 4.94332
+      vertex 18.9933 -4.2 4.99181
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.9727 -4.2 4.92174
+      vertex 19.0484 -4.2 4.94332
+      vertex 18.9834 -4.2 4.95784
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.9612 -4.2 4.88352
+      vertex 19.0484 -4.2 4.94332
+      vertex 18.9727 -4.2 4.92174
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.1218 -4.2 4.71091
+      vertex 18.9612 -4.2 4.88352
+      vertex 18.9339 -4.2 4.79999
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.9612 -4.2 4.88352
+      vertex 19.1218 -4.2 4.71091
+      vertex 19.0484 -4.2 4.94332
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.8758 -4.2 4.62804
+      vertex 19.1218 -4.2 4.71091
+      vertex 18.9339 -4.2 4.79999
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.7869 -4.2 4.36765
+      vertex 19.1218 -4.2 4.71091
+      vertex 18.8758 -4.2 4.62804
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 19.3594 -4.2 4.01883
+      vertex 18.7869 -4.2 4.36765
+      vertex 18.6673 -4.2 4.01883
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 18.7869 -4.2 4.36765
+      vertex 19.3594 -4.2 4.01883
+      vertex 19.1218 -4.2 4.71091
     endloop
   endfacet
   facet normal 1 -0 0

@@ -22,7 +22,12 @@ class BedLevelPatternController(ControllerBase):
     _openScadFilename = 'bedlevelpattern.scad'
     _qmlFilename = 'BedLevelPatternDialog.qml'
 
-    _presetsTable = {}
+    _presetsTable = {
+        'Bed Level Pattern - Concentric Squares 220x220': {},
+        'Bed Level Pattern - Concentric Squares 200x200': {},
+        'Bed Level Pattern - Concentric Squares 180x180': {},
+        'Bed Level Pattern - Concentric Squares 150x150': {},
+    }
 
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
@@ -34,7 +39,7 @@ class BedLevelPatternController(ControllerBase):
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
     }
 
-    _bedLevelPatternTypesModel = [
+    _bedLevelPatternsModel = [
         {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
         {'value': 'Concentric Circles', 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
         {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
@@ -45,30 +50,30 @@ class BedLevelPatternController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__('Bed Level Pattern', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__('Bed Level Pattern', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
     # The available tower types
     @pyqtProperty(list)
-    def bedLevelPatternTypesModel(self):
-        return self._bedLevelPatternTypesModel
+    def bedLevelPatternsModel(self):
+        return self._bedLevelPatternsModel
 
 
 
     # The selected bed level pattern type
-    _bedLevelPatternType = _bedLevelPatternTypesModel[0]['value']
+    _bedLevelPattern = _bedLevelPatternsModel[0]['value']
 
-    bedLevelPatternTypeChanged = pyqtSignal()
+    bedLevelPatternChanged = pyqtSignal()
 
-    def setBedLevelPatternType(self, value)->None:
-        self._bedLevelPatternType = value
-        self.bedLevelPatternTypeChanged.emit()
+    def setBedLevelPattern(self, value)->None:
+        self._bedLevelPattern = value
+        self.bedLevelPatternChanged.emit()
 
-    @pyqtProperty(str, notify=bedLevelPatternTypeChanged, fset=setBedLevelPatternType)
-    def bedLevelPatternType(self)->str:
-        return self._bedLevelPatternType
+    @pyqtProperty(str, notify=bedLevelPatternChanged, fset=setBedLevelPattern)
+    def bedLevelPattern(self)->str:
+        return self._bedLevelPattern
 
 
 
@@ -114,12 +119,28 @@ class BedLevelPatternController(ControllerBase):
     @pyqtProperty(str, notify=cellSizeStrChanged, fset=setCellSizeStr)
     def cellSizeStr(self)->str:
         return self._cellSizeStr
-            
+
 
 
     def _loadPreset(self, presetName)->None:
-        # No presets for now
-        pass
+        ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
+        # Load the preset table
+        try:
+            presetTable = self._presetsTable[presetName]
+        except KeyError:
+            Logger.log('e', f'A Bed Level Pattern preset named "{presetName}" was requested, but has not been defined')
+            return
+
+        # Determine the tower name
+        towerName = f'Preset {presetName}'
+
+        # Use the callback to load the preset STL file
+        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
 
 
 
@@ -142,7 +163,7 @@ class BedLevelPatternController(ControllerBase):
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPatternType.lower()
+        openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPattern.lower()
         openScadParameters ['Print_Area_Width'] = print_area_width
         openScadParameters ['Print_Area_Depth'] = print_area_depth
         openScadParameters ['Line_Width'] = line_width
@@ -152,7 +173,7 @@ class BedLevelPatternController(ControllerBase):
         openScadParameters ['Grid_Cell_Count'] = cell_size
 
         # Determine the tower name
-        towerName = f'Auto-Generated Bed Level Pattern {print_area_width}x{print_area_depth}'
+        towerName = f'Custom Bed Level Pattern - {self.bedLevelPattern} {print_area_width}x{print_area_depth}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

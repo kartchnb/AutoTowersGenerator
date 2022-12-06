@@ -24,43 +24,37 @@ class RetractTowerController(ControllerBase):
     _qmlFilename = 'RetractTowerDialog.qml'
 
     _presetsTable = {
-        'Distance 1-6': {
-            'filename': 'retracttower distance 1-6.stl',
+        'Retract Tower - Retract Distance 1-6': {
             'starting value': 1,
             'value change': 1,
             'tower type': 'Distance',
        },
 
-        'Distance 4-9': {
-            'filename': 'retracttower distance 4-9.stl',
+        'Retract Tower - Retract Distance 4-9': {
             'starting value': 4,
             'value change': 1,
             'tower type': 'Distance',
         },
 
-        'Distance 7-12': {
-            'filename': 'retracttower distance 7-12.stl',
+        'Retract Tower - Retract Distance 7-12': {
             'starting value': 7,
             'value change': 1,
             'tower type': 'Distance',
         },
  
-         'Speed 10-50': {
-            'filename': 'retracttower speed 10-50.stl',
+        'Retract Tower - Retract Speed 10-50': {
             'starting value': 10,
             'value change': 10,
             'tower type': 'Speed',
         },
 
-        'Speed 35-75': {
-            'filename': 'retracttower speed 35-75.stl',
+        'Retract Tower - Retract Speed 35-75': {
             'starting value': 35,
             'value change': 10,
             'tower type': 'Speed',
         },
 
-        'Speed 60-100': {
-            'filename': 'retracttower speed 60-100.stl',
+        'Retract Tower - Retract Speed 60-100': {
             'starting value': 60,
             'value change': 10,
             'tower type': 'Speed',
@@ -81,8 +75,8 @@ class RetractTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__("Retraction Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__("Retraction Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -185,32 +179,33 @@ class RetractTowerController(ControllerBase):
 
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
-            Logger.log('e', f'A RetractTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A Retract Tower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset values
         try:
-            stlFileName = presetTable['filename']
             self._startValue = presetTable['starting value']
             self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']
         except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Retract Tower preset "{presetName}"')
             return
 
         # Use the nominal base and section heights for this preset tower
         self._baseHeight = self._nominalBaseHeight
         self._sectionHeight = self._nominalSectionHeight
 
-        # Determine the file path of the preset
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Determine the tower name
-        towerName = f'Preset Retraction Value Tower {presetName}'
+        towerName = f'Preset {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -251,7 +246,7 @@ class RetractTowerController(ControllerBase):
         self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Custom Retraction Tower ({self._towerType}) {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Retraction Tower - {self._towerType} {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)

@@ -13,9 +13,10 @@ class OpenScadInterface:
 
 
 
-    def __init__(self):
+    def __init__(self, pluginName):
         self.errorMessage = ''
         self._openScadPath = ''
+        self._pluginName = pluginName
 
 
 
@@ -88,13 +89,14 @@ class OpenScadInterface:
             # Execute the OpenSCAD command and capture the error output
             # Output in stderr does not necessarily indicate an error - OpenSCAD seems to routinely output to stderr
             try:
-                self.errorMessage = subprocess.run(command, capture_output=True, text=True, shell=True).stderr.strip()
+                self.commandResult = subprocess.run(command, capture_output=True, text=True, shell=True).stderr.strip()
+
             except FileNotFoundError:
-                self.errorMessage = f'OpenSCAD not found at path "{self._openScadPath}"'
+                Message(f'OpenSCAD was not found at path "{self._openScadPath}"', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
 
         # If the OpenScad path is invalid
         else:
-            self.errorMessage = f'There is no valid OpenSCAD path'
+            Message(f'The OpenSCAD path is invalid', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
 
 
 

@@ -166,7 +166,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the OpenScad interface '''
 
         if self._cachedOpenScadInterface is None:
-            self._cachedOpenScadInterface = OpenScadInterface()
+            self._cachedOpenScadInterface = OpenScadInterface(self._pluginName)
 
         return self._cachedOpenScadInterface
 
@@ -256,7 +256,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the tower controllers '''
     
         if not ControllerClass in self._cachedControllerTable:
-            self._cachedControllerTable[ControllerClass] = ControllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback)
+            self._cachedControllerTable[ControllerClass] = ControllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback, self._pluginName)
         return self._cachedControllerTable[ControllerClass]
 
 
@@ -278,10 +278,10 @@ class AutoTowersGenerator(QObject, Extension):
 
             # Iterate over each of the tower controller presets
             for presetName in controller.presetNames:
-                self.addMenuItem(f'{controller.name} ({presetName})', lambda controllerClass=controllerClass, presetName=presetName: self._generateAutoTower(controllerClass, presetName))
+                self.addMenuItem(f'{presetName}', lambda controllerClass=controllerClass, presetName=presetName: self._generateAutoTower(controllerClass, presetName))
 
             # Add a custom tower entry
-            self.addMenuItem(f'{controller.name} (Custom)', lambda controllerClass=controllerClass: self._generateAutoTower(controllerClass))
+            self.addMenuItem(f'Custom {controller.name}', lambda controllerClass=controllerClass: self._generateAutoTower(controllerClass))
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ' * dividerCount, lambda: None)
@@ -405,7 +405,7 @@ class AutoTowersGenerator(QObject, Extension):
         stlFilePath = os.path.join(stlOutputDir.name, stlFilename)
 
         # Generate the STL file
-        # Since it can take a while to generate the STL file, do it in a separate thread to allow the GUI to remain responsive
+        # Since it can take a while to generate the STL file, this is done in a separate thread to allow the GUI to remain responsive
         job = OpenScadJob(self._openScadInterface, openScadFilePath, openScadParameters, stlFilePath)
         job.run()
 
@@ -416,9 +416,9 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Make sure the STL file was generated
         if os.path.isfile(stlFilePath) == False:
-            errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}":\n{self._openScadInterface.errorMessage}'
+            errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}"\nCommand output was\n"{self._openScadInterface.commandResult}"'
+            Message(errorMessage).show()
             Logger.log('e', errorMessage)
-            Message(errorMessage, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
             self._waitDialog.hide()
             return
 

@@ -30,7 +30,7 @@ class ControllerBase(QObject):
 
 
 
-    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable):
+    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable, pluginName):
         super().__init__()
         
         self.name = name
@@ -45,6 +45,8 @@ class ControllerBase(QObject):
         self._qmlFilename = qmlFilename
         self._presetsTable = presetsTable
         self._criticalSettingsTable = criticalSettingsTable
+
+        self._pluginName = pluginName
 
         self._backedUpSettings = {}
 

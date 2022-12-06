@@ -38,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPatternType.model[selectedBedLevelPatternType.currentIndex]["icon"])
+                source: Qt.resolvedUrl("../../Images/" + selectedBedLevelPattern.model[selectedBedLevelPattern.currentIndex]["icon"])
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -65,14 +65,14 @@ UM.Dialog
             }
             Cura.ComboBox
             {
-                id: selectedBedLevelPatternType
+                id: selectedBedLevelPattern
                 Layout.fillWidth: true
-                model: manager.bedLevelPatternTypesModel
+                model: manager.bedLevelPatternsModel
                 textRole: "value"
 
                 onCurrentIndexChanged: 
                 {
-                    manager.bedLevelPatternType = model[currentIndex]["value"]
+                    manager.bedLevelPattern = model[currentIndex]["value"]
                 }
             }
             UM.ToolTip
@@ -107,7 +107,7 @@ UM.Dialog
             UM.Label
             {
                 text: "Number of Rings"
-                visible: manager.bedLevelPatternType == "Concentric Squares" || manager.bedLevelPatternType == "Concentric Circles"
+                visible: manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
                 MouseArea 
                 {
                     id: number_of_squares_mouse_area
@@ -121,7 +121,7 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.numberOfSquaresStr
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
-                visible: manager.bedLevelPatternType == "Concentric Squares"
+                visible: manager.bedLevelPattern == "Concentric Squares"
             }
             UM.ToolTip
             {
@@ -132,7 +132,7 @@ UM.Dialog
             UM.Label
             {
                 text: "Size in Cells"
-                visible: manager.bedLevelPatternType == "Grid"
+                visible: manager.bedLevelPattern == "Grid"
                 MouseArea 
                 {
                     id: size_in_cells_mouse_area
@@ -146,7 +146,7 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
-                visible: manager.bedLevelPatternType == "Grid"
+                visible: manager.bedLevelPattern == "Grid"
             }
             UM.ToolTip
             {

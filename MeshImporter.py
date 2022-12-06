@@ -7,9 +7,7 @@ from cura.Scene.BuildPlateDecorator import BuildPlateDecorator
 from cura.Scene.CuraSceneNode import CuraSceneNode
 from cura.Scene.SliceableObjectDecorator import SliceableObjectDecorator
 
-from UM.Logger import Logger
 from UM.Mesh.MeshData import MeshData, calculateNormalsFromIndexedVertices
-from UM.Message import Message
 from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 
 # This code was shamelessly stolen and refactored from the CalibrationShapes plugin
@@ -68,7 +66,7 @@ def _toMeshData(tri_node: trimesh.base.Trimesh) -> MeshData:
     tri_faces = tri_node.faces
     tri_vertices = tri_node.vertices
 
-    # Following Source code from  fieldOfView
+    # Following Source code from fieldOfView
     # https://github.com/fieldOfView/Cura-SimpleShapes/blob/bac9133a2ddfbf1ca6a3c27aca1cfdd26e847221/SimpleShapes.py#L45
     indices = []
     vertices = []

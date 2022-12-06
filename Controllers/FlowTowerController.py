@@ -24,8 +24,7 @@ class FlowTowerController(ControllerBase):
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _presetsTable = {
-        '115-85': {
-            'filename': 'flowtower 115-85.stl',
+        'Flow Tower - Flow 115-85': {
             'starting value': 115,
             'value change': -5,
         },
@@ -33,7 +32,6 @@ class FlowTowerController(ControllerBase):
 
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
-        'infill_sparse_density': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 0),
         'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
@@ -41,8 +39,8 @@ class FlowTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback):
-        super().__init__("Flow Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__("Flow Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -123,31 +121,32 @@ class FlowTowerController(ControllerBase):
 
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
+
+        # Determine the STL file name
+        stlFileName = f'{presetName}.stl'
+        stlFilePath = self._getStlFilePath(stlFileName)
+
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
-            Logger.log('e', f'A FlowTower preset named "{presetName}" was requested, but has not been defined')
+            Logger.log('e', f'A Flow Tower preset named "{presetName}" was requested, but has not been defined')
             return
 
         # Load the preset values
         try:
-            stlFileName = presetTable['filename']
             self._startValue = presetTable['starting value']
             self._valueChange = presetTable['value change']
         except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the FanTower preset "{presetName}"')
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return
 
         # Use the nominal base and section heights for this preset tower
         self._baseHeight = self._nominalBaseHeight
         self._sectionHeight = self._nominalSectionHeight
 
-        # Determine the file path of the preset
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Determine the tower name
-        towerName = f'Preset Flow Tower {presetName}'
+        towerName = f'Preset {presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
@@ -188,7 +187,7 @@ class FlowTowerController(ControllerBase):
         self._sectionHeight = sectionSize
 
         # Determine the tower name
-        towerName = f'Custom Flow Tower {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Flow Tower - Flow {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
