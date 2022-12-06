@@ -98,16 +98,29 @@ UM.Dialog
             Label
             {
                 text: "Size in Cells"
-                visible: manager.bedLevelPattern == "Grid"
-
-             }
+                visible: manager.bedLevelPattern == "Grid" || manager.bedLevelPattern == "Padded Grid"
+            }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*/ }
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
-                visible: manager.bedLevelPattern == "Grid"
+                visible: manager.bedLevelPattern == "Grid" || manager.bedLevelPattern == "Padded Grid"
+            }
+
+            Label
+            {
+                text: "Pad Size"
+                visible: manager.bedLevelPattern == "Padded Grid"
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[0-9]*/ }
+                text: manager.padSizeStr
+                onTextChanged: if (manager.padSizeStr != text) manager.padSizeStr = text
+                visible: manager.bedLevelPattern == "Padded Grid"
             }
         }
     }

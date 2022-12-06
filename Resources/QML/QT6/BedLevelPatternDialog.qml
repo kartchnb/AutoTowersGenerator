@@ -132,7 +132,7 @@ UM.Dialog
             UM.Label
             {
                 text: "Size in Cells"
-                visible: manager.bedLevelPattern == "Grid"
+                visible: manager.bedLevelPattern == "Grid" || manager.bedLevelPattern == "Padded Grid"
                 MouseArea 
                 {
                     id: size_in_cells_mouse_area
@@ -146,12 +146,37 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.cellSizeStr
                 onTextChanged: if (manager.cellSizeStr != text) manager.cellSizeStr = text
-                visible: manager.bedLevelPattern == "Grid"
+                visible: manager.bedLevelPattern == "Grid" || manager.bedLevelPattern == "Padded Grid"
             }
             UM.ToolTip
             {
                 text: "The size of the grid in cells."
                 visible: size_in_cells_mouse_area.containsMouse
+            }
+
+            UM.Label
+            {
+                text: "Pad Size"
+                visible: manager.bedLevelPattern == "Padded Grid"
+                MouseArea 
+                {
+                    id: pad_size_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+             }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
+                text: manager.padSizeStr
+                onTextChanged: if (manager.padSizeStr != text) manager.padSizeStr = text
+                visible: manager.bedLevelPattern == "Padded Grid"
+            }
+            UM.ToolTip
+            {
+                text: "The size of each of the pads in the pattern."
+                visible: pad_size_mouse_area.containsMouse
             }
         }
     }

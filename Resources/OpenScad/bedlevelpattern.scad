@@ -2,7 +2,7 @@
 
 /* [General Parameters] */
 // The type of bed level pattern to generate
-Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "concentric circles", "x in square", "circle in square", "grid", "five circles"]
+Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "concentric circles", "x in square", "circle in square", "grid", "padded grid", "five circles"]
 
 // The width of the bed print area
 Print_Area_Width = 220.001;
@@ -27,6 +27,9 @@ Concentric_Ring_Count = 7;
 
 // The number of grids (horizontal and vertical) to generate for the grid bed level pattern
 Grid_Cell_Count = 4;
+
+// The size of pads (width and height) in the padded grid
+Grid_Pad_Size = 10.001;
 
 // The diameter of the circles to generate for the five circles pattern
 Circle_Diameter = 20;
@@ -115,13 +118,44 @@ module Generate_Model()
     // Draws a rectangular outline
     module outlined_square(dimensions=1, thickness=1, center=false)
     {
-        width = is_list(dimensions) ? dimensions.x : x;
-        height = is_list(dimensions) ? dimensions.y : y;
+        width = is_list(dimensions) ? dimensions.x : dimensions;
+        height = is_list(dimensions) ? dimensions.y : dimensions;
 
         difference()
         {
             square([width, height], center=center);
             square([width - thickness*2, height - thickness*2], center=center);
+        }
+    }
+        
+
+
+    // Draws a grid
+    module generate_grid(dimensions=1, line_width=1, cell_count=1)
+    {
+        width = (is_list(dimensions) ? dimensions.x : dimensions) - line_width;
+        height = (is_list(dimensions) ? dimensions.y : dimensions) - line_width;
+
+        // Horizontal lines
+        section_width = width/cell_count;
+        for (section_number = [0 : cell_count])
+        {
+            x_offset = -width/2 + section_width * section_number;
+            grid_line_width = line_width;
+            grid_line_height = height + line_width;
+            translate([x_offset, 0])
+                square([grid_line_width, grid_line_height], center=true);
+        }
+
+        // Vertical lines
+        section_height = height/cell_count;
+        for (section_number = [0 : cell_count])
+        {
+            y_offset = -height/2 + section_height * section_number;
+            grid_line_width = width + line_width;
+            grid_line_height = line_width;
+            translate([0, y_offset])
+                square([grid_line_width, grid_line_height], center=true);
         }
     }
 
@@ -222,7 +256,7 @@ module Generate_Model()
 
 
 
-    module Generate_Concentric_Squares()
+    module Generate_Concentric_Squares_Pattern()
     {
         width_delta = Pattern_Width/Concentric_Ring_Count;
         depth_delta = Pattern_Depth/Concentric_Ring_Count;
@@ -238,7 +272,7 @@ module Generate_Model()
 
 
 
-    module Generate_Concentric_Circles()
+    module Generate_Concentric_Circles_Pattern()
     {
         width_delta = Pattern_Width/Concentric_Ring_Count;
         depth_delta = Pattern_Depth/Concentric_Ring_Count;
@@ -254,7 +288,7 @@ module Generate_Model()
 
 
     
-    module Generate_X_In_Square()
+    module Generate_X_In_Square_Pattern()
     {
         square_width = Pattern_Width;
         square_depth = Pattern_Depth;
@@ -268,7 +302,7 @@ module Generate_Model()
 
 
 
-    module Generate_Circle_In_Square()
+    module Generate_Circle_In_Square_Pattern()
     {
         square_width = Pattern_Width;
         square_depth = Pattern_Depth;
@@ -282,36 +316,52 @@ module Generate_Model()
 
 
 
-    module Generate_Grid()
+    module Generate_Grid_Pattern()
     {
-        // Horizontal lines
-        for (section_number = [0 : Grid_Cell_Count - 1])
+        // Generate the grid
+        grid_width = Pattern_Width;
+        grid_height = Pattern_Depth;
+        cell_count = Grid_Cell_Count;
+        line_width = Line_Width;
+
+        generate_grid([grid_width, grid_height], line_width, cell_count);
+    }
+
+
+
+    module Generate_Padded_Grid_Pattern()
+    {
+        // Generate the grid
+        line_width = Line_Width;
+        grid_width = Pattern_Width - Grid_Pad_Size + line_width;
+        grid_height = Pattern_Depth - Grid_Pad_Size + line_width;
+        cell_count = Grid_Cell_Count;
+
+        generate_grid([grid_width, grid_height], line_width, cell_count);
+
+        // Generate the pads at grid intersections
+        section_width = (grid_width - line_width)/cell_count;
+        section_height = (grid_height - line_width)/cell_count;
+        pad_size = Grid_Pad_Size;
+
+        for (section_number = [0 : cell_count])
         {
-            section_width = Pattern_Width/Grid_Cell_Count;
-            section_height = Pattern_Depth;
-            x_offset = -Pattern_Width/2 + section_width * section_number + section_width/2;
-            y_offset = 0;
+            x_offset = -(grid_width - line_width)/2 + (section_width * section_number);
 
-            translate([x_offset, y_offset])
-                outlined_square([section_width, section_height], Line_Width, center=true);
-        }
+            for (section_number = [0: cell_count])
+            {
+                y_offset = -(grid_height - line_width)/2 + (section_height * section_number);
 
-        // Vertical lines
-        for (section_number = [0 : Grid_Cell_Count - 1])
-        {
-            section_width = Pattern_Width;
-            section_height = Pattern_Depth/Grid_Cell_Count;
-            x_offset = 0;
-            y_offset = -Pattern_Depth/2 + section_height * section_number + section_height/2;
-
-            translate([x_offset, y_offset])
-                outlined_square([section_width, section_height], Line_Width, center=true);
+                translate([x_offset, y_offset])
+                    square([pad_size, pad_size], center=true);
+                    //circle(d=pad_size);
+            }
         }
     }
 
 
 
-    module Generate_Five_Circles()
+    module Generate_Five_Circles_Pattern()
     {
         width = Pattern_Width;
         height = Pattern_Depth;
@@ -344,27 +394,31 @@ module Generate_Model()
         {
             if (Bed_Level_Pattern_Type == "concentric squares")
             {
-                Generate_Concentric_Squares();
+                Generate_Concentric_Squares_Pattern();
             }
             else if (Bed_Level_Pattern_Type == "concentric circles")
             {
-                Generate_Concentric_Circles();
+                Generate_Concentric_Circles_Pattern();
             }
             else if (Bed_Level_Pattern_Type == "circle in square")
             {
-                Generate_Circle_In_Square();
+                Generate_Circle_In_Square_Pattern();
             }
             else if (Bed_Level_Pattern_Type == "x in square")
             {
-                Generate_X_In_Square();
+                Generate_X_In_Square_Pattern();
             }
             else if (Bed_Level_Pattern_Type == "grid")
             {
-                Generate_Grid();
+                Generate_Grid_Pattern();
+            }
+            else if (Bed_Level_Pattern_Type == "padded grid")
+            {
+                Generate_Padded_Grid_Pattern();
             }
             else if (Bed_Level_Pattern_Type == "five circles")
             {
-                Generate_Five_Circles();
+                Generate_Five_Circles_Pattern();
             }
         }
     }

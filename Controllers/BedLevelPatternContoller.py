@@ -45,6 +45,7 @@ class BedLevelPatternController(ControllerBase):
         {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
         {'value': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
         {'value': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
+        {'value': 'Padded Grid', 'icon': 'bedlevelpattern_padded_grid_icon.png'},
         {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
 
@@ -122,6 +123,21 @@ class BedLevelPatternController(ControllerBase):
 
 
 
+    # The selected pad size
+    _padSizeStr = "20"
+
+    padSizeStrChanged = pyqtSignal()
+
+    def setPadSizeStr(self, value)->None:
+        self._padSizeStr = value
+        self.padSizeStrChanged.emit()
+
+    @pyqtProperty(str, notify=padSizeStrChanged, fset=setPadSizeStr)
+    def padSizeStr(self)->str:
+        return self._padSizeStr
+
+
+
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
@@ -151,6 +167,7 @@ class BedLevelPatternController(ControllerBase):
         fill_percentage = int(self.fillPercentageStr)
         number_of_squares = int(self.numberOfSquaresStr)
         cell_size = int(self.cellSizeStr)
+        pad_size = int(self.padSizeStr)
 
         # Determine the maximum print area
         (print_area_width, print_area_depth) = self._printArea
@@ -171,6 +188,7 @@ class BedLevelPatternController(ControllerBase):
         openScadParameters ['Fill_Percentage'] = fill_percentage
         openScadParameters ['Concentric_Ring_Count'] = number_of_squares
         openScadParameters ['Grid_Cell_Count'] = cell_size
+        openScadParameters ['Grid_Pad_Size'] = pad_size
 
         # Determine the tower name
         towerName = f'Custom Bed Level Pattern - {self.bedLevelPattern} {print_area_width}x{print_area_depth}'
