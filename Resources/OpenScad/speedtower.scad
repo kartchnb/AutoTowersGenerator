@@ -56,7 +56,7 @@ Inscription_Depth = 0.201;
 Preview_Quality_Value = 24;
 
 // The value to use for creating the final model render (higher is more detailed)
-Render_Quality_Value = 64;
+Render_Quality_Value = 48;
 
 // A small value used to improve rendering in preview mode
 Iota = 0.001;
@@ -103,23 +103,57 @@ Section_Label_Font_Size = (Section_Height - Wall_Thickness)*Section_Font_Height_
 
 module Generate_Model()
 {
+    module double_headed_arrow(dimensions, center=false)
+    {
+        width = is_list(dimensions) ? dimensions.x : dimensions;
+        length = is_list(dimensions) ? dimensions.y : dimensions;
+
+        y_offset = center ? -length/2 : 0;
+
+        arrow_width = width;
+        arrow_length = arrow_width;
+
+        shaft_width = width/2;
+
+        arrow_points =
+        [
+            [0, 0],
+            [arrow_width/2, arrow_length],
+            [-arrow_width/2, arrow_length],
+        ];
+
+        translate([0, y_offset])
+        for (side = [0, 1])
+        {
+            side_y_mir = side;
+            side_y_offset = length*side;
+            translate([0, side_y_offset])
+            mirror([0, side_y_mir])
+            {
+                polygon(arrow_points);
+                translate([-(width - shaft_width)/2, arrow_length])
+                    square([shaft_width, length/2 - arrow_length]);
+            }
+        }
+    }
+
+
 
     module Generate_Basic_Base()
     {
         width = Wing_Thickness + Base_Extension*2;
-        length = Wing_Length;
+        length = Wing_Length + Base_Extension*2;
         height = Base_Height;
 
-        for (z_rot = [0, -90])
-        rotate([0, 0, z_rot])
+        x_offset = -Base_Extension;
+        y_offset = -Base_Extension;
+
+        linear_extrude(height)
         {
-            translate([-width/2, 0, 0])
-                cube([width, length, height]);
-
-            cylinder(d=width, height);
-
-            translate([0, length, 0])
-                cylinder(d=width, height);
+            translate([x_offset, y_offset])
+                square([width, length]);
+            translate([y_offset, x_offset])
+                square([length, width]);
         }
     }
 
@@ -131,8 +165,8 @@ module Generate_Model()
         {
             thickness = Inscription_Depth*2;
 
-            x_offset = Wing_Length/2;
-            y_offset = -Wing_Thickness/2 - Base_Extension/2;
+            x_offset = Wing_Length/2 - Wing_Thickness/2;
+            y_offset = -Base_Extension/2;
             z_offset = Base_Height;
 
             translate([x_offset, y_offset, z_offset])
@@ -157,12 +191,15 @@ module Generate_Model()
             rotate([0, 0, -90])
                 Generate_Base_Label(Tower_Description);
 
-            translate([Wing_Length, 0, 0])
+            translate([Wing_Length, Wing_Thickness, 0])
             rotate([0, 0, 180])
                 Generate_Base_Label("X-AXIS");
 
+            translate([Wing_Thickness, Wing_Thickness, 0])
             rotate([0, 0, 90])
                 Generate_Base_Label("Y-AXIS");
+
+            Generate_Base_Axis_Arrow();
         }
     }
 
@@ -182,20 +219,9 @@ module Generate_Model()
         cap_y_offset = (body_length - cap_length)/2;
         cap_z_offset = body_height;
 
-        translate([-body_width/2, 0, 0])
-        {
-            cube([body_width, body_length, body_height]);
-            translate([cap_x_offset, cap_y_offset, cap_z_offset])
-            linear_extrude(cap_height)
-            hull()
-            {
-                square([cap_width, cap_length]);
-                translate([cap_width/2, -Wall_Thickness/2])
-                    circle(d=cap_width);
-            }
-        }
-
-        cylinder(d=body_width, body_height);
+        cube([body_width, body_length, body_height]);
+        translate([cap_x_offset, cap_y_offset, cap_z_offset])
+            cube([cap_width, cap_length, cap_height]);
     }
 
 
@@ -205,7 +231,7 @@ module Generate_Model()
         diameter = Section_Height;
         height = Inscription_Depth*2;
 
-        x_offset = -Wing_Thickness/2;
+        x_offset = 0;
         y_offset = Wing_Length/2;
         z_offset = (Section_Height - Wall_Thickness)/2;
 
@@ -219,14 +245,15 @@ module Generate_Model()
 
     module Generate_Section_Rear_Cutout()
     {
-        width = Wing_Length - Wall_Thickness*2;
+        width = Wing_Length - Wall_Thickness*2 - Wing_Thickness;
         height = Section_Height - Wall_Thickness*3;
         thickness = Inscription_Depth*2;
 
         diameter = Section_Height;
 
-        x_offset = Wall_Thickness;
-        y_offset = Wall_Thickness;
+        x_offset = Wing_Thickness;
+        y_offset = Wing_Thickness;
+        z_offset = 0;
 
         x_rot = 90;
         y_rot = 0;
@@ -235,11 +262,11 @@ module Generate_Model()
         circle_x_offset = width/2;
         circle_y_offset = height/2;
 
-        translate([Wing_Thickness/2, 0, 0])
+        translate([x_offset, y_offset, z_offset])
         rotate([x_rot, y_rot, z_rot])
         translate([0, 0, -thickness/2])
         linear_extrude(thickness)
-        translate([x_offset, y_offset])
+        translate([Wall_Thickness, Wall_Thickness])
         difference()
         {
             square([width, height]);
@@ -257,7 +284,7 @@ module Generate_Model()
         {
             thickness = Inscription_Depth*2;
 
-            x_offset = -Wing_Thickness/2 + Inscription_Depth;
+            x_offset = 0;
             y_offset = Wing_Length/2;
             z_offset = (Section_Height - Wall_Thickness)/2;
 
