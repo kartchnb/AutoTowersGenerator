@@ -100,6 +100,18 @@ UM.Dialog
                 text: manager.speedChangeStr
                 onTextChanged: if (manager.speedChangeStr != text) manager.speedChangeStr = text
             }
+
+            Label 
+            { 
+                text: "Wing Length" 
+            }
+            TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.wingLengthStr
+                onTextChanged: if (manager.wingLengthStr != text) manager.wingLengthStr = text
+            }
     
             Label 
             { 
@@ -114,13 +126,13 @@ UM.Dialog
     
             Label 
             { 
-                text: "Side Label" 
+                text: "Tower Description" 
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.temperatureLabelStr
-                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+                text: manager.descriptionLabelStr
+                onTextChanged: if (manager.descriptionLabelStr != text) manager.descriptionLabelStr = text
             }
         }
     }

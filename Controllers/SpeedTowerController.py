@@ -133,6 +133,21 @@ class SpeedTowerController(ControllerBase):
 
 
 
+    # The length of each of the tower wings
+    _wingLengthStr = '50'
+
+    wingLengthStrChanged = pyqtSignal()
+
+    def setWingLengthStr(self, value)->None:
+        self._wingLengthStr = value
+        self.wingLengthStrChanged.emit()
+
+    @pyqtProperty(str, notify=wingLengthStrChanged, fset=setWingLengthStr)
+    def wingLengthStr(self)->str:
+        return self._wingLengthStr
+
+
+
     # The label to add to the tower
     _towerLabelStr = _towerTypesModel[0]['label']
 
@@ -148,18 +163,18 @@ class SpeedTowerController(ControllerBase):
 
 
 
-    # The temperature label to add to the tower
-    _temperatureLabelStr = ''
+    # The a description to add to the tower
+    _descriptionLabelStr = ''
 
-    temperatureLabelStrChanged = pyqtSignal()
+    descriptionLabelStrChanged = pyqtSignal()
     
-    def setTemperatureLabelStr(self, value)->None:
-        self._temperatureLabelStr = value
-        self.temperatureLabelStrChanged.emit()
+    def setDescriptionLabelStr(self, value)->None:
+        self._descriptionLabelStr = value
+        self.descriptionLabelStrChanged.emit()
 
-    @pyqtProperty(str, notify=temperatureLabelStrChanged, fset=setTemperatureLabelStr)
-    def temperatureLabelStr(self)->str:
-        return self._temperatureLabelStr
+    @pyqtProperty(str, notify=descriptionLabelStrChanged, fset=setDescriptionLabelStr)
+    def descriptionLabelStr(self)->str:
+        return self._descriptionLabelStr
 
 
 
@@ -205,8 +220,9 @@ class SpeedTowerController(ControllerBase):
         startSpeed = float(self.startSpeedStr)
         endSpeed = float(self.endSpeedStr)
         speedChange = float(self.speedChangeStr)
+        wingLength = float(self.wingLengthStr)
         towerLabel = self.towerLabelStr
-        temperatureLabel = self.temperatureLabelStr
+        descriptionLabel = self.descriptionLabelStr
 
         # Ensure the change amount has the correct sign
         speedChange = self._correctChangeValueSign(speedChange, startSpeed, endSpeed)
@@ -217,13 +233,14 @@ class SpeedTowerController(ControllerBase):
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Starting_Value'] = startSpeed
-        openScadParameters ['Ending_Value'] = endSpeed
-        openScadParameters ['Value_Change'] = speedChange
+        openScadParameters ['Starting_Speed_Value'] = startSpeed
+        openScadParameters ['Ending_Speed_Value'] = endSpeed
+        openScadParameters ['Speed_Value_Change'] = speedChange
+        openScadParameters ['Wing_Length'] = wingLength
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Tower_Label'] = towerLabel
-        openScadParameters ['Temperature_Label'] = temperatureLabel
+        openScadParameters ['Tower_Description'] = descriptionLabel
 
         # Record the tower settings that will be needed for post-processing
         self._startValue = startSpeed
