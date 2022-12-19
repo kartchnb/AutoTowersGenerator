@@ -92,7 +92,7 @@ UM.Dialog
                 validator: RegExpValidator { regExp: /[0-9]*/ }
                 text: manager.numberOfSquaresStr
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
-                visible: manager.bedLevelPattern == "Concentric Squares"
+                visible: manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
             }
 
             Label
