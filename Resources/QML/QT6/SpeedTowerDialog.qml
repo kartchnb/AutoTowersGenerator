@@ -148,6 +148,29 @@ UM.Dialog
                 text: "The amount to change the speed between tower sections.<p>In combination with the starting and ending values, this determines the number of sections in the tower."
                 visible: speed_change_mouse_area.containsMouse
             }
+
+            UM.Label 
+            { 
+                text: "Wing Length" 
+                MouseArea 
+                {
+                    id: wing_length_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.TextField
+            {
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
+                text: manager.wingLengthStr
+                onTextChanged: if (manager.wingLengthStr != text) manager.wingLengthStr = text
+            }
+            UM.ToolTip
+            {
+                text: "The length of each \"wing\" of the tower. Longer wings allow more time for the printer to get up to speed while printing, but results in more material being used."
+                visible: wing_length_mouse_area.containsMouse
+            }
     
             UM.Label 
             { 
@@ -167,16 +190,16 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "An optional label to carve up the side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                text: "An optional label to carve into the base of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
                 visible: tower_label_mouse_Area.containsMouse
             }
     
             UM.Label 
             { 
-                text: "Temperature Label" 
+                text: "Tower Description" 
                 MouseArea 
                 {
-                    id: temperature_label_mouse_area
+                    id: description_label_mouse_area
                     anchors.fill: parent
                     hoverEnabled: true
                 }
@@ -184,13 +207,13 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.temperatureLabelStr
-                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+                text: manager.descriptionLabelStr
+                onTextChanged: if (manager.descriptionLabelStr != text) manager.descriptionLabelStr = text
             }
             UM.ToolTip
             {
-                text: "An optional secondary label to carve up the side of the tower.<p>This is intended to be used to indicate the temperature at which the tower was printed, but can be used for other purposes as well."
-                visible: temperature_label_mouse_area.containsMouse
+                text: "An optional second description to carve into the base of the tower.<p>This is can be used to provide additional information about the tower - why you printed it, for instance."
+                visible: description_label_mouse_area.containsMouse
             }
         }
     }
