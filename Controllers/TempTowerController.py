@@ -140,7 +140,7 @@ class TempTowerController(ControllerBase):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = 'TEMPERATURE'
+    _towerDescriptionStr = 'TEMP'
 
     towerDescriptionStrChanged = pyqtSignal()
     

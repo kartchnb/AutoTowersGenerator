@@ -20,13 +20,13 @@ from ..Postprocessing import FlowTower_PostProcessing
 
 
 class FlowTowerController(ControllerBase):
-    _openScadFilename = 'flowtower.scad'
+    _openScadFilename = 'temptower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _presetsTable = {
         'Flow Tower - Flow 115-85': {
-            'starting value': 115,
-            'value change': -5,
+            'starting flow': 115,
+            'flow change': -5,
         },
     }
 
@@ -44,53 +44,53 @@ class FlowTowerController(ControllerBase):
 
 
 
-    # The starting value for the tower
-    _startValueStr = '115'
+    # The starting flow percent for the tower
+    _startFlowStr = '115'
 
-    startValueStrChanged = pyqtSignal()
+    startFlowStrChanged = pyqtSignal()
     
-    def setStartValueStr(self, value)->None:
-        self._startValueStr = value
-        self.startValueStrChanged.emit()
+    def setStartFlowStr(self, value)->None:
+        self._startFlowStr = value
+        self.startFlowStrChanged.emit()
 
-    @pyqtProperty(str, notify=startValueStrChanged, fset=setStartValueStr)
-    def startValueStr(self)->str:
-        return self._startValueStr
+    @pyqtProperty(str, notify=startFlowStrChanged, fset=setStartFlowStr)
+    def startFlowStr(self)->str:
+        return self._startFlowStr
 
 
 
-    # The ending value for the tower
-    _endValueStr = '85'
+    # The ending flow percent for the tower
+    _endFlowStr = '85'
 
-    endValueStrChanged = pyqtSignal()
+    endFlowStrChanged = pyqtSignal()
     
-    def setEndValueStr(self, value)->None:
-        self._endValueStr = value
-        self.endValueStrChanged.emit()
+    def setEndFlowStr(self, value)->None:
+        self._endFlowStr = value
+        self.endFlowStrChanged.emit()
 
-    @pyqtProperty(str, notify=endValueStrChanged, fset=setEndValueStr)
-    def endValueStr(self)->str:
-        return self._endValueStr
+    @pyqtProperty(str, notify=endFlowStrChanged, fset=setEndFlowStr)
+    def endFlowStr(self)->str:
+        return self._endFlowStr
 
 
 
-    # The amount to change the value between tower sections
-    _valueChangeStr = '5'
+    # The amount to change the flow between tower sections
+    _flowChangeStr = '5'
 
-    valueChangeStrChanged = pyqtSignal()
+    flowChangeStrChanged = pyqtSignal()
     
-    def setValueChangeStr(self, value)->None:
-        self._valueChangeStr = value
-        self.valueChangeStrChanged.emit()
+    def setFlowChangeStr(self, value)->None:
+        self._flowChangeStr = value
+        self.flowChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChangeStr)
-    def valueChangeStr(self)->str:
-        return self._valueChangeStr
+    @pyqtProperty(str, notify=flowChangeStrChanged, fset=setFlowChangeStr)
+    def flowChangeStr(self)->str:
+        return self._flowChangeStr
 
 
 
     # The label to add to the tower
-    _towerLabelStr = 'FLOW'
+    _towerLabelStr = 'FLW'
 
     towerLabelStrChanged = pyqtSignal()
     
@@ -104,18 +104,18 @@ class FlowTowerController(ControllerBase):
 
 
 
-    # The temperature label to add to the tower
-    _temperatureLabelStr = ''
+    # The description to add to the side of the tower
+    _towerDescriptionStr = 'FLOW'
 
-    temperatureLabelStrChanged = pyqtSignal()
+    towerDescriptionStrChanged = pyqtSignal()
     
-    def setTemperatureLabelStr(self, value)->None:
-        self._temperatureLabelStr = value
-        self.temperatureLabelStrChanged.emit()
+    def setTowerDescriptionStr(self, value)->None:
+        self._towerDescriptionStr = value
+        self.towerDescriptionStrChanged.emit()
 
-    @pyqtProperty(str, notify=temperatureLabelStrChanged, fset=setTemperatureLabelStr)
-    def temperatureLabelStr(self)->str:
-        return self._temperatureLabelStr
+    @pyqtProperty(str, notify=towerDescriptionStrChanged, fset=setTowerDescriptionStr)
+    def towerDescriptionStr(self)->str:
+        return self._towerDescriptionStr
 
 
 
@@ -135,8 +135,8 @@ class FlowTowerController(ControllerBase):
 
         # Load the preset values
         try:
-            self._startValue = presetTable['starting value']
-            self._valueChange = presetTable['value change']
+            self._startFlow = presetTable['starting flow']
+            self._valueChange = presetTable['flow change']
         except KeyError as e:
             Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return
@@ -157,37 +157,37 @@ class FlowTowerController(ControllerBase):
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
         # Read the parameters directly from the dialog
-        startValue = float(self.startValueStr)
-        endValue = float(self.endValueStr)
-        valueChange = float(self.valueChangeStr)
+        startFlow = float(self.startFlowStr)
+        endFlow = float(self.endFlowStr)
+        flowChange = float(self.flowChangeStr)
         towerLabel = self.towerLabelStr
-        temperatureLabel = self.temperatureLabelStr
+        towerDescription = self.towerDescriptionStr
 
-        # Ensure the value change has the correct sign
-        valueChange = self._correctChangeValueSign(valueChange, startValue, endValue)
+        # Ensure the change amount has the correct sign
+        flowChange = self._correctChangeValueSign(flowChange, startFlow, endFlow)
 
         # Calculate the optimal base and section height, given the current printing layer height
         baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
-        sectionSize = self._calculateOptimalHeight(self._nominalSectionHeight)
+        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Starting_Value'] = startValue
-        openScadParameters ['Ending_Value'] = endValue
-        openScadParameters ['Value_Change'] = valueChange
+        openScadParameters ['Starting_Value'] = startFlow
+        openScadParameters ['Ending_Value'] = endFlow
+        openScadParameters ['Value_Change'] = flowChange
         openScadParameters ['Base_Height'] = baseHeight
-        openScadParameters ['Section_Size'] = sectionSize
-        openScadParameters ['Tower_Label'] = towerLabel
-        openScadParameters ['Temperature_Label'] = temperatureLabel
+        openScadParameters ['Section_Height'] = sectionHeight
+        openScadParameters ['Column_Label'] = towerLabel
+        openScadParameters ['Tower_Label'] = towerDescription
 
         # Record the tower settings that will be needed for post-processing
-        self._startValue = startValue
-        self._valueChange = valueChange
+        self._startFlow = startFlow
+        self._flowChange = flowChange
         self._baseHeight = baseHeight
-        self._sectionHeight = sectionSize
+        self._sectionHeight = sectionHeight
 
         # Determine the tower name
-        towerName = f'Custom Flow Tower - Flow {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Flow Tower - {startFlow}-{endFlow}x{flowChange}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
@@ -205,8 +205,8 @@ class FlowTowerController(ControllerBase):
             self._sectionHeight, 
             self._initialLayerHeight, 
             self._layerHeight, 
-            self._startValue, 
-            self._valueChange, 
+            self._startFlow, 
+            self._flowChange, 
             enable_lcd_messages
             )
 

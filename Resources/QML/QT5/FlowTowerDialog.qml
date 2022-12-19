@@ -57,8 +57,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startValueStr
-                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
+                text: manager.startFlowStr
+                onTextChanged: if (manager.startFlowStr != text) manager.startFlowStr = text
             }
 
             Label 
@@ -69,8 +69,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endValueStr
-                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
+                text: manager.endFlowStr
+                onTextChanged: if (manager.endFlowStr != text) manager.endFlowStr = text
             }
 
             Label 
@@ -81,8 +81,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.valueChangeStr
-                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
+                text: manager.flowChangeStr
+                onTextChanged: if (manager.flowChangeStr != text) manager.flowChangeStr = text
             }
     
             Label 
@@ -98,13 +98,13 @@ UM.Dialog
     
             Label 
             { 
-                text: "Side Label" 
+                text: "Tower Description" 
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.temperatureLabelStr
-                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+                text: manager.towerDescriptionStr
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
         }
     }

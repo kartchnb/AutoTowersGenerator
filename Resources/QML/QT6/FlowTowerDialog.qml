@@ -67,8 +67,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startValueStr
-                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
+                text: manager.startFlowStr
+                onTextChanged: if (manager.startFlowStr != text) manager.startFlowStr = text
             }
             UM.ToolTip
             {
@@ -90,8 +90,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endValueStr
-                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
+                text: manager.endFlowStr
+                onTextChanged: if (manager.endFlowStr != text) manager.endFlowStr = text
             }
             UM.ToolTip
             {
@@ -113,8 +113,8 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.valueChangeStr
-                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
+                text: manager.flowChangeStr
+                onTextChanged: if (manager.flowChangeStr != text) manager.flowChangeStr = text
             }
             UM.ToolTip
             {
@@ -122,9 +122,9 @@ UM.Dialog
                 visible: flow_rate_change_mouse_area.containsMouse
             }
    
-            UM.Label 
-            { 
-                text: "Tower Label" 
+            UM.Label
+            {
+                text: "Tower Label"
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -134,22 +134,23 @@ UM.Dialog
             }
             Cura.TextField
             {
-                Layout.fillWidth: true
+                Layout.preferredWidth: numberInputWidth
+                validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: manager.towerLabelStr
                 onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
             }
             UM.ToolTip
             {
-                text: "An optional label to carve into the base of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                text: "An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less."
                 visible: tower_label_mouse_area.containsMouse
             }
-    
-            UM.Label 
-            { 
-                text: "Temperature Label" 
+
+            UM.Label
+            {
+                text: "Tower Description"
                 MouseArea 
                 {
-                    id: temperature_label_mouse_area
+                    id: tower_description_mouse_area
                     anchors.fill: parent
                     hoverEnabled: true
                 }
@@ -157,13 +158,13 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.temperatureLabelStr
-                onTextChanged: if (manager.temperatureLabelStr != text) manager.temperatureLabelStr = text
+                text: manager.towerDescriptionStr
+                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
             }
             UM.ToolTip
             {
-                text: "An optional secondary label to carve into the base of the tower.<p>This is intended to be used to indicate the temperature at which the tower was printed, but can be used for other purposes as well."
-                visible: temperature_label_mouse_area.containsMouse
+                text: "An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                visible: tower_description_mouse_area.containsMouse
             }
         }
     }

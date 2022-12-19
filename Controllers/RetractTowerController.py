@@ -163,7 +163,7 @@ class RetractTowerController(ControllerBase):
 
 
     # The description to carve up the side of the tower
-    _towerDescriptionStr = 'RETRACTION'
+    _towerDescriptionStr = 'RETRAC'
 
     towerDescriptionStrChanged = pyqtSignal()
     
