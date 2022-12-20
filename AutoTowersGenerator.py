@@ -33,9 +33,6 @@ from .Controllers.TempTowerController import TempTowerController
 
 
 class AutoTowersGenerator(QObject, Extension):
-    _pluginName = 'AutoTowersGenerator'
-
-    _gcodeProcessedMarker = f';Post-Processed by {_pluginName}'
 
     # Add additional controller classes to this list
     _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
@@ -179,6 +176,14 @@ class AutoTowersGenerator(QObject, Extension):
 
         return not self._autoTowerOperation is None
 
+
+
+    @property
+    def _pluginName(self)->str:
+        ''' Returns the plugin's name '''
+
+        return self.getPluginId()
+    
 
 
     @pyqtProperty(str)
@@ -577,11 +582,13 @@ class AutoTowersGenerator(QObject, Extension):
             return
 
         try:
+            gcodeProcessedMarker = f';{self._pluginName}: Post-processed by {self._pluginName} version {self.pluginVersion}'
+
             # Proceed if the g-code has not already been post-processed
-            if self._gcodeProcessedMarker not in gcode[0]:
+            if gcodeProcessedMarker not in gcode[0]:
 
                 # Mark the g-code as having been post-processed
-                gcode[0] += self._gcodeProcessedMarker + '\n'
+                gcode[0] += gcodeProcessedMarker + '\n'
 
                 # Call the tower controller post-processing callback to modify the g-code
                 gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)

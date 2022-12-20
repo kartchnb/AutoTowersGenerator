@@ -120,20 +120,20 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                     # Retracting filament (relative)
                     if current_extrusion_position < 0:
                         if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)'  # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using relative positioning)'  # Speed value must be specified as mm/min for the gcode
                         else:
-                            new_line = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (relative)'
+                            new_line = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (using relative positioning)'
                     
                     # Extruding filament (relative)
                     else:
                         if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (relative)' # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using relative positioning)' # Speed value must be specified as mm/min for the gcode
                         else:
                             if first_code:
-                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (relative)'
+                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (using relative positioning)'
                                 first_code = False
                             else:
-                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (relative)'
+                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (using relative positioning)'
                 
                 # Handle absolute extrusion
                 else:
@@ -141,10 +141,10 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                     # Retracting filament (absolute)
                     if saved_extrusion_position > current_extrusion_position:
                         if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (absolute)' # Speed value must be specified as mm/min for the gcode
+                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using absolute positioning)' # Speed value must be specified as mm/min for the gcode
                         else:
                             current_extrusion_position = saved_extrusion_position - current_retract_value
-                            new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (absolute)'
+                            new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (using absolute positioning)'
                     
                     # Resetting the retraction 
                     else:
@@ -155,7 +155,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 if new_line != '':
 
                     # Keep the original line in the gcode, but comment it out
-                    lines[line_index] = f';{line} {Common.comment_prefix} This is the original line before being modified'
+                    lines[line_index] = f';{line} {Common.comment_prefix} This is the original line before it was modified'
 
                     # Insert the new line
                     lines.insert(line_index, new_line)
