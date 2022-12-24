@@ -1,7 +1,8 @@
 import os
 import platform
-from shutil import which
+import shutil
 import subprocess
+import tempfile
 
 from UM.Logger import Logger
 from UM.Message import Message
@@ -121,6 +122,7 @@ class OpenScadInterface:
             command_line += f' -D "{parameter}={value}"'
 
         # Finally, specify the OpenSCAD source file
+        inputFilePath = self._SymLinkWorkAround(inputFilePath)
         command_line += f' "{inputFilePath}"'
 
         return command_line
@@ -162,3 +164,37 @@ class OpenScadInterface:
                     break
 
         return openScadPath
+
+
+
+    def _SymLinkWorkAround(self, filePath)->str:
+        ''' OpenSCAD does not appear to handle files with a symlink directory anywhere in its path
+          This method checks for this condition and copies the provided file to a temprary location, if needed
+          The original path is returned if a symlink is involved, otherwise the path to the temporary file is returned '''
+        returnPath = filePath
+
+        # Determine if any element in the file path is a symlink
+        pathCopy = os.path.normpath(filePath)
+        isSymLink = False
+        while True:
+            # Check if the current portion of the path is a sym link
+            if os.path.islink(pathCopy):
+                isSymLink = True
+                break
+
+            # Throw away the last portion of the path and check again
+            split = os.path.split(pathCopy)
+            if pathCopy == split[0]:
+                break
+            pathCopy = split[0]
+
+        # If the file path involves a sym link, copy it to a temporary file
+        if isSymLink:
+            # Copy the file to the system's temporary directory
+            fileName = os.path.basename(filePath)
+            tempDir = tempfile.gettempdir()
+            tempFilePath = os.path.join(tempDir, fileName)
+            shutil.copy2(filePath, tempFilePath)
+            returnPath = tempFilePath
+
+        return returnPath
