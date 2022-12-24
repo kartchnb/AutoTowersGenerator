@@ -1,4 +1,5 @@
 # Don't check-in my development files
+*.bat
 *.notes
 *.scm
 *.sh

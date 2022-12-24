@@ -1,5 +1,6 @@
 import QtQuick 6.0
 import QtQuick.Controls 6.0
+import QtQuick.Dialogs 6.2
 import QtQuick.Layouts 6.0
 
 import UM 1.6 as UM
@@ -60,16 +61,38 @@ UM.Dialog
                     hoverEnabled: true
                 }
             }
-            Cura.TextField
+            RowLayout
             {
-                id: openScadPath
-                Layout.fillWidth: true
-                text: manager.openScadPathSetting
+                Cura.TextField
+                {
+                    id: openScadPath
+                    Layout.fillWidth: true
+                    text: manager.openScadPathSetting
+                }
+
+                Cura.PrimaryButton
+                {
+                    text: "..."
+                    onClicked: fileDialog.open()
+                }
             }
             UM.ToolTip
             {
                 text: "The path to the OpenSCAD executable.<p>If it is in the current path or installed in an expected location, the plugin should find it automatically.<p>You can manually set or override the path here.<p>Clearing out this value will cause the plugin to attempt to automatically locate OpenSCAD again."
                 visible: openscad_path_mouse_area.containsMouse
+            }
+            FileDialog
+            {
+                id: fileDialog
+                options: FileDialog.ReadOnly
+                onAccepted: 
+                {
+                    // Convert the url file path returned by the file dialog to a usable file path
+                    var path = selectedFile.toString()
+                    path = path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/, "")
+                    path = decodeURIComponent(path)
+                    openScadPath.text = path
+                }
             }
 
             UM.Label 

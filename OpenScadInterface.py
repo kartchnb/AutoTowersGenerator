@@ -149,10 +149,16 @@ class OpenScadInterface:
         if system == 'darwin':
             openScadPath = '/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD'
 
-        # For Windows, OpenSCAD should be installed in the Program Files folder
+        # For Windows, OpenSCAD should be installed in one of the Program Files folder
         elif system == 'windows':
-            program_files_path = f'{os.path.join(os.getenv("PROGRAMFILES"), "OpenSCAD", "openscad.exe")}'
-            if os.path.isfile(program_files_path):
-                openScadPath = program_files_path
+            program_files_paths = (
+                os.getenv("PROGRAMFILES"),
+                os.getenv("PROGRAMFILES(X86)")
+            )
+            for program_files_path in program_files_paths:
+                testPath = os.path.join(program_files_path, "OpenSCAD", "openscad.exe")
+                if os.path.isfile(testPath):
+                    openScadPath = testPath
+                    break
 
         return openScadPath
