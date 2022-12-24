@@ -1,4 +1,5 @@
 import os
+import platform
 import tempfile
 
 # Import the correct version of PyQt
@@ -167,6 +168,13 @@ class AutoTowersGenerator(QObject, Extension):
 
         return self._cachedOpenScadInterface
 
+
+
+    @pyqtProperty(str)
+    def os(self)->str:
+        ''' Return the operating system being used '''
+
+        return platform.system().lower()
 
 
     autoTowerGeneratedChanged = pyqtSignal()

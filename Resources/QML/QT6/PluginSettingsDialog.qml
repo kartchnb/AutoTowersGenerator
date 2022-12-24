@@ -89,8 +89,12 @@ UM.Dialog
                 {
                     // Convert the url file path returned by the file dialog to a usable file path
                     var path = selectedFile.toString()
+                    console.debug("path = ", path)
                     path = path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/, "")
                     path = decodeURIComponent(path)
+                    // On Linux, a forward slash needs to be prepended to the resulting path
+                    // (maybe on Mac OS as well?)
+                    if (manager.os == "linux") path = "/" + path
                     openScadPath.text = path
                 }
             }
