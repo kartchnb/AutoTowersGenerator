@@ -93,8 +93,9 @@ UM.Dialog
                     path = path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/, "")
                     path = decodeURIComponent(path)
                     // On Linux, a forward slash needs to be prepended to the resulting path
-                    // (maybe on Mac OS as well?)
-                    if (manager.os == "linux") path = "/" + path
+                    // I'm guessing this is needed on Mac OS, as well, but can't test it
+                    if (manager.os == "linux" || manager.os == "darwin") path = "/" + path
+                    // Use the resulting path
                     openScadPath.text = path
                 }
             }
