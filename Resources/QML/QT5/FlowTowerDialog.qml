@@ -9,7 +9,7 @@ UM.Dialog
     id: dialog
     title: "Flow Tower"
 
-    minimumWidth: screenScaleFactor * 445
+    minimumWidth: screenScaleFactor * 500
     minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
     maximumHeight: minimumHeight
     width: minimumWidth

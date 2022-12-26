@@ -1,6 +1,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.11
 import QtQuick.Layouts 1.11
+import QtQuick.Dialogs 1.0
 
 import UM 1.2 as UM
 
@@ -9,7 +10,7 @@ UM.Dialog
     id: dialog
     title: "AutoTowersGenerator v" + manager.pluginVersion + " Settings"
 
-    minimumWidth: screenScaleFactor * 445
+    minimumWidth: screenScaleFactor * 500
     minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
     maximumHeight: minimumHeight
     width: minimumWidth
@@ -50,27 +51,59 @@ UM.Dialog
             { 
                 text: "OpenSCAD path" 
             }
-            TextField
+            RowLayout
             {
-                id: openScadPath
-                text: manager.openScadPathSetting
+                spacing: UM.Theme.getSize("default_margin").width
+
+                TextField
+                {
+                    id: openScadPath
+                    Layout.fillWidth: true
+                    text: manager.openScadPathSetting
+                }
+
+                Button
+                {
+                    text: "..."
+                    onClicked: fileDialog.open()
+                }
+            }
+            FileDialog
+            {
+                id: fileDialog
+                onAccepted: openScadPath.text = urlToStringPath(fileUrl)
+
+                function urlToStringPath(url)
+                {
+                    // Convert the url to a usable string path
+                    var path = url.toString()
+                    path = path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/, "")
+                    path = decodeURIComponent(path)
+
+                    // On Linux, a forward slash needs to be prepended to the resulting path
+                    // I'm guessing this is needed on Mac OS, as well, but can't test it
+                    if (manager.os == "linux" || manager.os == "darwin") path = "/" + path
+                    
+                    // Return the resulting path
+                    return path
+                }
             }
 
-            UM.Label 
+            Label 
             { 
                 text: "Correct print settings" 
             }
-            UM.CheckBox
+            CheckBox
             {
                 id: correctPrintSettings
                 checked: manager.correctPrintSettings
             }
 
-            UM.Label 
+            Label 
             { 
                 text: "Enable LCD messages" 
             }
-            Cura.CheckBox
+            CheckBox
             {
                 id: enableLcdMessages
                 checked: manager.enableLcdMessagesSetting
@@ -94,6 +127,6 @@ UM.Dialog
     {
         manager.openScadPathSetting = openScadPath.text
         manager.enableLcdMessagesSetting = enableLcdMessages.checked
-        manager.correctPrintSettings = correctPrintSettings
+        manager.correctPrintSettings = correctPrintSettings.checked
     }
 }

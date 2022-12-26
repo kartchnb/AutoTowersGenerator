@@ -63,6 +63,8 @@ UM.Dialog
             }
             RowLayout
             {
+                spacing: UM.Theme.getSize("default_margin").width
+                
                 Cura.TextField
                 {
                     id: openScadPath
