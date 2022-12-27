@@ -2,7 +2,7 @@
 
 /* [General Parameters] */
 // The type of bed level pattern to generate
-Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "concentric circles", "x in square", "circle in square", "grid", "padded grid", "five circles"]
+Bed_Level_Pattern_Type = "concentric squares"; // ["concentric squares", "spiral squares", "concentric circles", "x in square", "circle in square", "grid", "padded grid", "five circles"]
 
 // The width of the bed print area
 Print_Area_Width = 220.001;
@@ -113,6 +113,7 @@ module Generate_Model()
             oval(d=[diameterX-thickness*2, diameterY-thickness*2]);
         }
     }
+    
 
 
     // Draws a rectangular outline
@@ -125,6 +126,58 @@ module Generate_Model()
         {
             square([width, height], center=center);
             square([width - thickness*2, height - thickness*2], center=center);
+        }
+    }
+
+
+
+    // Draws a spiral square outline
+    module outlined_spiral_square(dimensions = 1, ring_count=1, thickness=1, center=true)
+    {
+        width = is_list(dimensions) ? dimensions.x : dimensions;
+        height = is_list(dimensions) ? dimensions.y : dimensions;
+
+        width_delta = width/ring_count;
+        height_delta = height/ring_count;
+
+        for (ring_number = [0: ring_count-1])
+        {
+            ring_width = width_delta * (ring_number + 1);
+            ring_height = height_delta * (ring_number + 1);
+
+            x1 = -ring_width/2;
+            x2 = x1 + ring_width;
+            y1 = -ring_height/2;
+            y2 = y1 + ring_height;
+            y3 = y1 - height_delta/2;
+
+            // The bottom line of the ring
+            bottom_line_width = ring_width - width_delta/2;
+            if (bottom_line_width > 0)
+            translate([x1, y1])
+                square([bottom_line_width, thickness]);
+
+            // The left line of the ring
+            left_line_height = ring_height;
+            translate([x1, y1])
+                square([thickness, left_line_height]);
+
+            // The top line of the ring
+            top_line_width = ring_width;
+            translate([x1, y2])
+            translate([0, -thickness])
+                square([top_line_width, thickness]);
+
+            // The right line of the ring
+            right_line_height = ring_height + height_delta/2;
+            if (right_line_height < height)
+                translate([x2, y3])
+                translate([-thickness, 0])
+                    square([thickness, right_line_height]);
+            else
+                translate([x2, y1])
+                translate([-thickness, 0])
+                    square([thickness, height]);
         }
     }
         
@@ -272,6 +325,13 @@ module Generate_Model()
 
 
 
+    module Generate_Spiral_Squares_Pattern()
+    {
+        outlined_spiral_square([Pattern_Width, Pattern_Depth], Concentric_Ring_Count, Line_Width);
+    }
+
+
+
     module Generate_Concentric_Circles_Pattern()
     {
         width_delta = Pattern_Width/Concentric_Ring_Count;
@@ -395,6 +455,10 @@ module Generate_Model()
             if (Bed_Level_Pattern_Type == "concentric squares")
             {
                 Generate_Concentric_Squares_Pattern();
+            }
+            else if (Bed_Level_Pattern_Type == "spiral squares")
+            {
+                Generate_Spiral_Squares_Pattern();    
             }
             else if (Bed_Level_Pattern_Type == "concentric circles")
             {

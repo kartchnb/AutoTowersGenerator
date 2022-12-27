@@ -107,7 +107,7 @@ UM.Dialog
             UM.Label
             {
                 text: "Number of Rings"
-                visible: manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
+                visible: manager.bedLevelPattern == "Spiral Squares" || manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
                 MouseArea 
                 {
                     id: number_of_squares_mouse_area
@@ -121,7 +121,7 @@ UM.Dialog
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: manager.numberOfSquaresStr
                 onTextChanged: if (manager.numberOfSquaresStr != text) manager.numberOfSquaresStr = text
-                visible: manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
+                visible: manager.bedLevelPattern == "Spiral Squares" || manager.bedLevelPattern == "Concentric Squares" || manager.bedLevelPattern == "Concentric Circles"
             }
             UM.ToolTip
             {

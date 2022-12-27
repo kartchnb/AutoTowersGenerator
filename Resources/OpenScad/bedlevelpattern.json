@@ -1,7 +1,7 @@
 {
     "parameterSets": {
-        "Bed Level Pattern - Concentric Squares 220x220": {
-            "Bed_Level_Pattern_Type": "concentric squares",
+        "Bed Level Pattern - Spiral Squares 220x220": {
+            "Bed_Level_Pattern_Type": "spiral squares",
             "Circle_Diameter": "20",
             "Concentric_Ring_Count": "7",
             "Fill_Percentage": "90",
@@ -19,8 +19,8 @@
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
-        "Bed Level Pattern - Concentric Squares 200x200": {
-            "Bed_Level_Pattern_Type": "concentric squares",
+        "Bed Level Pattern - Spiral Squares 200x200": {
+            "Bed_Level_Pattern_Type": "spiral squares",
             "Circle_Diameter": "20",
             "Concentric_Ring_Count": "7",
             "Fill_Percentage": "90",
@@ -38,8 +38,8 @@
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
-        "Bed Level Pattern - Concentric Squares 180x180": {
-            "Bed_Level_Pattern_Type": "concentric squares",
+        "Bed Level Pattern - Spiral Squares 180x180": {
+            "Bed_Level_Pattern_Type": "spiral squares",
             "Circle_Diameter": "20",
             "Concentric_Ring_Count": "7",
             "Fill_Percentage": "90",
@@ -57,8 +57,8 @@
             "Screenshot_Vpt": "[0, -5, -16]",
             "Show_Print_Area": "false"
         },
-        "Bed Level Pattern - Concentric Squares 150x150": {
-            "Bed_Level_Pattern_Type": "concentric squares",
+        "Bed Level Pattern - Spiral Squares 150x150": {
+            "Bed_Level_Pattern_Type": "spiral squares",
             "Circle_Diameter": "20",
             "Concentric_Ring_Count": "7",
             "Fill_Percentage": "90",

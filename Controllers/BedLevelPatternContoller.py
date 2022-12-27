@@ -23,10 +23,10 @@ class BedLevelPatternController(ControllerBase):
     _qmlFilename = 'BedLevelPatternDialog.qml'
 
     _presetsTable = {
-        'Bed Level Pattern - Concentric Squares 220x220': {},
-        'Bed Level Pattern - Concentric Squares 200x200': {},
-        'Bed Level Pattern - Concentric Squares 180x180': {},
-        'Bed Level Pattern - Concentric Squares 150x150': {},
+        'Bed Level Pattern - Spiral Squares 220x220': {},
+        'Bed Level Pattern - Spiral Squares 200x200': {},
+        'Bed Level Pattern - Spiral Squares 180x180': {},
+        'Bed Level Pattern - Spiral Squares 150x150': {},
     }
 
     _criticalPropertiesTable = {
@@ -40,6 +40,7 @@ class BedLevelPatternController(ControllerBase):
     }
 
     _bedLevelPatternsModel = [
+        {'value': 'Spiral Squares', 'icon': 'bedlevelpattern_spiral_squares_icon.png'}, 
         {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
         {'value': 'Concentric Circles', 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
         {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
