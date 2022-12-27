@@ -92,7 +92,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new print speed on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(4, f'M117 SPD {current_speed:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_speed:.1f} mm/s" on the LCD')
+                lines.insert(4, f'M117 SPD {current_speed:.1f} mm/s')
 
             # Handle the first tower section
             if first_section:

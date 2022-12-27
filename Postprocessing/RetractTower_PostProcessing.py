@@ -79,9 +79,9 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 # Display the new retraction value on the printer's LCD
                 if enable_lcd_messages:
                     if tower_type == 'Speed':
-                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_value:.1f} mm/s" on the LCD')
+                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s')
                     else:
-                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_value:.1f} mm" on the LCD')
+                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
