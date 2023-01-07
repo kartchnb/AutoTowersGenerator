@@ -88,7 +88,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s')
 
             # Command the new feedrate percentage in the gcode
-            lines.insert(3, f'M220 S{feedrate_percentage:.2f} {Common.comment_prefix} Setting the feedrate percentage to {feedrate_percentage:.2f}% to mimic a speed change from {reference_speed}mm/s to {current_speed} mm/s')
+            lines.insert(3, f'M220 S{feedrate_percentage:.2f} {Common.comment_prefix} Setting the feedrate percentage to {feedrate_percentage:.2f}% to mimic a print speed setting change from {reference_speed}mm/s to {current_speed} mm/s')
 
             # Display the new print speed on the printer's LCD
             if enable_lcd_messages:
