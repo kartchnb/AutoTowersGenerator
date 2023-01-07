@@ -10,7 +10,7 @@ from UM.Message import Message
 
 
 class OpenScadInterface:
-    openScadPath = ''
+    _openscad_version_id = 'OpenSCAD version '
 
 
 
@@ -18,6 +18,7 @@ class OpenScadInterface:
         self.errorMessage = ''
         self._openScadPath = ''
         self._pluginName = pluginName
+        self._openscad_version = ''
 
 
 
@@ -25,6 +26,12 @@ class OpenScadInterface:
         ''' Manually assign the OpenScad path '''
 
         self._openScadPath = openScadPath
+
+
+
+    @property
+    def OpenScadVersion(self):
+        return self._openscad_version
 
 
 
@@ -45,7 +52,16 @@ class OpenScadInterface:
         # Attempt to verify the OpenScad executable is valid by querying the OpenScad version number
         command = f'{self._OpenScadCommand} -v'
         response = subprocess.run(command, capture_output=True, text=True, shell=True).stderr.strip()
-        valid = 'OpenSCAD version' in response
+        Logger.log('d', f'Checking for OpenSCAD returned the following response: "{response}"')
+
+        # OpenScad is considered valid if it returns a response including the string 'OpenScad version'
+        valid = self._openscad_version_id in response
+        if valid:
+            self._openscad_version = response.replace(self._openscad_version_id, '')
+            Logger.log('d', 'The OpenSCAD path is valid')
+        else:
+            self._openscad_version = ''
+            Logger.log('d', 'The OpenSCAD path is not valid')
 
         return valid
 
@@ -71,7 +87,7 @@ class OpenScadInterface:
                 command += 'unset LD_LIBRARY_PATH; '
 
             # Add the executable to the command
-            # Quotes are added in case there are embedded spaces
+            # Quotes are added in case there are embedded spaces in the path
             command += f'"{self.OpenScadPath}"'
 
         return command

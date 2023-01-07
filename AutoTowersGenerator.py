@@ -213,6 +213,11 @@ class AutoTowersGenerator(QObject, Extension):
             message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
             Message(message, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
 
+        # Notify the user of the detected OpenScad version number and path
+        else:
+            message = f'Found OpenScad version {self._openScadInterface.OpenScadVersion} at {self._openScadInterface.OpenScadPath}'
+            Message(message, title=self._pluginName, message_type=Message.MessageType.POSITIVE).show()
+
         self._openScadPathSettingChanged.emit()
 
     @pyqtProperty(str, notify=_openScadPathSettingChanged, fset=setOpenScadPathSetting)
