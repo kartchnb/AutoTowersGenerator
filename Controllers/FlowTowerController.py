@@ -136,7 +136,7 @@ class FlowTowerController(ControllerBase):
         # Load the preset values
         try:
             self._startFlow = presetTable['starting flow']
-            self._valueChange = presetTable['flow change']
+            self._flowChange = presetTable['flow change']
         except KeyError as e:
             Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return

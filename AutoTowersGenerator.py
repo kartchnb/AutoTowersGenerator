@@ -604,7 +604,12 @@ class AutoTowersGenerator(QObject, Extension):
                 gcode[0] += gcodeProcessedMarker + '\n'
 
                 # Call the tower controller post-processing callback to modify the g-code
-                gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
+                try:
+                    gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
+                except Exception as e:
+                    message = f'An exception occured during post-processing'
+                    Message(f'{message}:\n{e}', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
+                    Logger.log('e', f'{message}: {e}')
 
         except IndexError:
             return
