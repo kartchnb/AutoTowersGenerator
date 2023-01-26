@@ -89,9 +89,13 @@ This is used to specify the path to where OpenSCAD is installed.  Most of the ti
 With this selected, the plugin will send updates to your printer's LCD as the tower is printed.  Some printers don't handle the M117 gcode command that is used to send these messages, so deselect it if it causes you problems.
 
 # Install and Use
-Open Ultimaker-Cura and on the blue header bar, there is a button for "Marketplace." Click that button, and search "Auto Towers Generator" and click the bug install button.
+The AutoTowersGenerator plugin can be installed one of two ways.
 
-After restarting Cura, click the Extensions menu button at the top, and in there you will find "Auto Towers" and can select any of the available towers to print.
+The easiest way is to use Cura's built-in Marketplace.  Just open Ultimaker-Cura and, on the blue header bar, there is a button for "Marketplace." Click that button, and search for "Auto Towers Generator".  Once you've found it just click the "bug" button to install it.
+
+It doesn't take too much effort to install manually either.  You can find releases on the GitHub [Releases Page](https://github.com/kartchnb/AutoTowersGenerator/releases).  Download the .curapackage file that corresponds to your version of Cura.  To install, simply "drag and drop" the .curapackage file onto a running Ultimaker-Cura window.
+
+After installing using either method, Cura will need to be restarted.  After restarting Cura, click the "Extensions" menu item at the top of the window, and in there you will find "Auto Towers" and can select any of the available towers to print.
 
 # Some Final Notes
  
