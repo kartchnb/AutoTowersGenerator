@@ -88,6 +88,11 @@ This is used to specify the path to where OpenSCAD is installed.  Most of the ti
 ## Enable LCD Messages
 With this selected, the plugin will send updates to your printer's LCD as the tower is printed.  Some printers don't handle the M117 gcode command that is used to send these messages, so deselect it if it causes you problems.
 
+# Install and Use
+Open Ultimaker-Cura and on the blue header bar, there is a button for "Marketplace." Click that button, and search "Auto Towers Generator" and click the bug install button.
+
+After restarting Cura, click the Extensions menu button at the top, and in there you will find "Auto Towers" and can select any of the available towers to print.
+
 # Some Final Notes
  
  - Preset towers are designed to work best with the most common layer heights that I use: 0.10, 0.12, 0.20, 0.24, and 0.30.  The plugin will accomodate for other layer heights, but may not work perfectly.
