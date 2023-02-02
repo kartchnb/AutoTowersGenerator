@@ -16,7 +16,9 @@
 # Version 3.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-__version__ = '3.0'
+# Version 3.1 - 2 Feb 2023:
+#   Bugfix to make marlin linear and reprap pressure modes work.
+__version__ = '3.1'
 
 from UM.Logger import Logger
 
@@ -74,12 +76,12 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
                 lcd_line = f'M117 JCN J{float(current_speed):.3f}'
 
             # Handle Marlin linear speed
-            elif tower_type=='Marlin linear':
+            elif tower_type=='Marlin Linear':
                 command_line = f'M900 K{float(current_speed):.3f} {Common.comment_prefix} setting Marlin linear value to {float(current_speed):.3f} for this tower section'
                 lcd_line = f'M117 LIN {float(current_speed):.3f}'
 
             # Handle RepRap pressure speed
-            elif tower_type=='RepRap pressure':
+            elif tower_type=='RepRap Pressure':
                 command_line = f'M572 D0 S{float(current_speed):.3f} {Common.comment_prefix} setting RepRap pressure value to {float(current_speed):.3f} for this tower section'
                 lcd_line = f'M117 PRS {float(current_speed):.3f}'
 
