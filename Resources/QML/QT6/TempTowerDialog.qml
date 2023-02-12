@@ -93,7 +93,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "The nozzle temperature for the last section of the tower.<p>It is good practice to make this temperature lower than the ending temperature."
+                text: "The nozzle temperature for the last section of the tower.<p>It is good practice to make this temperature lower than the starting temperature."
                 visible: ending_temperature_mouse_area.containsMouse
             }
 
