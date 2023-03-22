@@ -262,6 +262,8 @@ class SpeedTowerController(ControllerBase):
 
         # Call the post-processing script for print speed towers
         if self._towerType == 'Print Speed':
+            current_print_speed = self._printSpeed
+
             gcode = PrintSpeedTower_PostProcessing.execute(
                 gcode, 
                 self._baseHeight, 
@@ -270,7 +272,7 @@ class SpeedTowerController(ControllerBase):
                 self._layerHeight, 
                 self._startValue, 
                 self._valueChange, 
-                self._printSpeed,
+                current_print_speed,
                 enable_lcd_messages
                 )
         
