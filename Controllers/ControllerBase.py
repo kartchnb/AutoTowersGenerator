@@ -72,6 +72,12 @@ class ControllerBase(QObject):
 
 
     @property
+    def _flowRate(self)->float:
+        ''' Return the current flow rate setting '''
+        return ExtruderManager.getInstance().getActiveExtruderStack().getProperty('material_flow', 'value')
+
+
+    @property
     def _initialLayerHeight(self)->float:
         ''' Return the current initial layer height setting '''
         return Application.getInstance().getGlobalContainerStack().getProperty("layer_height_0", "value")

@@ -6,6 +6,7 @@
 *.xcf
 .vscode
 pluginSettings.json
+dev/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

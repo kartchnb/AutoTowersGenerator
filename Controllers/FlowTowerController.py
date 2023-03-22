@@ -33,6 +33,7 @@ class FlowTowerController(ControllerBase):
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
         'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
+        'material_flow': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 100),
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
@@ -195,19 +196,22 @@ class FlowTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
+        current_flow_rate = self._flowRate
+
         # Call the post-processing script
-        gcode = FlowTower_PostProcessing.execute(
-            gcode, 
-            self._baseHeight, 
-            self._sectionHeight, 
-            self._initialLayerHeight, 
-            self._layerHeight, 
-            self._startFlow, 
-            self._flowChange, 
-            enable_lcd_messages
+        output_gcode = FlowTower_PostProcessing.execute(
+            gcode=input_gcode, 
+            base_height=self._baseHeight, 
+            section_height=self._sectionHeight, 
+            initial_layer_height=self._initialLayerHeight, 
+            layer_height=self._layerHeight, 
+            start_flow_rate=self._startFlow, 
+            flow_rate_change=self._flowChange, 
+            reference_flow_rate=current_flow_rate,
+            enable_lcd_messages=enable_lcd_messages
             )
 
-        return gcode
+        return output_gcode
