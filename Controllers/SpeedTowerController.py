@@ -62,7 +62,7 @@ class SpeedTowerController(ControllerBase):
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Speed Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+        super().__init__("Speed Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 
@@ -262,6 +262,8 @@ class SpeedTowerController(ControllerBase):
 
         # Call the post-processing script for print speed towers
         if self._towerType == 'Print Speed':
+            current_print_speed = self._printSpeed
+
             gcode = PrintSpeedTower_PostProcessing.execute(
                 gcode, 
                 self._baseHeight, 
@@ -270,7 +272,7 @@ class SpeedTowerController(ControllerBase):
                 self._layerHeight, 
                 self._startValue, 
                 self._valueChange, 
-                self._printSpeed,
+                current_print_speed,
                 enable_lcd_messages
                 )
         

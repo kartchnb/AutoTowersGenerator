@@ -75,7 +75,7 @@ class TempTowerController(ControllerBase):
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Temp Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+        super().__init__("Temp Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
 
 
 

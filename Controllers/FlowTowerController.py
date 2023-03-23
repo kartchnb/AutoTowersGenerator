@@ -20,11 +20,14 @@ from ..Postprocessing import FlowTower_PostProcessing
 
 
 class FlowTowerController(ControllerBase):
-    _openScadFilename = 'temptower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _presetsTable = {
         'Flow Tower - Flow 115-85': {
+            'starting flow': 115,
+            'flow change': -5,
+        },
+        'Spiral Flow Tower - Flow 115-85': {
             'starting flow': 115,
             'flow change': -5,
         },
@@ -33,14 +36,46 @@ class FlowTowerController(ControllerBase):
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
         'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
+        'material_flow': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 100),
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
 
+    _towerModelOptionsModel = [
+        {'value': 'Classic', 'icon': 'flowtower_icon.png', 'filename': 'temptower.scad'}, 
+        {'value': 'Spiral', 'icon': 'spiral_flowtower_icon.png', 'filename': 'flowtower.scad'}, 
+    ]
+
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Flow Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+        super().__init__('Flow Tower', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+    
+    
+    
+    # The available tower models
+    @pyqtProperty(list)
+    def towerModelOptionsModel(self):
+        return self._towerModelOptionsModel
+
+
+
+    # The selected tower model
+    _towerModel = _towerModelOptionsModel[0]['value']
+
+    towerModelChanged = pyqtSignal()
+
+    def setTowerModel(self, value)->None:
+        self._towerModel = value
+        self.towerModelChanged.emit()
+
+    @pyqtProperty(str, notify=towerModelChanged, fset=setTowerModel)
+    def towerModel(self)->str:
+        return self._towerModel
+    
+    @property
+    def towerModelFileName(self)->str:
+        return [entry['filename'] for entry in self._towerModelOptionsModel if entry['value'] == self._towerModel][0]
 
 
 
@@ -157,6 +192,8 @@ class FlowTowerController(ControllerBase):
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
         # Read the parameters directly from the dialog
+        openScadFileName = self.towerModelFileName
+        Logger.log('d', f'OpenScadFileName = {openScadFileName}')
         startFlow = float(self.startFlowStr)
         endFlow = float(self.endFlowStr)
         flowChange = float(self.flowChangeStr)
@@ -178,6 +215,7 @@ class FlowTowerController(ControllerBase):
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Column_Label'] = towerLabel
+        openScadParameters ['Temperature_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
         # Record the tower settings that will be needed for post-processing
@@ -190,24 +228,27 @@ class FlowTowerController(ControllerBase):
         towerName = f'Custom Flow Tower - {startFlow}-{endFlow}x{flowChange}'
 
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(self, towerName, openScadFileName, openScadParameters, self.postProcess)
 
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
+        current_flow_rate = self._flowRate
+
         # Call the post-processing script
-        gcode = FlowTower_PostProcessing.execute(
-            gcode, 
-            self._baseHeight, 
-            self._sectionHeight, 
-            self._initialLayerHeight, 
-            self._layerHeight, 
-            self._startFlow, 
-            self._flowChange, 
-            enable_lcd_messages
+        output_gcode = FlowTower_PostProcessing.execute(
+            gcode=input_gcode, 
+            base_height=self._baseHeight, 
+            section_height=self._sectionHeight, 
+            initial_layer_height=self._initialLayerHeight, 
+            layer_height=self._layerHeight, 
+            start_flow_rate=self._startFlow, 
+            flow_rate_change=self._flowChange, 
+            reference_flow_rate=current_flow_rate,
+            enable_lcd_messages=enable_lcd_messages
             )
 
-        return gcode
+        return output_gcode

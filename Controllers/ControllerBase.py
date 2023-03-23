@@ -30,7 +30,7 @@ class ControllerBase(QObject):
 
 
 
-    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, openScadFilename, qmlFilename, presetsTable, criticalSettingsTable, pluginName):
+    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, qmlFilename, presetsTable, criticalSettingsTable, pluginName):
         super().__init__()
         
         self.name = name
@@ -41,7 +41,6 @@ class ControllerBase(QObject):
         self._loadStlCallback = loadStlCallback
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
 
-        self._openScadFilename = openScadFilename
         self._qmlFilename = qmlFilename
         self._presetsTable = presetsTable
         self._criticalSettingsTable = criticalSettingsTable
@@ -69,6 +68,12 @@ class ControllerBase(QObject):
 
         return self._cachedDialog
 
+
+
+    @property
+    def _flowRate(self)->float:
+        ''' Return the current flow rate setting '''
+        return ExtruderManager.getInstance().getActiveExtruderStack().getProperty('material_flow', 'value')
 
 
     @property
