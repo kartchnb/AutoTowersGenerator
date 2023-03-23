@@ -86,9 +86,11 @@ class OpenScadInterface:
                 # Prefix the OpenScad call with a command to unset LD_LIBRARY_PATH
                 command += 'unset LD_LIBRARY_PATH; '
 
+            path = self.OpenScadPath
+
             # Add the executable to the command
-            # Quotes are added in case there are embedded spaces in the path
-            command += f'"{self.OpenScadPath}"'
+            # Quotes are added in case there are embedded spaces in the path, but we shouldn't double up if already quoted
+            command += f'"{path}"' if not path.startswith('\"') else path
 
         return command
 
