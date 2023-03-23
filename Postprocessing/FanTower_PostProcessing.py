@@ -69,7 +69,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new the fan speed % on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 Speed {current_fan_percent}%')
+                lines.insert(3, f'M117 Speed {current_fan_percent}% {Common.comment_prefix} Displaying "Speed {current_fan_percent}%" on the LCD')
 
         # Handle fan speed changes in the gcode
         if Common.IsFanSpeedChangeLine(line):

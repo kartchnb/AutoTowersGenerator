@@ -79,9 +79,9 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 # Display the new retraction value on the printer's LCD
                 if enable_lcd_messages:
                     if tower_type == 'Speed':
-                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s')
+                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_value:.1f}" on the LCD')
                     else:
-                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm')
+                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_value:.1f}" on the LCD')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
@@ -154,11 +154,11 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 # If the current line needs to be modified
                 if new_line != '':
 
-                    # Keep the original line in the gcode, but comment it out
-                    lines[line_index] = f';{line} {Common.comment_prefix} This is the original line before it was modified'
+                    # Replace the original line with the post-processed line
+                    lines[line_index] = new_line
 
-                    # Insert the new line
-                    lines.insert(line_index, new_line)
+                    # Leave the original line commented out in the gcode for reference
+                    lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
 
 

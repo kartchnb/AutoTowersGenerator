@@ -73,7 +73,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new flow rate on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 FLOW {current_flow_rate:.1f}%')
+                lines.insert(3, f'M117 FLOW {current_flow_rate:.1f}% {Common.comment_prefix} Displaying "FLOW {current_flow_rate:.1f}% on the LCD')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
