@@ -38,7 +38,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/flowtower_icon.png")
+                source: Qt.resolvedUrl("../../Images/" + selected_tower_model.model[selected_tower_model.currentIndex]["icon"])
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -52,6 +52,34 @@ UM.Dialog
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
+
+            UM.Label
+            {
+                text: "Tower Model"
+                MouseArea
+                {
+                    id: tower_model_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.ComboBox
+            {
+                id: selected_tower_model
+                Layout.fillWidth: true
+                model: manager.towerModelOptionsModel
+                textRole: "value"
+
+                onCurrentIndexChanged: 
+                {
+                    manager.towerModel = model[currentIndex]["value"]
+                }
+            }
+            UM.ToolTip
+            {
+                text: "The tower model to use.<p>The \"Classic\" model is the same tower that is used by the temperature tower.<p>The \"Spiral\" model is radically different and may suit certain materials or uses better.<p>In the end, either one should work just fine."
+                visible: tower_model_mouse_area.containsMouse
+            }
 
             UM.Label 
             { 

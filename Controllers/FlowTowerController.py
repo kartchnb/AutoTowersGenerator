@@ -20,11 +20,14 @@ from ..Postprocessing import FlowTower_PostProcessing
 
 
 class FlowTowerController(ControllerBase):
-    _openScadFilename = 'temptower.scad'
     _qmlFilename = 'FlowTowerDialog.qml'
 
     _presetsTable = {
         'Flow Tower - Flow 115-85': {
+            'starting flow': 115,
+            'flow change': -5,
+        },
+        'Spiral Flow Tower - Flow 115-85': {
             'starting flow': 115,
             'flow change': -5,
         },
@@ -38,10 +41,41 @@ class FlowTowerController(ControllerBase):
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
 
+    _towerModelOptionsModel = [
+        {'value': 'Classic', 'icon': 'flowtower_icon.png', 'filename': 'temptower.scad'}, 
+        {'value': 'Spiral', 'icon': 'spiral_flowtower_icon.png', 'filename': 'flowtower.scad'}, 
+    ]
+
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Flow Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._openScadFilename, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+        super().__init__('Flow Tower', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+    
+    
+    
+    # The available tower models
+    @pyqtProperty(list)
+    def towerModelOptionsModel(self):
+        return self._towerModelOptionsModel
+
+
+
+    # The selected tower model
+    _towerModel = _towerModelOptionsModel[0]['value']
+
+    towerModelChanged = pyqtSignal()
+
+    def setTowerModel(self, value)->None:
+        self._towerModel = value
+        self.towerModelChanged.emit()
+
+    @pyqtProperty(str, notify=towerModelChanged, fset=setTowerModel)
+    def towerModel(self)->str:
+        return self._towerModel
+    
+    @property
+    def towerModelFileName(self)->str:
+        return [entry['filename'] for entry in self._towerModelOptionsModel if entry['value'] == self._towerModel][0]
 
 
 
@@ -158,6 +192,8 @@ class FlowTowerController(ControllerBase):
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
         # Read the parameters directly from the dialog
+        openScadFileName = self.towerModelFileName
+        Logger.log('d', f'OpenScadFileName = {openScadFileName}')
         startFlow = float(self.startFlowStr)
         endFlow = float(self.endFlowStr)
         flowChange = float(self.flowChangeStr)
@@ -179,6 +215,7 @@ class FlowTowerController(ControllerBase):
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Column_Label'] = towerLabel
+        openScadParameters ['Temperature_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
         # Record the tower settings that will be needed for post-processing
@@ -191,7 +228,7 @@ class FlowTowerController(ControllerBase):
         towerName = f'Custom Flow Tower - {startFlow}-{endFlow}x{flowChange}'
 
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateAndLoadStlCallback(self, towerName, openScadFileName, openScadParameters, self.postProcess)
 
 
 

@@ -58,7 +58,7 @@ UM.Dialog
                 text: "Bed Level Pattern Type"
                 MouseArea 
                 {
-                    id: bed_level_Pattern_type_mouse_area
+                    id: bed_level_pattern_type_mouse_area
                     anchors.fill: parent
                     hoverEnabled: true
                 }
@@ -78,7 +78,7 @@ UM.Dialog
             UM.ToolTip
             {
                 text: "The type of bed level Pattern to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level Pattern type will look like."
-                visible: bed_level_Pattern_type_mouse_area.containsMouse
+                visible: bed_level_pattern_type_mouse_area.containsMouse
             }
 
             UM.Label
