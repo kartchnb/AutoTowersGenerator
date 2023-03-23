@@ -50,7 +50,7 @@ class TempTowerController(ControllerBase):
         },
 
         'Temperature Tower - PLA': {
-            'starting value': 230,
+            'starting value': 220,
             'value change': -5,
         },
 

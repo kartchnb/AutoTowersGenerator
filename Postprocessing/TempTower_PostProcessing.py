@@ -30,8 +30,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Section height = {section_height} mm')
     Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
     Logger.log('d', f'Printed layer height = {layer_height} mm')
-    Logger.log('d', f'Starting temperature = {start_temp}%')
-    Logger.log('d', f'Temperature change = {temp_change}%')
+    Logger.log('d', f'Starting temperature = {start_temp}\u00B0 C')
+    Logger.log('d', f'Temperature change = {temp_change}\u00B0 C')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
@@ -40,8 +40,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Printed layer height = {layer_height} mm\n'
-    gcode[0] += f'{Common.comment_prefix} Starting temperature = {start_temp}%\n'
-    gcode[0] += f'{Common.comment_prefix} Temperature change = {temp_change}%\n'
+    gcode[0] += f'{Common.comment_prefix} Starting temperature = {start_temp}\u00B0C\n'
+    gcode[0] += f'{Common.comment_prefix} Temperature change = {temp_change}\u00B0C\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
 
     # Start at the selected starting temperature
@@ -57,11 +57,11 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             current_temp += temp_change
 
             # Configure the new temperature in the gcode
-            lines.insert(2, f'M104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} for this tower section')
+            lines.insert(2, f'M104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp}\u00B0C for this tower section')
 
             # Display the new temperature on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 TMP {current_temp}')
+                lines.insert(3, f'M117 TMP {current_temp} {Common.comment_prefix} Displaying "TMP {current_temp}" on the LCD')
 
     Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     
