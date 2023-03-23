@@ -245,6 +245,7 @@ class FlowTowerController(ControllerBase):
             section_height=self._sectionHeight, 
             initial_layer_height=self._initialLayerHeight, 
             layer_height=self._layerHeight, 
+            relative_extrusion=self._relativeExtrusion,
             start_flow_rate=self._startFlow, 
             flow_rate_change=self._flowChange, 
             reference_flow_rate=current_flow_rate,

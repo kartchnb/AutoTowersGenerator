@@ -17,7 +17,9 @@
 # Version 3.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-__version__ = '3.0'
+# Version 3.1 - 22 Mar 2023:
+#   Rewrote the post-processing code to ensure I understand what it's doing
+__version__ = '3.1'
 
 import re 
 
@@ -56,32 +58,30 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     current_retract_value = start_retract_value - retract_value_change # The current retract value will be corrected when the first section is encountered
     
     # Keep track of values throughout the script
-    saved_extrusion_position = -1
-    current_extrusion_position = 0
-    current_extrusion_speed = 0
-    first_code = True
+    relative_extrusion = False
+    reference_extrusion_position = None
 
     # Iterate over each line in the g-code
     for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
 
-        # Handle each new section
+        # Handle each new tower section
         if start_of_new_section:
 
-                # Update the retraction value for the new tower section
-                current_retract_value += retract_value_change
+            # Update the retraction value for the new tower section
+            current_retract_value += retract_value_change
 
-                # Document the new retraction value in the gcode
+            # Document the new retraction value in the gcode
+            if tower_type == 'Speed':
+                lines.insert(2, f'{Common.comment_prefix} Using retraction speed {current_retract_value} mm/s for this tower section')
+            else:
+                lines.insert(2, f'{Common.comment_prefix} Using retraction distance {current_retract_value} mm for this tower section')
+
+            # Display the new retraction value on the printer's LCD
+            if enable_lcd_messages:
                 if tower_type == 'Speed':
-                    lines.insert(2, f'{Common.comment_prefix} Using retraction speed {current_retract_value} mm/s for this tower section')
+                    lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_value:.1f}" on the LCD')
                 else:
-                    lines.insert(2, f'{Common.comment_prefix} Using retraction distance {current_retract_value} mm for this tower section')
-
-                # Display the new retraction value on the printer's LCD
-                if enable_lcd_messages:
-                    if tower_type == 'Speed':
-                        lines.insert(3, f'M117 SPD {current_retract_value:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_value:.1f}" on the LCD')
-                    else:
-                        lines.insert(3, f'M117 DST {current_retract_value:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_value:.1f}" on the LCD')
+                    lines.insert(3, f'M117 DST {current_retract_value:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_value:.1f}" on the LCD')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
@@ -91,76 +91,101 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
         elif Common.IsAbsoluteInstructionLine(line):
             relative_extrusion = False
 
-        # Handle reseting the extruder position
+            # The absolute extrusion position data is irrelevant in this mode
+            reference_extrusion_position = None
+
+        # Handle resetting the extruder position
         elif Common.IsResetExtruderLine(line):
-            current_extrusion_position = 0
-            saved_extrusion_position = 0
+
+            # Reset the recorded extrusion position to 0
+            reference_extrusion_position = 0
 
         # Handle extrusion commands
+        # For absolute extrusion, the current extrusion position needs to be tracked
         elif Common.IsExtrusionLine(line):
-            # Record the new extrusion position
-            position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
-            if position_search_results:
-                extrusion_position_string_value = position_search_results.group(1)
-                saved_extrusion_position=float(extrusion_position_string_value)        
+
+            # Only absolute extrusions need to be tracked
+            if not relative_extrusion:
+
+                # Determine the new extrusion position
+                position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
+                if position_search_results:
+                    current_extrusion_position_string = position_search_results.group(1)
+                    current_extrusion_position = float(current_extrusion_position_string)
+
+                    # Keep track of the current filament position
+                    reference_extrusion_position = current_extrusion_position
 
         # Handle retraction commands
+        # Retraction commands need to be modified to match the requested speed or distance
         elif Common.IsRetractLine(line):
+
+            # Determine the new extrusion position
             speed_search_results = re.search(r'F([-+]?\d*\.?\d+)', line.split(';')[0])
             position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
             if speed_search_results and position_search_results:
-                current_extrusion_speed=float(speed_search_results.group(1))
-                current_extrusion_position=float(position_search_results.group(1))
+                original_speed_string = speed_search_results.group(1)
+                original_speed = float(original_speed_string)
+                original_extrusion_position_string = position_search_results.group(1)
+                original_extrusion_position = float(original_extrusion_position_string)
 
-                new_line = ''
+                # For retraction speed towers, the speed is simple to update
+                if tower_type == 'Speed':
 
-                # Handle relative extrusion
-                if relative_extrusion:
+                    # Update the line with the new retraction speed
+                    new_line = line.replace(f'F{original_speed_string}', f'F{int(current_retract_value * 60)}')
+                    new_line += f' {Common.comment_prefix} Retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min)'  # Speed value must be specified as mm/min for the gcode'
 
-                    # Retracting filament (relative)
-                    if current_extrusion_position < 0:
-                        if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using relative positioning)'  # Speed value must be specified as mm/min for the gcode
-                        else:
-                            new_line = f'G1 F{int(current_extrusion_speed)} E{-current_retract_value:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (using relative positioning)'
-                    
-                    # Extruding filament (relative)
-                    else:
-                        if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using relative positioning)' # Speed value must be specified as mm/min for the gcode
-                        else:
-                            if first_code:
-                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} extruding {current_extrusion_position:.1f} mm of filament (using relative positioning)'
-                                first_code = False
-                            else:
-                                new_line = f'G1 F{int(current_extrusion_speed)} E{current_retract_value:.5f} {Common.comment_prefix} extruding {current_retract_value:.1f} mm of filament (using relative positioning)'
-                
-                # Handle absolute extrusion
+                # Retraction distance towers are more complicated than retraction speed towers
                 else:
 
-                    # Retracting filament (absolute)
-                    if saved_extrusion_position > current_extrusion_position:
-                        if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting filament at {current_retract_value} mm/s ({current_retract_value * 60} mm/min) (using absolute positioning)' # Speed value must be specified as mm/min for the gcode
+                    # Relative retraction is fairly simple since the filament position doesn't need to be tracked
+                    if relative_extrusion:
+
+                        # The original retraction distance is just the "extrusion position" in this case
+                        original_retraction_distance = original_extrusion_position
+
+                        # If this command is actually retracting filament, update the retraction distance
+                        if original_retraction_distance < 0:
+                            # Update the line with the new retraction distance
+                            new_line = line.replace(f'E{original_extrusion_position_string}', f'E{-current_retract_value:.5f}')
+                            new_line += f' {Common.comment_prefix} Retracting {current_retract_value:.5f} mm of filament using relative positioning'
+
                         else:
-                            current_extrusion_position = saved_extrusion_position - current_retract_value
-                            new_line = f'G1 F{int(current_extrusion_speed)} E{current_extrusion_position:.5f} {Common.comment_prefix} retracting {current_retract_value:.1f} mm of filament (using absolute positioning)'
-                    
-                    # Resetting the retraction 
+                            # Update the line with the new retraction distance
+                            new_line = line.replace(f'E{original_extrusion_position_string}', f'E{current_retract_value:.5f}')
+                            new_line += f' {Common.comment_prefix} Extruding {current_retract_value:.5f} mm of filament using relative positioning to reverse the previous retraction'
+
+                    # Absolute retraction needs to take into account the current absolute filament position
                     else:
-                        if tower_type == 'Speed':
-                            new_line = f'G1 F{int(current_retract_value * 60)} E{current_extrusion_position:.5f} {Common.comment_prefix} setting retraction speed to {current_retract_value} mm/s ({current_retract_value * 60} mm/min)' # Speed value must be specified as mm/min for the gcode
+                        
+                        # If the reference filament position has not been determined yet, then the command won't be changed this time
+                        if reference_extrusion_position is None:
 
-                # If the current line needs to be modified
-                if new_line != '':
+                            # Just record this filament position as the reference position and move on to the next line
+                            reference_extrusion_position = original_extrusion_position
+                            continue
 
-                    # Replace the original line with the post-processed line
-                    lines[line_index] = new_line
+                        # If this command is actually retracting filament, update the retraction distance
+                        if original_extrusion_position < reference_extrusion_position:
 
-                    # Leave the original line commented out in the gcode for reference
-                    lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
+                            # Determine the new position given the desired retraction distance for this section
+                            updated_extrusion_position = reference_extrusion_position - current_retract_value
+                            new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
+                            new_line += f' {Common.comment_prefix} Retracting {current_retract_value:.5f} mm of filament using absolute positioning'
 
+                        # If this command is undoing the previous retraction (by extruding the filament back out),
+                        # then, since the extrusion is just returning the filament to the previous position, the original line will work unchanged
+                        else:
 
+                            # Continue on to process the next line of gcode
+                            continue
+
+                # Replace the original line with the post-processed line
+                lines[line_index] = new_line
+
+                # Leave the original line commented out in the gcode for reference
+                lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
     Logger.log('d', f'AutoTowersGenerator completing RetractTower post-processing ({tower_type})')
 

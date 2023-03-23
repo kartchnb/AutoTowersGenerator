@@ -254,21 +254,26 @@ class RetractTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
+        # BAK: Revert this
+        with open(f'/home/brad/MEGA/Code/cura/AutoTowersGenerator/dev/unmodified.gcode', 'w') as file:
+            for line in input_gcode:
+                file.write(line)
+
         # Call the post-processing script
-        gcode = RetractTower_PostProcessing.execute(
-            gcode, 
-            self._baseHeight, 
-            self._sectionHeight, 
-            self._initialLayerHeight, 
-            self._layerHeight, 
-            self._relativeExtrusion,
-            self._startValue, 
-            self._valueChange, 
-            self._towerType, 
-            enable_lcd_messages
+        output_gcode = RetractTower_PostProcessing.execute(
+            gcode=input_gcode, 
+            base_height=self._baseHeight, 
+            section_height=self._sectionHeight, 
+            initial_layer_height=self._initialLayerHeight, 
+            layer_height=self._layerHeight, 
+            relative_extrusion=self._relativeExtrusion,
+            start_retract_value=self._startValue, 
+            retract_value_change=self._valueChange, 
+            tower_type=self._towerType, 
+            enable_lcd_messages=enable_lcd_messages
             )
 
-        return gcode
+        return output_gcode
