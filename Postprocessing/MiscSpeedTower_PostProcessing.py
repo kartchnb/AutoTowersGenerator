@@ -30,6 +30,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
 
     # Log the post-processing settings
     Logger.log('d', f'AutoTowersGenerator beginning {tower_type} SpeedTower post-processing')
+    Logger.log('d', f'Script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
     Logger.log('d', f'Section height = {section_height} mm')
     Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
@@ -40,6 +41,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Post-processing a {tower_type} SpeedTower\n'
+    gcode[0] += f'{Common.comment_prefix} Script version {__version__}\n'
     gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height}\n'
