@@ -34,7 +34,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/flowtower_icon.png")
+                source: Qt.resolvedUrl("../../Images/" + selected_tower_model.model[selected_tower_model.currentIndex]["icon"])
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -50,6 +50,21 @@ UM.Dialog
             Layout.alignment: Qt.AlignTop
 
             Label 
+            {
+                text: "Tower Model"
+            }
+            ComboBox
+            {
+                id: selected_tower_model
+                layout.fillWidth: true
+                model: manager.towerModelOptionsModel
+                textRole: "value"
+
+                onCurrentIndexChanged:
+                {
+                    manager.towerModel = model[currentIndex]["value"]
+                }
+            }
             { 
                 text: "Starting Flow Rate %" 
             }
