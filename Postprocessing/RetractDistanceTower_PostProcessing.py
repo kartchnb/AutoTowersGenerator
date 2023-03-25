@@ -78,7 +78,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new retraction value on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 DST {current_retract_distance:.1f} mm {Common.comment_prefix} Displaying "DST {current_retract_distance:.1f}" on the LCD')
+                lines.insert(3, f'M117 DST {current_retract_distance:.1f} mm')
+                lines.insert(3, f'{Common.comment_prefix} Displaying "DST {current_retract_distance:.1f}" on the LCD')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
