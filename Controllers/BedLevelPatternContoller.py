@@ -23,10 +23,18 @@ class BedLevelPatternController(ControllerBase):
     _qmlFilename = 'BedLevelPatternDialog.qml'
 
     _presetsTable = {
-        'Bed Level Pattern - Spiral Squares 220x220': {},
-        'Bed Level Pattern - Spiral Squares 200x200': {},
-        'Bed Level Pattern - Spiral Squares 180x180': {},
-        'Bed Level Pattern - Spiral Squares 150x150': {},
+        'Bed Level Pattern - Spiral Squares 220x220': {
+            'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl',
+        },
+        'Bed Level Pattern - Spiral Squares 200x200': {
+            'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl',
+        },
+        'Bed Level Pattern - Spiral Squares 180x180': {
+            'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl',
+        },
+        'Bed Level Pattern - Spiral Squares 150x150': {
+            'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl',
+        },
     }
 
     _criticalPropertiesTable = {
@@ -142,15 +150,18 @@ class BedLevelPatternController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
         except KeyError:
             Logger.log('e', f'A Bed Level Pattern preset named "{presetName}" was requested, but has not been defined')
+            return
+
+        # Load the preset values
+        try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
+        except KeyError as e:
+            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return
 
         # Determine the tower name

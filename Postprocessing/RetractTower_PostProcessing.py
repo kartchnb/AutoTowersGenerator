@@ -187,7 +187,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 lines[line_index] = new_line
 
                 # Leave the original line commented out in the gcode for reference
-                lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
+                #lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
     Logger.log('d', f'AutoTowersGenerator completing RetractTower post-processing ({tower_type})')
 

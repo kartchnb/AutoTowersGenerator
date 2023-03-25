@@ -1,6 +1,7 @@
 import os
 import platform
 import tempfile
+import traceback
 
 # Import the correct version of PyQt
 try:
@@ -607,10 +608,11 @@ class AutoTowersGenerator(QObject, Extension):
                 try:
                     gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
                 except Exception as e:
-                    message = f'An exception occured during post-processing'
-                    Message(f'{message}:\n{e}', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
-                    Logger.log('e', f'{message}: {e}')
+                    message = f'An exception occured during post-processing: {e}'
+                    Message(f'{message}', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
+                    Logger.log('e', f'{message}\n{traceback.format_exc()}')
 
         except IndexError:
+            # This will be thrown if there is no gcode available
             return
         

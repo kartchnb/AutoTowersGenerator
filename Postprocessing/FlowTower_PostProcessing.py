@@ -84,19 +84,19 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
         elif Common.IsAbsoluteInstructionLine(line):
             relative_extrusion = False
 
-            # The absolute extrusion position data is irrelevant in this mode
+            # The absolute extrusion position data will need to be redetermined
             reference_extrusion_position = None
             updated_extrusion_position = None
 
         # Handle resetting the extruder position
-        elif Common.IsResetExtruderLine(line):
+        elif Common.IsResetExtruderLine(line) and relative_extrusion == False:
 
             # Reset the recorded extrusion positions to 0
             reference_extrusion_position = 0
             updated_extrusion_position = 0
 
-        # Handle extrusion commands
-        elif Common.IsExtrusionLine(line):
+        # Handle the first extrusion position encountered in the code (absolute positioning)
+        elif (Common.IsExtrusionLine(line) or Common.IsRetractLine(line)):
 
             # Determine the new extrusion position
             position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
@@ -104,75 +104,71 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 original_extrusion_position_string = position_search_results.group(1)
                 original_extrusion_position = float(original_extrusion_position_string)
 
-                # Handle relative extrusion commands
-                # Relative extrusion is pretty simple
-                if relative_extrusion:
+                # If the absolute filament reference extrusion position hasn't been read yet, just take it from this command
+                if reference_extrusion_position is None and relative_extrusion == False:
 
-                    # With relative extrusion, the "extrusion position" is simply the distance of filament being extruded
-                    original_extruded_distance = original_extrusion_position
+                    # Record the original extrusion position as the reference position for future updates
+                    reference_extrusion_position = original_extrusion_position
+                    updated_extrusion_position = original_extrusion_position
 
-                    # Modify positive extrusion (filament being pushed out) to achieve the requested flow rate
-                    if original_extruded_distance > 0:
+                elif Common.IsRetractLine(line):
+
+                    # Only absolute extrusions need to be tracked
+                    if not relative_extrusion:
+
+                        # Determine how far the filament is being extruded or retracted
+                        original_extruded_distance = original_extrusion_position - reference_extrusion_position
                         
-                        # Update the extruded distance to reflect the current flow rate
-                        updated_extruded_distance = original_extruded_distance * current_flow_rate / 100
-
-                        # Update the gcode line
-                        new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extruded_distance:.5f}')
-                        new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament ({current_flow_rate}% of the original {original_extruded_distance:.5f} mm)'
-
-                # Handle absolute extrusion commands
-                # This is more complicated than relative since we need to keep track of how much 
-                # filament the script originally extruded and how much our modifications are extruding
-                else:
-                
-                    # The first absolute extrusion command that is encountered is used as a baseline to adjust future extrusions against
-                    # It is only read in, not modified
-                    if reference_extrusion_position is None:
-
-                        # Record the original extrusion position as the reference position for future updates
-                        # then process the next gcode line
+                        # Update the referenced extrusion positions
                         reference_extrusion_position = original_extrusion_position
-                        updated_extrusion_position = original_extrusion_position
-                        continue
+                        updated_extrusion_position += original_extruded_distance
 
-                    # Calculate how much filament is being extruded by the script
-                    original_extruded_distance = original_extrusion_position - reference_extrusion_position
-                    
-                    # Update the referenced extrusion position
-                    reference_extrusion_position = original_extrusion_position
+                # Handle extrusion commands
+                elif Common.IsExtrusionLine(line):
 
-                    # Update the extruded distance to reflect the current flow rate
-                    updated_extruded_distance = original_extruded_distance * current_flow_rate / 100
-                    comment = f'Extruding {updated_extruded_distance:.5f} mm of filament ({current_flow_rate}% of the original {original_extruded_distance:.5f} mm)'
+                        # Handle relative extrusion commands
+                        # Relative extrusion is pretty simple
+                        if relative_extrusion:
 
-                    # Create a new line with the updated filament position
-                    updated_extrusion_position += updated_extruded_distance
-                    new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}') + f' {Common.comment_prefix} {comment}'
-                    
-                # Replace the original line with the post-processing modifications
-                lines[line_index] = new_line
+                            # With relative extrusion, the "extrusion position" is simply the distance of filament being extruded
+                            original_extruded_distance = original_extrusion_position
 
-                # Leave the original line commented out in the gcode for reference
-                lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
+                            # Modify positive extrusion (filament being pushed out) to achieve the requested flow rate
+                            if original_extruded_distance > 0:
+                                
+                                # Update the extruded distance to reflect the current flow rate
+                                nominal_extruded_distance = original_extruded_distance / (reference_flow_rate / 100) # Correct for the reference flow rate
+                                updated_extruded_distance = nominal_extruded_distance * (current_flow_rate / 100) # Convert to the current flow rate
 
-        elif Common.IsRetractLine(line):
+                                # Update the gcode line
+                                new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extruded_distance:.5f}')
+                                new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
 
-            # Only absolute extrusions need to be tracked
-            if not relative_extrusion:
+                        # Handle absolute extrusion commands
+                        # This is more complicated than relative since we need to keep track of how much 
+                        # filament the script originally extruded and how much our modifications are extruding
+                        else:
 
-                # Determine the new extrusion position
-                position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
-                if position_search_results:
-                    original_extrusion_position_string = position_search_results.group(1)
-                    original_extrusion_position = float(original_extrusion_position_string)
+                            # Calculate how much filament is being extruded by the script
+                            original_extruded_distance = original_extrusion_position - reference_extrusion_position
+                            
+                            # Update the referenced extrusion position
+                            reference_extrusion_position = original_extrusion_position
 
-                    # Determine how far the filament is being extruded or retracted
-                    original_extruded_distance = original_extrusion_position - reference_extrusion_position
-                    
-                    # Update the referenced extrusion positions
-                    reference_extrusion_position = original_extrusion_position
-                    updated_extrusion_position += original_extruded_distance
+                            # Update the extruded distance to reflect the current flow rate
+                            nominal_extruded_distance = original_extruded_distance / (reference_flow_rate / 100) # Correct for the reference flow rate
+                            updated_extruded_distance = nominal_extruded_distance * (current_flow_rate / 100) # Convert to the current flow rate
+                            updated_extrusion_position += updated_extruded_distance
+
+                            # Update the gcode line
+                            new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
+                            new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
+                            
+                        # Replace the original line with the post-processing modifications
+                        lines[line_index] = new_line
+
+                        # Leave the original line commented out in the gcode for reference
+                        lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
     Logger.log('d', 'AutoTowersGenerator completing FlowTower post-processing')
     

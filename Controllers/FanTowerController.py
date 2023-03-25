@@ -25,6 +25,7 @@ class FanTowerController(ControllerBase):
 
     _presetsTable = {
         'Fan Tower - Fan Speed 0-100': {
+            'filename': 'Fan Tower - Fan Speed 0-100.stl',
             'starting value': 0,
             'value change': 20,
         },
@@ -137,10 +138,6 @@ class FanTowerController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -150,6 +147,7 @@ class FanTowerController(ControllerBase):
 
         # Load the preset values
         try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
             self._startFanSpeed = presetTable['starting value']
             self._fanSpeedChange = presetTable['value change']
         except KeyError as e:

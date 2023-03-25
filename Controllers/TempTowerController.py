@@ -25,41 +25,49 @@ class TempTowerController(ControllerBase):
 
     _presetsTable = {
         'Temperature Tower - ABA': {
+            'filename': 'Temperature Tower - ABA.stl',
             'starting value': 260,
             'value change': -5,
         },
 
         'Temperature Tower - ABS': {
+            'filename': 'Temperature Tower - ABS.stl',
             'starting value': 250,
             'value change': -5,
         },
 
         'Temperature Tower - Nylon': {
+            'filename': 'Temperature Tower - Nylon.stl',
             'starting value': 260,
             'value change': -5,
         },
 
         'Temperature Tower - PC': {
+            'filename': 'Temperature Tower - PC.stl',
             'starting value': 310,
             'value change': -5,
         },
 
         'Temperature Tower - PETG': {
+            'filename': 'Temperature Tower - PETG.stl',
             'starting value': 250,
             'value change': -5,
         },
 
         'Temperature Tower - PLA': {
+            'filename': 'Temperature Tower - PLA.stl',
             'starting value': 220,
             'value change': -5,
         },
 
         'Temperature Tower - PLA+': {
+            'filename': 'Temperature Tower - PLA+.stl',
             'starting value': 230,
             'value change': -5,
         },
 
         'Temperature Tower - TPU': {
+            'filename': 'Temperature Tower - TPU.stl',
             'starting value': 230,
             'value change': -5,
         },
@@ -157,10 +165,6 @@ class TempTowerController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -170,6 +174,7 @@ class TempTowerController(ControllerBase):
 
         # Load the preset values
         try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
             self._startTemperature = presetTable['starting value']
             self._temperatureChange = presetTable['value change']
         except KeyError as e:

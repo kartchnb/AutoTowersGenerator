@@ -25,36 +25,42 @@ class RetractTowerController(ControllerBase):
 
     _presetsTable = {
         'Retract Tower - Retract Distance 1-6': {
+            'filename': 'Retract Tower - Retract Distance 1-6.stl',
             'starting value': 1,
             'value change': 1,
             'tower type': 'Distance',
        },
 
         'Retract Tower - Retract Distance 4-9': {
+            'filename': 'Retract Tower - Retract Distance 4-9.stl',
             'starting value': 4,
             'value change': 1,
             'tower type': 'Distance',
         },
 
         'Retract Tower - Retract Distance 7-12': {
+            'filename': 'Retract Tower - Retract Distance 7-12.stl',
             'starting value': 7,
             'value change': 1,
             'tower type': 'Distance',
         },
  
         'Retract Tower - Retract Speed 10-50': {
+            'filename': 'Retract Tower - Retract Speed 10-50.stl',
             'starting value': 10,
             'value change': 10,
             'tower type': 'Speed',
         },
 
         'Retract Tower - Retract Speed 35-75': {
+            'filename': 'Retract Tower - Retract Speed 35-75.stl',
             'starting value': 35,
             'value change': 10,
             'tower type': 'Speed',
         },
 
         'Retract Tower - Retract Speed 60-100': {
+            'filename': 'Retract Tower - Retract Speed 60-100.stl',
             'starting value': 60,
             'value change': 10,
             'tower type': 'Speed',
@@ -180,10 +186,6 @@ class RetractTowerController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -193,6 +195,7 @@ class RetractTowerController(ControllerBase):
 
         # Load the preset values
         try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
             self._startValue = presetTable['starting value']
             self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']

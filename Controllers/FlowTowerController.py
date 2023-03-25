@@ -24,10 +24,12 @@ class FlowTowerController(ControllerBase):
 
     _presetsTable = {
         'Flow Tower - Flow 115-85': {
+            'filename': 'Flow Tower - Flow 115-85.stl',
             'starting flow': 115,
             'flow change': -5,
         },
-        'Spiral Flow Tower - Flow 115-85': {
+        'Flow Tower (Spiral) - Flow 115-85': {
+            'filename': 'Flow Tower Spiral - Flow 115-85.stl',
             'starting flow': 115,
             'flow change': -5,
         },
@@ -157,10 +159,6 @@ class FlowTowerController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -170,6 +168,7 @@ class FlowTowerController(ControllerBase):
 
         # Load the preset values
         try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
             self._startFlow = presetTable['starting flow']
             self._flowChange = presetTable['flow change']
         except KeyError as e:

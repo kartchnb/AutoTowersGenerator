@@ -26,18 +26,21 @@ class SpeedTowerController(ControllerBase):
 
     _presetsTable = {
         'Speed Tower - Print Speed 20-100': {
+            'filename': 'Speed Tower - Print Speed 20-100.stl',
             'starting value': 20,
             'value change': 20,
             'tower type': 'Print Speed',
         },
 
         'Speed Tower - Print Speed 50-150': {
+            'filename': 'Speed Tower - Print Speed 50-150.stl',
             'starting value': 50,
             'value change': 20,
             'tower type': 'Print Speed',
         },
 
         'Speed Tower - Print Speed 100-200': {
+            'filename': 'Speed Tower - Print Speed 100-200.stl',
             'starting value': 100,
             'value change': 20,
             'tower type': 'Print Speed',
@@ -181,10 +184,6 @@ class SpeedTowerController(ControllerBase):
     def _loadPreset(self, presetName)->None:
         ''' Load a preset tower '''
 
-        # Determine the STL file name
-        stlFileName = f'{presetName}.stl'
-        stlFilePath = self._getStlFilePath(stlFileName)
-
         # Load the preset table
         try:
             presetTable = self._presetsTable[presetName]
@@ -194,6 +193,7 @@ class SpeedTowerController(ControllerBase):
 
         # Load the preset values
         try:
+            stlFilePath = self._getStlFilePath(presetTable['filename'])
             self._startValue = presetTable['starting value']
             self._valueChange = presetTable['value change']
             self._towerType = presetTable['tower type']
