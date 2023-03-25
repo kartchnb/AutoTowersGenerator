@@ -38,7 +38,6 @@ class FlowTowerController(ControllerBase):
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
         'layer_height': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, None),
-        'material_flow': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, 100),
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
