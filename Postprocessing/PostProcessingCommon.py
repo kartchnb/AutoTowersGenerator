@@ -79,7 +79,7 @@ def LayerEnumerate(gcode, base_height:float, section_height:float, initial_layer
             
             # Comment the start of the tower section in the gcode
             cura_layer_number = layer_index - 1
-            lines.insert(1, f'{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which corresponds to layer {layer_index - initial_inserted_layer_count} in this gcode file)')
+            lines.insert(1, f'{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which is labeled as layer {layer_index - initial_inserted_layer_count} in this gcode file)')
             
         # If this is not the start of a new tower section
         else:

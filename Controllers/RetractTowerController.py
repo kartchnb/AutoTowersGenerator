@@ -14,8 +14,9 @@ from UM.Logger import Logger
 
 from .ControllerBase import ControllerBase
 
-# Import the script that does the actual post-processing
-from ..Postprocessing import RetractTower_PostProcessing
+# Import the scripts that do the actual post-processing
+from ..Postprocessing import RetractSpeedTower_PostProcessing
+from ..Postprocessing import RetractDistanceTower_PostProcessing
 
 
 
@@ -260,23 +261,32 @@ class RetractTowerController(ControllerBase):
     def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
-        # BAK: Revert this
-        with open(f'/home/brad/MEGA/Code/cura/AutoTowersGenerator/dev/unmodified.gcode', 'w') as file:
-            for line in input_gcode:
-                file.write(line)
+        # Call the retract speed post-processing script
+        if self._towerType == 'Speed':
+            output_gcode = RetractSpeedTower_PostProcessing.execute(
+                gcode=input_gcode, 
+                base_height=self._baseHeight, 
+                section_height=self._sectionHeight, 
+                initial_layer_height=self._initialLayerHeight, 
+                layer_height=self._layerHeight, 
+                start_retract_speed=self._startValue, 
+                retract_speed_change=self._valueChange, 
+                enable_lcd_messages=enable_lcd_messages
+                )
 
-        # Call the post-processing script
-        output_gcode = RetractTower_PostProcessing.execute(
-            gcode=input_gcode, 
-            base_height=self._baseHeight, 
-            section_height=self._sectionHeight, 
-            initial_layer_height=self._initialLayerHeight, 
-            layer_height=self._layerHeight, 
-            relative_extrusion=self._relativeExtrusion,
-            start_retract_value=self._startValue, 
-            retract_value_change=self._valueChange, 
-            tower_type=self._towerType, 
-            enable_lcd_messages=enable_lcd_messages
-            )
+        # Call the retract distance post-processing script
+        else:
+            # Call the post-processing script
+            output_gcode = RetractDistanceTower_PostProcessing.execute(
+                gcode=input_gcode, 
+                base_height=self._baseHeight, 
+                section_height=self._sectionHeight, 
+                initial_layer_height=self._initialLayerHeight, 
+                layer_height=self._layerHeight, 
+                relative_extrusion=self._relativeExtrusion,
+                start_retract_distance=self._startValue, 
+                retract_distance_change=self._valueChange, 
+                enable_lcd_messages=enable_lcd_messages
+                )
 
         return output_gcode
