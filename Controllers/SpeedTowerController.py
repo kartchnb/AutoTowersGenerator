@@ -82,6 +82,14 @@ class SpeedTowerController(ControllerBase):
     towerTypeChanged = pyqtSignal()
 
     def setTowerType(self, value)->None:
+        # Update the tower label if it currently matches the default label for the current tower type
+        if self._towerLabelStr in [item['label'] for item in self._towerTypesModel if item['value'] == self._towerType]:
+
+            # This feels like a bit of a hack, but it works
+            self._towerLabelStr = [item['label'] for item in self._towerTypesModel if item['value'] == value][0]
+            self.towerLabelStrChanged.emit()
+
+        # Update the tower type
         self._towerType = value
         self.towerTypeChanged.emit()
 
