@@ -34,8 +34,7 @@ from . import PostProcessingCommon as Common
 def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_retract_value:float, retract_value_change:float, tower_type:str, enable_lcd_messages:bool):
     
     # Log the post-processing settings
-    Logger.log('d', f'AutoTowersGenerator beginning {tower_type} RetractTower post-processing')
-    Logger.log('d', f'Script version {__version__}')
+    Logger.log('d', f'Beginning Retract Tower ({tower_type}) post-processing script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
     Logger.log('d', f'Section height = {section_height} mm')
     Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
@@ -46,8 +45,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f'{Common.comment_prefix} Post-processing a {tower_type} RetractTower\n'
-    gcode[0] += f'{Common.comment_prefix} Script version {__version__}\n'
+    gcode[0] += f'{Common.comment_prefix} Retract Tower ({tower_type}) post-processing script version {__version__}\n'
     gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'

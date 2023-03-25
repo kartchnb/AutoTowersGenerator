@@ -29,7 +29,7 @@ from . import PostProcessingCommon as Common
 def execute(gcode, base_height:float, section_height:float, initial_layer_height: float, layer_height:float, start_fan_percent:float, fan_percent_change:float, maintain_bridge_value:bool, enable_lcd_messages:bool):
     
     # Log the post-processing settings
-    Logger.log('d', 'AutoTowersGenerator beginning FanTower post-processing')
+    Logger.log('d', f'Beginning Fan Tower post-processing script version {__version__}')
     Logger.log('d', f'Script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
     Logger.log('d', f'Section height = {section_height} mm')
@@ -41,8 +41,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f'{Common.comment_prefix} Post-processing a FanTower\n'
-    gcode[0] += f'{Common.comment_prefix} Script version {__version__}\n'
+    gcode[0] += f'{Common.comment_prefix} Fan Tower post-processing script version {__version__}\n'
     gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height} mm\n'
