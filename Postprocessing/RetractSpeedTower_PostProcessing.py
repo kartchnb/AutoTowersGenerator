@@ -73,7 +73,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new retraction value on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 SPD {current_retract_speed:.1f} mm/s {Common.comment_prefix} Displaying "SPD {current_retract_speed:.1f}" on the LCD')
+                lines.insert(3, f'M117 SPD {current_retract_speed:.1f} mm/s')
+                lines.insert(3, f'{Common.comment_prefix} Displaying "SPD {current_retract_speed:.1f}" on the LCD')
 
         # Handle retraction commands
         # Retraction commands need to be modified to match the requested speed

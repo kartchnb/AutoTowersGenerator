@@ -63,7 +63,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Display the new temperature on the printer's LCD
             if enable_lcd_messages:
-                lines.insert(3, f'M117 TMP {current_temp} C {Common.comment_prefix} Displaying "TMP {current_temp} C" on the LCD')
+                lines.insert(3, f'M117 TMP {current_temp} C')
+                lines.insert(3, f'{Common.comment_prefix} Displaying "TMP {current_temp} C" on the LCD')
 
     Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     
