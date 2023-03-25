@@ -32,7 +32,7 @@ from . import PostProcessingCommon as Common
 def execute(gcode, base_height: float, section_height: float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, tower_type:str, enable_lcd_messages:bool):
 
     # Log the post-processing settings
-    Logger.log('d', f'Beginning Speed Tower ({tower_type}) post-processing script version {__version__}')
+    Logger.log('d', f'Beginning Speed Tower ({tower_type.lower()}) post-processing script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
     Logger.log('d', f'Section height = {section_height} mm')
     Logger.log('d', f'Initial printed layer height = {initial_layer_height}')
@@ -42,7 +42,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
 
     # Document the settings in the g-code
-    gcode[0] += f'{Common.comment_prefix} Speed Tower ({tower_type}) post-processing script version {__version__}\n'
+    gcode[0] += f'{Common.comment_prefix} Speed Tower ({tower_type.lower()}) post-processing script version {__version__}\n'
     gcode[0] += f'{Common.comment_prefix} Base height = {base_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Section height = {section_height} mm\n'
     gcode[0] += f'{Common.comment_prefix} Initial printed layer height = {initial_layer_height}\n'
