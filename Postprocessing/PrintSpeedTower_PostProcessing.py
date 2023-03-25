@@ -28,7 +28,9 @@
 #   However, it's not that simple and is going to take a lot more work to figure out how to do this right
 #   So, for now, M220 is used to simulate print speed changes
 #   Unfortunately, this is still not a completely accurate demonstration of the different print speeds
-__version__ = '2.1'
+# Version 2.2 - 24 Mar 2023
+#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
+__version__ = '2.2'
 
 from UM.Logger import Logger
 

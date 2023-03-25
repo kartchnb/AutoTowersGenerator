@@ -14,7 +14,9 @@
 # Version 3.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-__version__ = '3.0'
+# Version 3.1 - 24 Mar 2023
+#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
+__version__ = '3.1'
 
 from UM.Logger import Logger
 

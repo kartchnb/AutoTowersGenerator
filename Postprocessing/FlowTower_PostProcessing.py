@@ -15,6 +15,7 @@
 # Version 3.0 - 10 Jan 2023:
 #   Corrected the method of simulating flow rate changes from using the M221 command to 
 #   changing the extrusion distance
+#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
 __version__ = '3.0'
 
 import re
@@ -168,7 +169,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                         lines[line_index] = new_line
 
                         # Leave the original line commented out in the gcode for reference
-                        lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
+                        #lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
     Logger.log('d', 'AutoTowersGenerator completing FlowTower post-processing')
     

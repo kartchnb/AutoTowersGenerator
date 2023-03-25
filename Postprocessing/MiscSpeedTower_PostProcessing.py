@@ -18,7 +18,10 @@
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
 # Version 3.1 - 2 Feb 2023:
 #   Bugfix to make marlin linear and reprap pressure modes work.
-__version__ = '3.1'
+#   (Contributed by "Hello1024" on Github)
+# Version 3.2 - 24 Mar 2023:
+#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
+__version__ = '3.2'
 
 from UM.Logger import Logger
 
