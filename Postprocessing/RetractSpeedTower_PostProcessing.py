@@ -19,7 +19,6 @@
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
 # Version 3.1 - 22 Mar 2023:
 #   Rewrote the post-processing code to ensure I understand what it's doing
-#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
 # Version 4.0 - 25 Mar 2023: 
 #   Split this script off from the RetractTower_PostProcessing script
 #   This script has been simplified to focus solely on retraction speed

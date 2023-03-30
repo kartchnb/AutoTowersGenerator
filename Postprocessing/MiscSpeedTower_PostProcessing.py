@@ -19,9 +19,7 @@
 # Version 3.1 - 2 Feb 2023:
 #   Bugfix to make marlin linear and reprap pressure modes work.
 #   (Contributed by "Hello1024" on Github)
-# Version 3.2 - 24 Mar 2023:
-#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
-__version__ = '3.2'
+__version__ = '3.1'
 
 from UM.Logger import Logger
 

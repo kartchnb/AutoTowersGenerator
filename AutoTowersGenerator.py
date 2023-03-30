@@ -37,8 +37,7 @@ from .Controllers.TempTowerController import TempTowerController
 class AutoTowersGenerator(QObject, Extension):
 
     # Add additional controller classes to this list
-    #_controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
-    _controllerClasses = [BedLevelPatternController, FanTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
+    _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
 
 
 

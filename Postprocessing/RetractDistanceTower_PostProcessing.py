@@ -19,7 +19,6 @@
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
 # Version 3.1 - 22 Mar 2023:
 #   Rewrote the post-processing code to ensure I understand what it's doing
-#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
 # Version 4.0 - 25 Mar 2023: 
 #   Split this script off from the RetractTower_PostProcessing script
 #   This script has been simplified to focus solely on retraction distance
@@ -35,7 +34,7 @@ from . import PostProcessingCommon as Common
 
 
 def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_retract_distance:float, retract_distance_change:float, enable_lcd_messages:bool):
-    
+
     # Log the post-processing settings
     Logger.log('d', f'Beginning Retract Tower (distance) post-processing script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
@@ -129,7 +128,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                             # Update the line with the new retraction distance
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{-current_retract_distance:.5f}')
-                            new_line += f' {Common.comment_prefix} Retracting {current_retract_distance:.5f} mm of filament using relative positioning'
+                            new_line += f' {Common.comment_prefix} Retracting {-current_retract_distance:.5f} mm of filament using relative positioning'
 
                         # Update filament extrusion (reversing the previous retraction)
                         else:

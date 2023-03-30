@@ -12,10 +12,9 @@
 # Version 2.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-# Version 3.0 - 10 Jan 2023:
+# Version 3.0 - 29 Mar 2023:
 #   Corrected the method of simulating flow rate changes from using the M221 command to 
 #   changing the extrusion distance
-#   STL filenames for preset towers must now be specified rather than assuming they are named after the preset
 __version__ = '3.0'
 
 import re
@@ -27,7 +26,7 @@ from . import PostProcessingCommon as Common
 
 
 def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_flow_rate:float, flow_rate_change:float, reference_flow_rate:float, enable_lcd_messages:bool):
-    
+
     # Log the post-processing settings
     Logger.log('d', f'Beginning Flow Tower post-processing script version {__version__}')
     Logger.log('d', f'Base height = {base_height} mm')
@@ -95,8 +94,11 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             reference_extrusion_position = 0
             updated_extrusion_position = 0
 
-        # Handle the first extrusion position encountered in the code (absolute positioning)
-        elif (Common.IsExtrusionLine(line) or Common.IsRetractLine(line)):
+        # Handle extrusion or retraction lines that need to be processed
+        # All extrusion commands will need to be modified to achieve the requested flow rate
+        # Absolute retraction commands will need to modified to account for flow rate extrusion changes
+        # Relative retraction commands can be left unchanged 
+        elif (Common.IsExtrusionLine(line) or (Common.IsRetractLine(line) and not relative_extrusion)):
 
             # Determine the new extrusion position
             position_search_results = re.search(r'E([-+]?\d*\.?\d+)', line.split(';')[0])
@@ -104,16 +106,18 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 original_extrusion_position_string = position_search_results.group(1)
                 original_extrusion_position = float(original_extrusion_position_string)
 
-                # If the absolute filament reference extrusion position hasn't been read yet, just take it from this command
+                # If the absolute filament reference extrusion position hasn't been read yet, read it from this command and move to the next line
                 if reference_extrusion_position is None and relative_extrusion == False:
 
                     # Record the original extrusion position as the reference position for future updates
                     reference_extrusion_position = original_extrusion_position
                     updated_extrusion_position = original_extrusion_position
+                    continue
 
+                # Handle absolute retraction commands
                 elif Common.IsRetractLine(line):
 
-                    # Only absolute extrusions need to be tracked
+                    # Only absolute extrusions need to be tracked and modified
                     if not relative_extrusion:
 
                         # Determine how far the filament is being extruded or retracted
@@ -122,6 +126,13 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                         # Update the referenced extrusion positions
                         reference_extrusion_position = original_extrusion_position
                         updated_extrusion_position += original_extruded_distance
+
+                        # Update the gcode line
+                        new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
+                        if original_extruded_distance < 0:
+                            new_line += f' {Common.comment_prefix} Retracting {-original_extruded_distance:.5f} mm of filament'
+                        else:
+                            new_line += f' {Common.comment_prefix} Extruding {original_extruded_distance:.5f} mm of filament to reverse the last retraction'
 
                 # Handle extrusion commands
                 elif Common.IsExtrusionLine(line):
@@ -145,7 +156,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                                 new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
 
                         # Handle absolute extrusion commands
-                        # This is more complicated than relative since we need to keep track of how much 
+                        # This is more complicated than relative extrusion since we need to keep track of how much 
                         # filament the script originally extruded and how much our modifications are extruding
                         else:
 
@@ -163,12 +174,12 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                             # Update the gcode line
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
                             new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
-                            
-                        # Replace the original line with the post-processing modifications
-                        lines[line_index] = new_line
+                    
+                # Replace the original line with the post-processing modifications
+                lines[line_index] = new_line
 
-                        # Leave the original line commented out in the gcode for reference
-                        #lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
+                # Leave the original line commented out in the gcode for reference
+                #lines.insert(line_index, f';{line} {Common.comment_prefix} This is the original line before it was modified')
 
     Logger.log('d', 'AutoTowersGenerator completing FlowTower post-processing')
     
