@@ -542,6 +542,9 @@ class AutoTowersGenerator(QObject, Extension):
 
 
         self._pluginSettings = PluginSettings(self._pluginSettingsFilePath)
+        # Init openscad path
+        self._openScadInterface.SetOpenScadPath(self._pluginSettings.GetValue('openscad path'))        
+        
 
         self._initializeMenu()
 
