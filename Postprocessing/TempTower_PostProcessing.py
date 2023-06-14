@@ -57,7 +57,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             current_temp += temp_change
 
             # Configure the new temperature in the gcode
-            lines.insert(2, f'M104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section')
+            lines.insert(2, f'M109 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section')
 
             # Display the new temperature on the printer's LCD
             if enable_lcd_messages:
