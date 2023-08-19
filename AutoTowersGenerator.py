@@ -39,7 +39,7 @@ class AutoTowersGenerator(QObject, Extension):
     # Add additional controller classes to this list
     _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
     # BAK: Delete this line when done rearchitecting GUI
-    _controllerClasses = [BedLevelPatternController]
+    _controllerClasses = [BedLevelPatternController, FanTowerController]
 
 
 
@@ -277,7 +277,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the tower controllers '''
     
         if not ControllerClass in self._cachedControllerTable:
-            self._cachedControllerTable[ControllerClass] = ControllerClass(guiPath=self._qmlPath, stlPath=self._stlPath, loadStlCallback=self._loadStlCallback, generateAndLoadStlCallback=self._generateAndLoadStlCallback, pluginName=self._pluginName)
+            self._cachedControllerTable[ControllerClass] = ControllerClass(guiPath=self._qmlPath, stlPath=self._stlPath, loadStlCallback=self._loadStlCallback, generateStlCallback=self._generateStlCallback, pluginName=self._pluginName)
         return self._cachedControllerTable[ControllerClass]
 
 
@@ -388,7 +388,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _generateAndLoadStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
+    def _generateStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
         # This could take up to a couple of minutes...

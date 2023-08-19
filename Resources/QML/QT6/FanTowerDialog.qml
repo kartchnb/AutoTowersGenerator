@@ -22,6 +22,11 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
 
+    // Only display customizable options when a prest is not selected
+    property bool show_custom_options: selectedPreset.currentText == 'Custom'
+
+
+
     RowLayout
     {
         id: contents
@@ -54,10 +59,10 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
+            // Preset option
             UM.Label
             {
                 text: 'Fan Tower Preset'
-                visible: model.presetsEnabled
                 MouseArea
                 {
                     id: preset_mouse_area
@@ -67,44 +72,23 @@ UM.Dialog
             }
             Cura.ComboBox
             {
-                id: selectedFanTowerPreset
+                id: selectedPreset
                 Layout.fillWidth: true
-                model: manager.fanTowerPresetsTable
-                textRole: 'value'
-                visible: model.presetsEnabled
+                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
 
                 onCurrentIndexChanged:
                 {
-                    manager.fanTowerPreset = model[currentIndex]['value']
-                    if (currentIndex != 0)
-                    {
-                        if ('start fan speed' in model[currentIndex])
-                        {
-                            manager.startFanSpeedStr = model[currentIndex]['start fan speed']
-                        }
-                        if ('end fan speed' in model[currentIndex])
-                        {
-                            manager.endFanSpeedStr = model[currentIndex]['end fan speed']
-                        }
-                        if ('fan speed change' in model[currentIndex])
-                        {
-                            manager.fanSpeedChangeStr = model[currentIndex]['fan speed change']
-                        }
-                        if ('tower label' in model[currentIndex])
-                        {
-                            manager.towerLabelStr = model[currentIndex]['tower label']
-                        }
-                        if ('tower description' in model[currentIndex])
-                        {
-                            manager.towerDescriptionStr = model[currentIndex]['tower description']
-                        }
-                    }
+                    dataModel.presetIndex = currentIndex
                 }
             }
 
+            // Bed level pattern option
             UM.Label 
             { 
                 text: 'Starting Fan Speed %' 
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: starting_fan_percent_mouse_area
@@ -116,9 +100,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
-                text: manager.startFanSpeedStr
-                enabled: selectedFanTowerPreset.currentIndex == 0
-                onTextChanged: if (manager.startFanSpeedStr != text) manager.startFanSpeedStr = text
+                text: dataModel.startFanPercentStr
+                visible: show_custom_options
+
+                onTextChanged: 
+                {
+                    if (dataModel.startFanPercentStr != text) dataModel.startFanPercentStr = text
+                }
             }
             UM.ToolTip
             {
@@ -129,6 +117,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Ending Fan Speed %' 
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: ending_fan_percent_mouse_area
@@ -140,9 +129,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
-                text: manager.endFanSpeedStr
-                enabled: selectedFanTowerPreset.currentIndex == 0
-                onTextChanged: if (manager.endFanSpeedStr != text) manager.endFanSpeedStr = text
+                text: dataModel.endFanPercentStr
+                visible: show_custom_options
+
+                onTextChanged: 
+                {
+                    if (dataModel.endFanPercentStr != text) dataModel.endFanPercentStr = text
+                }
             }
             UM.ToolTip
             {
@@ -153,6 +146,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Fan Speed % Change' 
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: fan_speed_change_mouse_area
@@ -164,9 +158,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]{1,2}(?:\.[0-9]+)?|[+-]?100/ }
-                text: manager.fanSpeedChangeStr
-                enabled: selectedFanTowerPreset.currentIndex == 0
-                onTextChanged: if (manager.fanSpeedChangeStr != text) manager.fanSpeedChangeStr = text
+                text: dataModel.fanPercentChangeStr
+                visible: show_custom_options
+
+                onTextChanged: 
+                {
+                    if (dataModel.fanPercentChangeStr != text) dataModel.fanPercentChangeStr = text
+                }
             }
             UM.ToolTip
             {
@@ -177,6 +175,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Label' 
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -189,8 +188,12 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: manager.towerLabelStr
-                enabled: selectedFanTowerPreset.currentIndex == 0
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                visible: show_custom_options
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabelStr != text) dataModel.towerLabelStr = text
+                }
             }
             UM.ToolTip
             {
@@ -201,6 +204,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Description' 
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: tower_description_mouse_area
@@ -212,8 +216,12 @@ UM.Dialog
             {
                 Layout.fillWidth: true
                 text: manager.towerDescriptionStr
-                enabled: selectedFanTowerPreset.currentIndex == 0
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                visible: show_custom_options
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerDescriptionStr != text) dataModel.towerDescriptionStr = text
+                }
             }
             UM.ToolTip
             {

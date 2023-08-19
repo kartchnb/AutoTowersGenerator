@@ -1,15 +1,17 @@
 # Import the correct version of PyQt
 try:
-    from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty
+    from PyQt6.QtCore import pyqtSignal, pyqtProperty
 except ImportError:
-    from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
+    from PyQt5.QtCore import pyqtSignal, pyqtProperty
 
 
 from UM.Logger import Logger
 
+from .ModelBase import ModelBase
 
 
-class BedLevelPatternModel(QObject):
+
+class BedLevelPatternModel(ModelBase):
 
     # The available bed level presets
     _presetsTable = [
@@ -33,7 +35,7 @@ class BedLevelPatternModel(QObject):
 
 
 
-    # Convert the presets table to a model that can be used by QML
+    # Make the presets available to QML
     presetsModelChanged = pyqtSignal()
 
     @pyqtProperty(list, notify=presetsModelChanged)
@@ -42,7 +44,7 @@ class BedLevelPatternModel(QObject):
     
 
     
-    # Convert the patterns to a model that can be used by QML
+    # Make the patterns available to QML
     patternsModelChanged = pyqtSignal()
 
     @pyqtProperty(list, notify=patternsModelChanged)
@@ -74,6 +76,10 @@ class BedLevelPatternModel(QObject):
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFileName(self)->str:
         return self._presetsTable[self._presetIndex]['filename']
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetFilePath(self)->str:
+        return self._buildStlFilePath(self.presetFileName)
     
 
 
@@ -179,5 +185,5 @@ class BedLevelPatternModel(QObject):
     
 
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, stlPath):
+        super().__init__(stlPath=stlPath)
