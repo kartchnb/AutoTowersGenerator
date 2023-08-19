@@ -20,9 +20,15 @@ from ..Postprocessing import FanTower_PostProcessing
 
 
 class FanTowerController(ControllerBase):
+
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
+        super().__init__('Fan Tower', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+
+
     _openScadFilename = 'temptower.scad'
     _qmlFilename = 'FanTowerDialog.qml'
 
+    # BAK: Remove this when it's no longer needed
     _presetsTable = {
         'Fan Tower - Fan Speed 0-100': {
             'filename': 'Fan Tower - Fan Speed 0-100.stl',
@@ -30,6 +36,8 @@ class FanTowerController(ControllerBase):
             'value change': 20,
         },
     }
+
+
 
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
@@ -40,8 +48,15 @@ class FanTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Fan Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+    # The available fan tower presets
+    _fanTowerPresetsTable = [
+        {'value': 'None',},
+        {'value': 'Fan Tower - Fan Speed 0-100', 'filename': 'Fan Tower - Fan Speed 0-100.stl', 'start fan speed': '0', 'end fan speed': '100', 'fan speed change': '20', 'tower label': '', 'tower description': 'FAN'},
+    ]
+
+    @pyqtProperty(list)
+    def fanTowerPresetsTable(self):
+        return self._fanTowerPresetsTable
 
 
 
@@ -148,8 +163,8 @@ class FanTowerController(ControllerBase):
         # Load the preset values
         try:
             stlFilePath = self._getStlFilePath(presetTable['filename'])
-            self._startFanSpeed = presetTable['starting value']
-            self._fanSpeedChange = presetTable['value change']
+            self._startFanSpeed = presetTable['start fan speed']
+            self._fanSpeedChange = presetTable['fan speed change']
         except KeyError as e:
             Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
             return

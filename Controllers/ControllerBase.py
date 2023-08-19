@@ -1,8 +1,8 @@
 # Import the correct version of PyQt
 try:
-    from PyQt6.QtCore import QObject
+    from PyQt6.QtCore import QObject, pyqtSlot
 except ImportError:
-    from PyQt5.QtCore import QObject
+    from PyQt5.QtCore import QObject, pyqtSlot
 
 from enum import IntEnum
 import math
@@ -30,7 +30,7 @@ class ControllerBase(QObject):
 
 
 
-    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, qmlFilename, presetsTable, criticalSettingsTable, pluginName):
+    def __init__(self, name, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, qmlFilename, criticalSettingsTable, dataModel, pluginName):
         super().__init__()
         
         self.name = name
@@ -42,31 +42,13 @@ class ControllerBase(QObject):
         self._generateAndLoadStlCallback = generateAndLoadStlCallback
 
         self._qmlFilename = qmlFilename
-        self._presetsTable = presetsTable
         self._criticalSettingsTable = criticalSettingsTable
 
+        self._dataModel = dataModel
+
         self._pluginName = pluginName
-
+        
         self._backedUpSettings = {}
-
-
-
-    @property
-    def presetNames(self)->list:
-        return list(self._presetsTable.keys())
-
-
-
-    _cachedDialog = None
-
-    @property
-    def _dialog(self)->QObject:
-        ''' Lazy instantiation of this controller's dialog '''
-        if self._cachedDialog is None:
-            qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
-            self._cachedDialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self})
-
-        return self._cachedDialog
 
 
 
@@ -205,15 +187,13 @@ class ControllerBase(QObject):
 
 
 
-    def generate(self, preset='')->None:
+    _dialog = None
+
+    def generate(self, customizable)->None:
         ''' Generate a tower - either a preset tower or a custom tower '''
-        # If a preset was requested, load it
-        if not preset == '':
-            self._loadPreset(preset)
-        
-        # Generate a custom tower
-        else:
-            self._dialog.show()
+        qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
+        self._dialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'manager': self, 'dataModel': self._dataModel, 'allow_customization': customizable})
+        self._dialog.show()
 
 
 
@@ -289,7 +269,7 @@ class ControllerBase(QObject):
 
 
 
-    def _getStlFilePath(self, filename)->str:
+    def _buildStlFilePath(self, filename)->str:
         ''' Determine the full path to an STL file '''
 
         return os.path.join(self._stlPath, filename)

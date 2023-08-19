@@ -15,28 +15,18 @@ from UM.Logger import Logger
 from UM.Message import Message
 
 from .ControllerBase import ControllerBase
+from ..Models.BedLevelPatternModel import BedLevelPatternModel
 
 
 
 class BedLevelPatternController(ControllerBase):
+
     _openScadFilename = 'bedlevelpattern.scad'
     _qmlFilename = 'BedLevelPatternDialog.qml'
 
-    _presetsTable = {
-        'Bed Level Pattern - Spiral Squares 220x220': {
-            'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl',
-        },
-        'Bed Level Pattern - Spiral Squares 200x200': {
-            'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl',
-        },
-        'Bed Level Pattern - Spiral Squares 180x180': {
-            'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl',
-        },
-        'Bed Level Pattern - Spiral Squares 150x150': {
-            'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl',
-        },
-    }
 
+
+    # The print settings that are considered critical for this tower
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
         'adhesion_type': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, 'none'),
@@ -47,139 +37,38 @@ class BedLevelPatternController(ControllerBase):
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
     }
 
-    _bedLevelPatternsModel = [
-        {'value': 'Spiral Squares', 'icon': 'bedlevelpattern_spiral_squares_icon.png'}, 
-        {'value': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
-        {'value': 'Concentric Circles', 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
-        {'value': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
-        {'value': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
-        {'value': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
-        {'value': 'Padded Grid', 'icon': 'bedlevelpattern_padded_grid_icon.png'},
-        {'value': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
-    ]
 
 
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__('Bed Level Pattern', guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
+        dataModel = BedLevelPatternModel()
+        super().__init__(name='Bed Level Pattern', guiPath=guiPath, stlPath=stlPath, loadStlCallback=loadStlCallback, generateAndLoadStlCallback=generateAndLoadStlCallback, qmlFilename=self._qmlFilename, criticalSettingsTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 
-    # The available tower types
-    @pyqtProperty(list)
-    def bedLevelPatternsModel(self):
-        return self._bedLevelPatternsModel
-
-
-
-    # The selected bed level pattern type
-    _bedLevelPattern = _bedLevelPatternsModel[0]['value']
-
-    bedLevelPatternChanged = pyqtSignal()
-
-    def setBedLevelPattern(self, value)->None:
-        self._bedLevelPattern = value
-        self.bedLevelPatternChanged.emit()
-
-    @pyqtProperty(str, notify=bedLevelPatternChanged, fset=setBedLevelPattern)
-    def bedLevelPattern(self)->str:
-        return self._bedLevelPattern
-
-
-
-    # The selected bed fill percentage
-    _fillPercentageStr = "90"
-
-    fillPercentageStrChanged = pyqtSignal()
-
-    def setFillPercentageStr(self, value)->None:
-        self._fillPercentageStr = value
-        self.fillPercentageStrChanged.emit()
-
-    @pyqtProperty(str, notify=fillPercentageStrChanged, fset=setFillPercentageStr)
-    def fillPercentageStr(self)->str:
-        return self._fillPercentageStr
-
-
-
-    # The selected number of squares
-    _numberOfSquaresStr = "7"
-
-    numberOfSquaresStrChanged = pyqtSignal()
-
-    def setNumberOfSquaresStr(self, value)->None:
-        self._numberOfSquaresStr = value
-        self.numberOfSquaresStrChanged.emit()
-
-    @pyqtProperty(str, notify=numberOfSquaresStrChanged, fset=setNumberOfSquaresStr)
-    def numberOfSquaresStr(self)->str:
-        return self._numberOfSquaresStr
-
-
-
-    # The selected cell size
-    _cellSizeStr = "4"
-
-    cellSizeStrChanged = pyqtSignal()
-
-    def setCellSizeStr(self, value)->None:
-        self._cellSizeStr = value
-        self.cellSizeStrChanged.emit()
-
-    @pyqtProperty(str, notify=cellSizeStrChanged, fset=setCellSizeStr)
-    def cellSizeStr(self)->str:
-        return self._cellSizeStr
-
-
-
-    # The selected pad size
-    _padSizeStr = "20"
-
-    padSizeStrChanged = pyqtSignal()
-
-    def setPadSizeStr(self, value)->None:
-        self._padSizeStr = value
-        self.padSizeStrChanged.emit()
-
-    @pyqtProperty(str, notify=padSizeStrChanged, fset=setPadSizeStr)
-    def padSizeStr(self)->str:
-        return self._padSizeStr
-
-
-
-    def _loadPreset(self, presetName)->None:
+    def _loadPresetBedLevelPattern(self)->None:
         ''' Load a preset tower '''
 
-        # Load the preset table
-        try:
-            presetTable = self._presetsTable[presetName]
-        except KeyError:
-            Logger.log('e', f'A Bed Level Pattern preset named "{presetName}" was requested, but has not been defined')
-            return
-
-        # Load the preset values
-        try:
-            stlFilePath = self._getStlFilePath(presetTable['filename'])
-        except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Fan Tower preset "{presetName}"')
-            return
+        # Determine the path of the STL file to load
+        stlFilePath = self._buildStlFilePath(self._dataModel.presetFileName)
 
         # Determine the tower name
-        towerName = f'Preset {presetName}'
+        towerName = f'Preset {self._dataModel.presetName}'
 
         # Use the callback to load the preset STL file
         self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
 
 
 
-    @pyqtSlot()
-    def dialogAccepted(self)->None:
-        ''' This method is called by the dialog when the "Generate" button is clicked '''
- 
-        fill_percentage = int(self.fillPercentageStr)
-        number_of_squares = int(self.numberOfSquaresStr)
-        cell_size = int(self.cellSizeStr)
-        pad_size = int(self.padSizeStr)
+    def _generateCustomBedLevelPattern(self)->None:
+        ''' Generate a custom tower '''
+
+        # Collect data from the data model
+        patternName = self._dataModel.patternName.lower()
+        fill_percentage = self._dataModel.fillPercentage
+        number_of_rings = self._dataModel.numberOfRings
+        cell_size = self._dataModel.cellSize
+        pad_size = self._dataModel.padSize
 
         # Determine the maximum print area
         (print_area_width, print_area_depth) = self._printArea
@@ -192,26 +81,39 @@ class BedLevelPatternController(ControllerBase):
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Bed_Level_Pattern_Type'] = self.bedLevelPattern.lower()
+        openScadParameters ['Bed_Level_Pattern_Type'] = patternName
         openScadParameters ['Print_Area_Width'] = print_area_width
         openScadParameters ['Print_Area_Depth'] = print_area_depth
         openScadParameters ['Line_Width'] = line_width
         openScadParameters ['Line_Height'] = layer_height
         openScadParameters ['Fill_Percentage'] = fill_percentage
-        openScadParameters ['Concentric_Ring_Count'] = number_of_squares
+        openScadParameters ['Concentric_Ring_Count'] = number_of_rings
         openScadParameters ['Grid_Cell_Count'] = cell_size
         openScadParameters ['Grid_Pad_Size'] = pad_size
 
         # Determine the tower name
-        towerName = f'Custom Bed Level Pattern - {self.bedLevelPattern} {print_area_width}x{print_area_depth}'
+        towerName = f'Custom Bed Level Pattern - {self._dataModel.patternName} {print_area_width}x{print_area_depth}'
 
         # Send the filename and parameters to the model callback
         self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
 
 
 
+    @pyqtSlot()
+    def dialogAccepted(self)->None:
+        ''' This method is called by the dialog when the "Generate" button is clicked '''
+
+        if self._dataModel.presetName != 'Custom':
+            # Load a preset tower
+            self._loadPresetBedLevelPattern()
+        else:
+            # Generate a custom tower using the user's settings
+            self._generateCustomBedLevelPattern()
+
+
+
     def postProcess(self, gcode, displayOnLcd=False)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
         
-        # No post-processing needs to be done for this pattern
+        # No post-processing needs to be done for bed level prints
         return gcode
