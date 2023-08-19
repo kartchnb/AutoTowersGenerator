@@ -60,8 +60,8 @@ class BedLevelPatternModel(QObject):
         self._presetIndex = int(value)
         self.presetIndexChanged.emit()
 
-    @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
-    def presetIndex(self)->str:
+    @pyqtProperty(int, notify=presetIndexChanged, fset=setPresetIndex)
+    def presetIndex(self)->int:
         return self._presetIndex
     
     @pyqtProperty(str, notify=presetIndexChanged)
@@ -89,7 +89,7 @@ class BedLevelPatternModel(QObject):
         except ValueError:
             Logger.log('e', f'Attempted to set patternIndex to "{value}", which could not be converted to an integer')
 
-    @pyqtProperty(str, notify=patternIndexChanged, fset=setPatternIndex)
+    @pyqtProperty(int, notify=patternIndexChanged, fset=setPatternIndex)
     def patternIndex(self)->int:
         return self._patternIndex
 

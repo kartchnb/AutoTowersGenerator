@@ -76,6 +76,7 @@ UM.Dialog
                 Layout.fillWidth: true
                 model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
+                currentIndex: dataModel.presetIndex
 
                 onCurrentIndexChanged:
                 {
@@ -102,6 +103,7 @@ UM.Dialog
                 model: dataModel.patternsModel
                 textRole: 'name'
                 visible: show_custom_options
+                currentIndex: patternIndex
 
                 onCurrentIndexChanged: 
                 {
