@@ -116,7 +116,7 @@ class BedLevelPatternModel(QObject):
     def fillPercentageStr(self)->str:
         return self._fillPercentageStr
     
-    @pyqtProperty(str, notify=fillPercentageStrChanged)
+    @pyqtProperty(int, notify=fillPercentageStrChanged)
     def fillPercentage(self)->int:
         return int(self._fillPercentageStr)
 
@@ -135,7 +135,7 @@ class BedLevelPatternModel(QObject):
     def numberOfRingsStr(self)->str:
         return self._numberOfRingsStr
     
-    @pyqtProperty(str, notify=numberOfRingsStrChanged)
+    @pyqtProperty(int, notify=numberOfRingsStrChanged)
     def numberOfRings(self)->int:
         return int(self._numberOfRingsStr)
 
@@ -154,7 +154,7 @@ class BedLevelPatternModel(QObject):
     def cellSizeStr(self)->str:
         return self._cellSizeStr
 
-    @pyqtProperty(str, notify=cellSizeStrChanged)
+    @pyqtProperty(int, notify=cellSizeStrChanged)
     def cellSize(self)->int:
         return int(self._cellSizeStr)
     
@@ -173,7 +173,7 @@ class BedLevelPatternModel(QObject):
     def padSizeStr(self)->str:
         return self._padSizeStr
 
-    @pyqtProperty(str, notify=padSizeStrChanged)
+    @pyqtProperty(int, notify=padSizeStrChanged)
     def padSize(self)->int:
         return int(self._padSizeStr)
     
