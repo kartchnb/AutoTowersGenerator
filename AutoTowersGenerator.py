@@ -38,8 +38,6 @@ class AutoTowersGenerator(QObject, Extension):
 
     # Add additional controller classes to this list
     _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController, TempTowerController]
-    # BAK: Delete this line when done rearchitecting GUI
-    _controllerClasses = [BedLevelPatternController, FanTowerController, FlowTowerController, RetractTowerController, SpeedTowerController]
 
 
 

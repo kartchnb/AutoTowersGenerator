@@ -20,12 +20,18 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
 
+    // Only display customizable options when a prest is not selected
+    property bool show_custom_options: dataModel.presetName == 'Custom'
+
+
+
     RowLayout
     {
         id: contents
         width: dialog.width - 2 * UM.Theme.getSize('default_margin').width
         spacing: UM.Theme.getSize('default_margin').width
 
+        // Display the icon for this tower
         Rectangle
         {
             Layout.preferredWidth: icon.width
@@ -51,9 +57,35 @@ UM.Dialog
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
+            // Preset option
+            UM.Label
+            {
+                text: 'Fan Tower Preset'
+                MouseArea
+                {
+                    id: preset_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
+
+                onCurrentIndexChanged:
+                {
+                    dataModel.presetIndex = currentIndex
+                }
+            }
+
+            // Start temp
             UM.Label
             {
                 text: 'Starting Temperature'
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: starting_temperature_mouse_area
@@ -65,8 +97,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startTemperatureStr
-                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
+                text: dataModel.startTemperatureStr
+                visible: show_custom_options
+
+                onTextChanged:
+                {
+                    if (dataModel.startTemperatureStr != text) dataModel.startTemperatureStr = text
+                }
             }
             UM.ToolTip
             {
@@ -74,9 +111,11 @@ UM.Dialog
                 visible: starting_temperature_mouse_area.containsMouse
             }
 
+            // End temp
             UM.Label
             {
                 text: 'Ending Temperature'
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: ending_temperature_mouse_area
@@ -88,8 +127,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endTemperatureStr
-                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
+                text: dataModel.endTemperatureStr
+                visible: show_custom_options
+
+                onTextChanged:
+                {
+                    if (dataModel.endTemperatureStr != text) dataModel.endTemperatureStr = text
+                }
             }
             UM.ToolTip
             {
@@ -97,9 +141,11 @@ UM.Dialog
                 visible: ending_temperature_mouse_area.containsMouse
             }
 
+            // Temp change
             UM.Label
             {
                 text: 'Temperature Change'
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: temperature_change_mouse_area
@@ -111,8 +157,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.temperatureChangeStr
-                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
+                text: dataModel.temperatureChangeStr
+                visible: show_custom_options
+
+                onTextChanged:
+                {
+                    if (dataModel.temperatureChangeStr != text) dataModel.temperatureChangeStr = text
+                }
             }
             UM.ToolTip
             {
@@ -120,9 +171,11 @@ UM.Dialog
                 visible: temperature_change_mouse_area.containsMouse
             }
 
+            // Tower label
             UM.Label
             {
                 text: 'Tower Label'
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -134,8 +187,13 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                text: dataModel.towerLabel
+                visible: show_custom_options
+
+                onTextChanged:
+                {
+                    if (dataModel.towerLabel != text) dataModel.towerLabel = text
+                }
             }
             UM.ToolTip
             {
@@ -143,9 +201,11 @@ UM.Dialog
                 visible: tower_label_mouse_area.containsMouse
             }
 
+            // Tower description
             UM.Label
             {
                 text: 'Tower Description'
+                visible: show_custom_options
                 MouseArea 
                 {
                     id: tower_description_mouse_area
@@ -156,8 +216,13 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: dataModel.towerDescription
+                visible: show_custom_options
+
+                onTextChanged:
+                {
+                    if (dataModel.towerDescription != text) dataModel.towerDescription = text
+                }
             }
             UM.ToolTip
             {
@@ -183,6 +248,6 @@ UM.Dialog
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }
