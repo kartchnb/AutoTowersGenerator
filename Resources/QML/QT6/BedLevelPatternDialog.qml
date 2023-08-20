@@ -254,6 +254,6 @@ UM.Dialog
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }

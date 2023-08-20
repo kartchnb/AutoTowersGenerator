@@ -189,7 +189,7 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.towerLabelStr
+                text: dataModel.towerLabelStr
                 visible: show_custom_options
 
                 onTextChanged: 
@@ -218,7 +218,7 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
+                text: dataModel.towerDescription
                 visible: show_custom_options
 
                 onTextChanged: 
@@ -246,8 +246,8 @@ UM.Dialog
             UM.CheckBox
             {
                 id: maintainBridgeValueCheckBox
-                checked: manager.maintainBridgeValue
-                onClicked: manager.maintainBridgeValue = checked
+                checked: dataModel.maintainBridgeValue
+                onClicked: dataModel.maintainBridgeValue = checked
             }
             UM.ToolTip
             {
@@ -273,6 +273,6 @@ UM.Dialog
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }
