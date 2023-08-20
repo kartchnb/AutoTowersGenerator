@@ -72,7 +72,6 @@ UM.Dialog
             }
             Cura.ComboBox
             {
-                id: preset_selection
                 Layout.fillWidth: true
                 model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'

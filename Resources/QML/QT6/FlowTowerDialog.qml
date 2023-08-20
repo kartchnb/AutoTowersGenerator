@@ -72,7 +72,6 @@ UM.Dialog
             }
             Cura.ComboBox
             {
-                id: selectedPreset
                 Layout.fillWidth: true
                 model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
@@ -111,7 +110,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The tower model to use.<p>The \'Classic\' model is the same tower that is used by the temperature tower.<p>The \'Spiral\' model is radically different and may suit certain materials or uses better.<p>In the end, either one should work just fine.'
+                text: 'The tower model to use.<p>The "Classic" model is the same tower that is used by the temperature tower.<p>The "Spiral" model is radically different and may suit certain materials or uses better.<p>In the end, either one should work just fine.'
                 visible: tower_design_mouse_area.containsMouse
             }
 
@@ -141,7 +140,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The flow rate % for the first section of the tower.<p>This is equivalent to changing Cura\'s \'Flow\' setting.<p>This value will be changed for each section of the tower<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle.<p>It is good practice for the starting value to be higher than the ending value.'
+                text: 'The flow rate % for the first section of the tower.<p>This is equivalent to changing Cura\'s "Flow" setting.<p>This value will be changed for each section of the tower<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle.<p>It is good practice for the starting value to be higher than the ending value.'
                 visible: start_flow_rate_mouse_area.containsMouse
             }
 
@@ -171,7 +170,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The flow rate % for the last section of the tower.<p>This is equivalent to changing Cura\'s \'Flow\' setting.<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle.<p>It is good practice for the ending value to be lower than the starting value.'
+                text: 'The flow rate % for the last section of the tower.<p>This is equivalent to changing Cura\'s "Flow" setting.<p>Rates less than 100 result in less filament being pushed through the nozzle.<p>Rates greater than 100 result in more filament being pushed through the nozzle.<p>It is good practice for the ending value to be lower than the starting value.'
                 visible: end_flow_rate_mouse_area.containsMouse
             }
 
