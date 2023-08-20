@@ -1,8 +1,8 @@
 # Import the correct version of PyQt
 try:
-    from PyQt6.QtCore import pyqtSlot, pyqtSignal, pyqtProperty
+    from PyQt6.QtCore import pyqtSlot
 except ImportError:
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, pyqtProperty
+    from PyQt5.QtCore import pyqtSlot
 
 from UM.Logger import Logger
 
@@ -27,6 +27,8 @@ class FanTowerController(ControllerBase):
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
         'support_enable': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
     }
+
+
 
     def __init__(self, guiPath, stlPath, loadStlCallback, generateStlCallback, pluginName):
         dataModel = FanTowerModel(stlPath=stlPath)
@@ -94,6 +96,7 @@ class FanTowerController(ControllerBase):
         ''' Generate a custom tower '''
 
         # Collect data from the data model
+        openScadFilename = self._openScadFilename
         startFanPercent = self._dataModel.startFanPercent
         endFanPercent = self._dataModel.endFanPercent
         fanPercentChange = self._dataModel.fanPercentChange
@@ -117,4 +120,4 @@ class FanTowerController(ControllerBase):
         towerName = f'Custom Fan Tower - Fan Speed {startFanPercent}-{endFanPercent}x{fanPercentChange}'
 
         # Send the filename and parameters to the STL generation callback
-        self._generateStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
+        self._generateStlCallback(self, towerName, openScadFilename, openScadParameters, self.postProcess)

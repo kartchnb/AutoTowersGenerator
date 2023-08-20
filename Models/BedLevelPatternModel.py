@@ -66,18 +66,18 @@ class BedLevelPatternModel(ModelBase):
     def presetIndex(self)->int:
         return self._presetIndex
     
-    @pyqtProperty(str, notify=presetIndexChanged)
+    @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetName(self)->str:
         try:
-            return self._presetsTable[self._presetIndex]['name']
+            return self._presetsTable[self.presetIndex]['name']
         except IndexError:
             return 'Custom'
     
-    @pyqtProperty(str, notify=presetIndexChanged)
+    @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetFileName(self)->str:
-        return self._presetsTable[self._presetIndex]['filename']
+        return self._presetsTable[self.presetIndex]['filename']
     
-    @pyqtProperty(str, notify=presetIndexChanged)
+    @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
     
@@ -101,11 +101,11 @@ class BedLevelPatternModel(ModelBase):
 
     @pyqtProperty(str, notify=patternIndexChanged)
     def patternName(self)->str:
-        return self._patternsTable[self._patternIndex]['name']
+        return self._patternsTable[self.patternIndex]['name']
 
     @pyqtProperty(str, notify=patternIndexChanged)
     def patternIcon(self)->str:
-        return self._patternsTable[self._patternIndex]['icon']
+        return self._patternsTable[self.patternIndex]['icon']
 
 
 
@@ -124,7 +124,7 @@ class BedLevelPatternModel(ModelBase):
     
     @pyqtProperty(int, notify=fillPercentageStrChanged)
     def fillPercentage(self)->int:
-        return int(self._fillPercentageStr)
+        return int(self.fillPercentageStr)
 
 
 
@@ -143,7 +143,7 @@ class BedLevelPatternModel(ModelBase):
     
     @pyqtProperty(int, notify=numberOfRingsStrChanged)
     def numberOfRings(self)->int:
-        return int(self._numberOfRingsStr)
+        return int(self.numberOfRingsStr)
 
 
 
@@ -162,7 +162,7 @@ class BedLevelPatternModel(ModelBase):
 
     @pyqtProperty(int, notify=cellSizeStrChanged)
     def cellSize(self)->int:
-        return int(self._cellSizeStr)
+        return int(self.cellSizeStr)
     
 
 
@@ -181,7 +181,7 @@ class BedLevelPatternModel(ModelBase):
 
     @pyqtProperty(int, notify=padSizeStrChanged)
     def padSize(self)->int:
-        return int(self._padSizeStr)
+        return int(self.padSizeStr)
     
 
 

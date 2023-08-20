@@ -4,12 +4,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSlot
 
-
-from cura.CuraApplication import CuraApplication
-
-from UM.Application import Application
 from UM.Logger import Logger
-from UM.Message import Message
 
 from .ControllerBase import ControllerBase
 from ..Models.BedLevelPatternModel import BedLevelPatternModel

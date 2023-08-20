@@ -23,7 +23,7 @@ UM.Dialog
     property int numberInputWidth: UM.Theme.getSize('button').width
 
     // Only display customizable options when a prest is not selected
-    property bool show_custom_options: selectedPreset.currentText == 'Custom'
+    property bool show_custom_options: dataModel.presetName == 'Custom'
 
 
 
@@ -72,7 +72,6 @@ UM.Dialog
             }
             Cura.ComboBox
             {
-                id: selectedPreset
                 Layout.fillWidth: true
                 model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
@@ -84,7 +83,7 @@ UM.Dialog
                 }
             }
 
-            // Bed level pattern option
+            // Starting fan percent
             UM.Label 
             { 
                 text: 'Starting Fan Speed %' 
@@ -114,6 +113,7 @@ UM.Dialog
                 visible: starting_fan_percent_mouse_area.containsMouse
             }
 
+            // Ending fan percent
             UM.Label 
             { 
                 text: 'Ending Fan Speed %' 
@@ -143,6 +143,7 @@ UM.Dialog
                 visible: ending_fan_percent_mouse_area.containsMouse
             }
 
+            // Fan percent change
             UM.Label 
             { 
                 text: 'Fan Speed % Change' 
@@ -172,6 +173,7 @@ UM.Dialog
                 visible: fan_speed_change_mouse_area.containsMouse
             }
 
+            // The tower label
             UM.Label 
             { 
                 text: 'Tower Label' 
@@ -201,6 +203,7 @@ UM.Dialog
                 visible: tower_label_mouse_area.containsMouse
             }
 
+            // Tower description
             UM.Label 
             { 
                 text: 'Tower Description' 
@@ -229,6 +232,7 @@ UM.Dialog
                 visible: tower_description_mouse_area.containsMouse
             }
 
+            // Maintain fan value for bridges
             UM.Label
             {
                 text: 'Maintain Value for Bridges'

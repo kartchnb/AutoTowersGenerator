@@ -44,13 +44,13 @@ class FanTowerModel(ModelBase):
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetName(self)->str:
         try:
-            return self._presetsTable[self._presetIndex]['name']
+            return self._presetsTable[self.presetIndex]['name']
         except IndexError:
             return 'Custom'
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFileName(self)->str:
-        return self._presetsTable[self._presetIndex]['filename']
+        return self._presetsTable[self.presetIndex]['filename']
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFilePath(self)->str:
@@ -58,11 +58,11 @@ class FanTowerModel(ModelBase):
     
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetStartPercent(self)->float:
-        return self._presetsTable[self._presetIndex]['start percent']
+        return self._presetsTable[self.presetIndex]['start percent']
     
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetPercentChange(self)->float:
-        return self._presetsTable[self._presetIndex]['percent change']
+        return self._presetsTable[self.presetIndex]['percent change']
 
 
 
@@ -81,7 +81,7 @@ class FanTowerModel(ModelBase):
     
     @pyqtProperty(float, notify=startFanPercentStrChanged)
     def startFanPercent(self)->float:
-        return float(self._startFanPercentStr)
+        return float(self.startFanPercentStr)
 
 
 
@@ -100,7 +100,7 @@ class FanTowerModel(ModelBase):
 
     @pyqtProperty(float, notify=endFanPercentStrChanged)
     def endFanPercent(self)->float:
-        return float(self._endFanPercentStr)
+        return float(self.endFanPercentStr)
 
 
 
@@ -119,7 +119,7 @@ class FanTowerModel(ModelBase):
 
     @pyqtProperty(float, notify=fanPercentChangeStrChanged)
     def fanPercentChange(self)->float:
-        fanPercentChange = float(self._fanPercentChangeStr)
+        fanPercentChange = float(self.fanPercentChangeStr)
         # Ensure the sign of the fan percent change is appropriate for the starting and end percentages
         return self._correctChangeValueSign(fanPercentChange, self.startFanPercent, self.endFanPercent)
 
