@@ -40,7 +40,7 @@ class FanTowerController(ControllerBase):
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
 
-        if self._dataModel.presetName != 'Custom':
+        if self._dataModel.presetSelected:
             # Load a preset tower
             self._loadPresetFanTower()
         else:

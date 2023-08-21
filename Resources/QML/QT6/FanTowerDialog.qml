@@ -22,9 +22,6 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
 
-    // Only display customizable options when a prest is not selected
-    property bool show_custom_options: dataModel.presetName == 'Custom'
-
 
 
     RowLayout
@@ -44,7 +41,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl('../../Images/fantower_icon.png')
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -73,7 +70,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -87,7 +84,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Starting Fan Speed %' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: starting_fan_percent_mouse_area
@@ -100,7 +97,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
                 text: dataModel.startFanPercentStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -117,7 +114,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Ending Fan Speed %' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: ending_fan_percent_mouse_area
@@ -130,7 +127,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
                 text: dataModel.endFanPercentStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -147,7 +144,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Fan Speed % Change' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: fan_speed_change_mouse_area
@@ -160,7 +157,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]{1,2}(?:\.[0-9]+)?|[+-]?100/ }
                 text: dataModel.fanPercentChangeStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -177,7 +174,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Label' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -190,7 +187,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: dataModel.towerLabelStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -207,7 +204,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Description' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_description_mouse_area
@@ -219,7 +216,7 @@ UM.Dialog
             {
                 Layout.fillWidth: true
                 text: dataModel.towerDescription
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {

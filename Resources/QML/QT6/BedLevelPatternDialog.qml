@@ -21,9 +21,6 @@ UM.Dialog
 
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
-
-    // Only display customizable options when a prest is not selected
-    property bool show_custom_options: dataModel.presetName == 'Custom'
     
 
 
@@ -44,7 +41,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl('../../Images/' + dataModel.patternIcon)
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -73,7 +70,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -87,7 +84,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Pattern'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: pattern_mouse_area
@@ -101,7 +98,7 @@ UM.Dialog
                 Layout.fillWidth: true
                 model: dataModel.patternsModel
                 textRole: 'name'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 currentIndex: dataModel.patternIndex
 
                 onCurrentIndexChanged: 
@@ -119,7 +116,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Bed Fill %'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: bed_inset_mouse_area
@@ -132,7 +129,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /^[1-9][0-9]?$|^100$/ }
                 text: dataModel.fillPercentageStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -149,7 +146,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Number of Rings'
-                visible: show_custom_options && (selected_pattern.currentText == 'Spiral Squares' || selected_pattern.currentText == 'Concentric Squares' || selected_pattern.currentText == 'Concentric Circles')
+                visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Spiral Squares' || selected_pattern.currentText == 'Concentric Squares' || selected_pattern.currentText == 'Concentric Circles')
                 MouseArea 
                 {
                     id: number_of_squares_mouse_area
@@ -162,7 +159,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: dataModel.numberOfRingsStr
-                visible: show_custom_options && (selected_pattern.currentText == 'Spiral Squares' || selected_pattern.currentText == 'Concentric Squares' || selected_pattern.currentText == 'Concentric Circles')
+                visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Spiral Squares' || selected_pattern.currentText == 'Concentric Squares' || selected_pattern.currentText == 'Concentric Circles')
                 
                 onTextChanged: 
                 {
@@ -179,7 +176,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Size in Cells'
-                visible: show_custom_options && (selected_pattern.currentText == 'Grid' || selected_pattern.currentText == 'Padded Grid')
+                visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Grid' || selected_pattern.currentText == 'Padded Grid')
                 MouseArea 
                 {
                     id: size_in_cells_mouse_area
@@ -192,7 +189,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: dataModel.cellSizeStr
-                visible: show_custom_options && (selected_pattern.currentText == 'Grid' || selected_pattern.currentText == 'Padded Grid')
+                visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Grid' || selected_pattern.currentText == 'Padded Grid')
                 
                 onTextChanged: 
                 {
@@ -209,7 +206,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Pad Size'
-                visible: show_custom_options && (selected_pattern.currentText == 'Padded Grid')
+                visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Padded Grid')
                 MouseArea 
                 {
                     id: pad_size_mouse_area
@@ -222,7 +219,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*/ }
                 text: dataModel.padSizeStr
-                visible: show_custom_options && selected_pattern.currentText == 'Padded Grid'
+                visible: !dataModel.presetSelected && selected_pattern.currentText == 'Padded Grid'
                 
                 onTextChanged: 
                 {

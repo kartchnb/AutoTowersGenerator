@@ -94,8 +94,9 @@ class ControllerBase(QObject):
 
     def generate(self, customizable)->None:
         ''' Generate a tower - either a preset tower or a custom tower '''
+
         qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
-        self._dialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'controller': self, 'dataModel': self._dataModel, 'allow_customization': customizable})
+        self._dialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'controller': self, 'dataModel': self._dataModel, 'enableCustom': customizable})
         self._dialog.show()
 
 

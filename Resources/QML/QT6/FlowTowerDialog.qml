@@ -22,9 +22,6 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
 
-    // Only display customizable options when a prest is not selected
-    property bool show_custom_options: dataModel.presetName == 'Custom'
-
 
 
     RowLayout
@@ -44,7 +41,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl('../../Images/' + dataModel.towerDesignIcon)
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -73,7 +70,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -87,7 +84,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Tower Design'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea
                 {
                     id: tower_design_mouse_area
@@ -100,7 +97,7 @@ UM.Dialog
                 Layout.fillWidth: true
                 model: dataModel.towerDesignsModel
                 textRole: 'name'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 currentIndex: dataModel.towerDesignIndex
 
                 onCurrentIndexChanged: 
@@ -118,7 +115,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Starting Flow %'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: start_flow_rate_mouse_area
@@ -131,7 +128,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.startFlowPercentStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -148,7 +145,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Ending Flow Rate %' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: end_flow_rate_mouse_area
@@ -161,7 +158,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.endFlowPercentStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -178,7 +175,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Flow Rate % Change' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: flow_rate_change_mouse_area
@@ -191,7 +188,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.flowPercentChangeStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
@@ -208,7 +205,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Tower Label'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -221,7 +218,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
                 text: dataModel.towerLabel
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
@@ -238,7 +235,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Tower Description'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_description_mouse_area
@@ -250,7 +247,7 @@ UM.Dialog
             {
                 Layout.fillWidth: true
                 text: dataModel.towerDescription
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {

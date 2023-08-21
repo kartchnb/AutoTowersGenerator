@@ -13,14 +13,14 @@ class FlowTowerModel(ModelBase):
 
     # The available flow tower presets
     _presetsTable = [
-        {'name': 'Flow Tower - Flow 115-85', 'filename': 'Flow Tower - Flow 115-85.stl', 'start flow': 115, 'flow change': -5},
-        {'name': 'Flow Tower (Spiral) - Flow 115-85', 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'start flow': 115, 'flow change': -5},
+        {'name': 'Flow Tower - Flow 115-85', 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': 115, 'flow change': -5},
+        {'name': 'Flow Tower (Spiral) - Flow 115-85', 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': 115, 'flow change': -5},
     ]
 
     # The available flow tower designs
     _towerDesignsTable = [
-        {'name': 'Standard', 'icon': 'flowtower_icon.png', 'filename': 'temptower.scad'}, 
-        {'name': 'Spiral', 'icon': 'spiral_flowtower_icon.png', 'filename': 'flowtower.scad'}, 
+        {'name': 'Standard', 'filename': 'temptower.scad', 'icon': 'flowtower_icon.png'}, 
+        {'name': 'Spiral', 'filename': 'flowtower.scad', 'icon': 'spiral_flowtower_icon.png'}, 
     ]
 
 
@@ -56,12 +56,13 @@ class FlowTowerModel(ModelBase):
     def presetIndex(self)->int:
         return self._presetIndex
     
+    @pyqtProperty(bool, notify=presetIndexChanged)
+    def presetSelected(self)->bool:
+        return self._presetIndex < len(self._presetsTable)
+    
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetName(self)->str:
-        try:
-            return self._presetsTable[self.presetIndex]['name']
-        except IndexError:
-            return 'Custom'
+        return self._presetsTable[self.presetIndex]['name']
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFileName(self)->str:
@@ -70,6 +71,10 @@ class FlowTowerModel(ModelBase):
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
+
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetTowerDesign(self)->str:
+        return self._presetsTable[self.presetIndex]['tower design']
     
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetStartFlowPercent(self)->float:
@@ -78,7 +83,10 @@ class FlowTowerModel(ModelBase):
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetFlowPercentChange(self)->float:
         return float(self._presetsTable[self.presetIndex]['flow change'])
-
+        
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetIcon(self)->str:
+        return self._presetsTable[self.presetIndex]['icon']
 
 
     # The selected tower design
@@ -105,6 +113,18 @@ class FlowTowerModel(ModelBase):
     @pyqtProperty(str, notify=towerDesignIndexChanged)
     def towerDesignIcon(self)->str:
         return self._towerDesignsTable[self.towerDesignIndex]['icon']
+    
+
+
+    # The icon to display on the dialog
+    dialogIconChanged = pyqtSignal()
+
+    @pyqtProperty(str, notify=dialogIconChanged)
+    def dialogIcon(self)->str:
+        try:
+            return self.presetIcon
+        except IndexError:
+            return self.towerDesignIcon
 
 
 

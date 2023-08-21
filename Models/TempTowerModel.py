@@ -48,12 +48,13 @@ class TempTowerModel(ModelBase):
     def presetIndex(self)->int:
         return self._presetIndex
     
+    @pyqtProperty(bool, notify=presetIndexChanged)
+    def presetSelected(self)->bool:
+        return self._presetIndex < len(self._presetsTable)
+    
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetName(self)->str:
-        try:
-            return self._presetsTable[self.presetIndex]['name']
-        except IndexError:
-            return 'Custom'
+        return self._presetsTable[self.presetIndex]['name']
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetFileName(self)->str:
@@ -70,6 +71,15 @@ class TempTowerModel(ModelBase):
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetTempChange(self)->float:
         return self._presetsTable[self.presetIndex]['temp change']
+    
+
+
+    # The icon to display on the dialog
+    dialogIconChanged = pyqtSignal()
+
+    @pyqtProperty(str, notify=dialogIconChanged)
+    def dialogIcon(self)->str:
+        return 'temptower_icon.png'
 
 
 

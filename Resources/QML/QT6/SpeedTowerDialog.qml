@@ -22,9 +22,6 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
 
-    // Only display customizable options when a prest is not selected
-    property bool show_custom_options: dataModel.presetName == 'Custom'
-
 
 
     RowLayout
@@ -44,7 +41,7 @@ UM.Dialog
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl('../../Images/speedtower_icon.png')
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -73,7 +70,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: allow_customization ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -87,7 +84,7 @@ UM.Dialog
             UM.Label
             {
                 text: 'Tower Type'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_type_mouse_area
@@ -100,7 +97,7 @@ UM.Dialog
                 Layout.fillWidth: true
                 model: dataModel.towerTypesModel
                 textRole: 'name'
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 currentIndex: dataModel.towerTypeIndex
 
                 onCurrentIndexChanged: 
@@ -118,7 +115,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Starting Speed' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: starting_speed_mouse_area
@@ -131,7 +128,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.startSpeedStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -147,7 +144,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Ending Speed' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: ending_speed_mouse_area
@@ -160,7 +157,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.endSpeedStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
@@ -176,7 +173,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Speed Change' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: speed_change_mouse_area
@@ -189,7 +186,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.speedChangeStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged: 
                 {
@@ -205,7 +202,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Wing Length' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: wing_length_mouse_area
@@ -218,7 +215,7 @@ UM.Dialog
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
                 text: dataModel.wingLengthStr
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
@@ -234,7 +231,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Label' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_label_mouse_Area
@@ -246,7 +243,7 @@ UM.Dialog
             {
                 Layout.fillWidth: true
                 text: dataModel.towerLabel
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
@@ -262,7 +259,7 @@ UM.Dialog
             UM.Label 
             { 
                 text: 'Tower Description' 
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: description_label_mouse_area
@@ -274,7 +271,7 @@ UM.Dialog
             {
                 Layout.fillWidth: true
                 text: dataModel.towerDescription
-                visible: show_custom_options
+                visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {

@@ -15,10 +15,10 @@ class BedLevelPatternModel(ModelBase):
 
     # The available bed level presets
     _presetsTable = [
-        {'name': 'Bed Size 220x220', 'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl'},
-        {'name': 'Bed Size 200x200', 'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl'},
-        {'name': 'Bed Size 180x180', 'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl'},
-        {'name': 'Bed Size 150x150', 'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl'},
+        {'name': 'Bed Size 220x220', 'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': 'Bed Size 200x200', 'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': 'Bed Size 180x180', 'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': 'Bed Size 150x150', 'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
     ]
 
     # The available bed level patterns
@@ -61,17 +61,19 @@ class BedLevelPatternModel(ModelBase):
     def setPresetIndex(self, value)->None:
         self._presetIndex = int(value)
         self.presetIndexChanged.emit()
+        self.dialogIconChanged.emit()
 
     @pyqtProperty(int, notify=presetIndexChanged, fset=setPresetIndex)
     def presetIndex(self)->int:
         return self._presetIndex
     
+    @pyqtProperty(bool, notify=presetIndexChanged)
+    def presetSelected(self)->bool:
+        return self._presetIndex < len(self._presetsTable)
+    
     @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetName(self)->str:
-        try:
-            return self._presetsTable[self.presetIndex]['name']
-        except IndexError:
-            return 'Custom'
+        return self._presetsTable[self.presetIndex]['name']
     
     @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetFileName(self)->str:
@@ -80,7 +82,10 @@ class BedLevelPatternModel(ModelBase):
     @pyqtProperty(str, notify=presetIndexChanged, fset=setPresetIndex)
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
-    
+        
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetIcon(self)->str:
+        return self._presetsTable[self.presetIndex]['icon']
 
 
     # The selected pattern type
@@ -89,11 +94,9 @@ class BedLevelPatternModel(ModelBase):
     patternIndexChanged = pyqtSignal()
 
     def setPatternIndex(self, value)->None:
-        try:
-            self._patternIndex = int(value)
-            self.patternIndexChanged.emit()
-        except ValueError:
-            Logger.log('e', f'Attempted to set patternIndex to "{value}", which could not be converted to an integer')
+        self._patternIndex = int(value)
+        self.patternIndexChanged.emit()
+        self.dialogIconChanged.emit()
 
     @pyqtProperty(int, notify=patternIndexChanged, fset=setPatternIndex)
     def patternIndex(self)->int:
@@ -106,6 +109,18 @@ class BedLevelPatternModel(ModelBase):
     @pyqtProperty(str, notify=patternIndexChanged)
     def patternIcon(self)->str:
         return self._patternsTable[self.patternIndex]['icon']
+    
+
+
+    # The icon to display on the dialog
+    dialogIconChanged = pyqtSignal()
+
+    @pyqtProperty(str, notify=dialogIconChanged)
+    def dialogIcon(self)->str:
+        try:
+            return self.presetIcon
+        except IndexError:
+            return self.patternIcon
 
 
 
