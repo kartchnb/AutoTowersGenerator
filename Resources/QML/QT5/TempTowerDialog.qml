@@ -7,34 +7,36 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Temperature Tower"
+    title: 'Temperature Tower'
 
     minimumWidth: screenScaleFactor * 500
-    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize('default_margin').height) + UM.Theme.getSize('button').height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     // Define the width of the number input text boxes
-    property int numberInputWidth: UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize('button').width
+
+
 
     RowLayout
     {
         id: contents
-        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
-        spacing: UM.Theme.getSize("default_margin").width
+        width: dialog.width - 2 * UM.Theme.getSize('default_margin').width
+        spacing: UM.Theme.getSize('default_margin').width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
             Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: UM.Theme.getColor("primary_button")
+            color: UM.Theme.getColor('primary_button')
 
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/temptower_icon.png")
+                source: Qt.resolvedUrl('../../Images/temptower_icon.png')
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
            }
@@ -43,87 +45,140 @@ UM.Dialog
         GridLayout
         {
             columns: 2
-            rowSpacing: UM.Theme.getSize("default_lining").height
-            columnSpacing: UM.Theme.getSize("default_margin").width
+            rowSpacing: UM.Theme.getSize('default_lining').height
+            columnSpacing: UM.Theme.getSize('default_margin').width
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
+            // Preset option
             Label
             {
-                text: "Starting Temperature"
+                text: 'Preset'
+            }
+            ComboBox
+            {
+                Layout.fillWidth: true
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
+
+                onCurrentIndexChanged:
+                {
+                    dataModel.presetIndex = currentIndex
+                }
+            }
+
+            // Starting temperature
+            Label
+            {
+                text: 'Starting Temperature'
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startTemperatureStr
-                onTextChanged: if (manager.startTemperatureStr != text) manager.startTemperatureStr = text
+                text: dataModel.startTemperatureStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.startTemperatureStr != text) dataModel.startTemperatureStr = text
+                }
             }
 
+            // Ending temperature
             Label
             {
-                text: "Ending Temperature"
+                text: 'Ending Temperature'
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endTemperatureStr
-                onTextChanged: if (manager.endTemperatureStr != text) manager.endTemperatureStr = text
+                text: dataModel.endTemperatureStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.endTemperatureStr != text) dataModel.endTemperatureStr = text
+                }
             }
 
+            // Temperature change
             Label
             {
-                text: "Temperature Change"
+                text: 'Temperature Change'
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.temperatureChangeStr
-                onTextChanged: if (manager.temperatureChangeStr != text) manager.temperatureChangeStr = text
+                text: dataModel.temperatureChangeStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.temperatureChangeStr != text) dataModel.temperatureChangeStr = text
+                }
             }
 
+            // Tower label
             Label
             {
-                text: "Tower Label"
+                text: 'Tower Label'
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /.{0,3}/ }
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                text: dataModel.towerLabel
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabel != text) dataModel.towerLabel = text
+                }
             }
 
+            // Tower description
             Label
             {
-                text: "Tower Description"
+                text: 'Tower Description'
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: dataModel.towerDescription
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerDescription != text) dataModel.towerDescription = text
+                }
             }
         }
     }
 
     rightButtons: Button
     {
-        text: "OK"
+        text: 'OK'
         onClicked: dialog.accept()
     }
 
     leftButtons: Button
     {
-        text: "Cancel"
+        text: 'Cancel'
         onClicked: dialog.reject()
     }
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }

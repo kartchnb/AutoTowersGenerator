@@ -7,34 +7,36 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Retraction Tower"
+    title: 'Retraction Tower'
 
     minimumWidth: screenScaleFactor * 500
-    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize('default_margin').height) + UM.Theme.getSize('button').height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     // Define the width of the number input text boxes
-    property int numberInputWidth: UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize('button').width
+
+
 
     RowLayout
     {
         id: contents
-        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
-        spacing: UM.Theme.getSize("default_margin").width
+        width: dialog.width - 2 * UM.Theme.getSize('default_margin').width
+        spacing: UM.Theme.getSize('default_margin').width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
             Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: UM.Theme.getColor("primary_button")
+            color: UM.Theme.getColor('primary_button')
 
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/retracttower_icon.png")
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -43,102 +45,159 @@ UM.Dialog
         GridLayout
         {
             columns: 2
-            rowSpacing: UM.Theme.getSize("default_lining").height
-            columnSpacing: UM.Theme.getSize("default_margin").width
+            rowSpacing: UM.Theme.getSize('default_lining').height
+            columnSpacing: UM.Theme.getSize('default_margin').width
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
- 
+
+            // Preset option
             Label
             {
-                text: "Tower Type"
+                text: 'Preset'
             }
             ComboBox
             {
                 Layout.fillWidth: true
-                model: manager.towerTypesModel
-                textRole: "value"
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
+
+                onCurrentIndexChanged:
+                {
+                    dataModel.presetIndex = currentIndex
+                }
+            }
+ 
+            // Tower type
+            Label
+            {
+                text: 'Tower Type'
+                visible: !dataModel.presetSelected
+            }
+            ComboBox
+            {
+                Layout.fillWidth: true
+                model: dataModel.towerTypesModel
+                textRole: 'name'
+                visible: !dataModel.presetSelected
+                currentIndex: dataModel.towerTypeIndex
 
                 onCurrentIndexChanged: 
                 {
-                    manager.towerType = model[currentIndex]["value"]
+                    dataModel.towerTypeIndex = currentIndex
                 }
             }
 
+            // Starting value
             Label 
             { 
-                text: "Starting Value" 
+                text: 'Starting ' + tower_type_selection.currentText 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startValueStr
-                onTextChanged: if (manager.startValueStr != text) manager.startValueStr = text
+                text: dataModel.startValueStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.startValueStr != text) dataModel.startValueStr = text
+                }
             }
 
+            // Ending value
             Label 
             { 
-                text: "Ending Value" 
+                text: 'Ending ' + tower_type_selection.currentText
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endValueStr
-                onTextChanged: if (manager.endValueStr != text) manager.endValueStr = text
+                text: dataModel.endValueStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.endValueStr != text) dataModel.endValueStr = text
+                }
             }
 
+            // Value change
             Label 
             { 
-                text: "Value Change" 
+                text: tower_type_selection.currentText + ' Change' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.valueChangeStr
-                onTextChanged: if (manager.valueChangeStr != text) manager.valueChangeStr = text
+                text: dataModel.valueChangeStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.valueChangeStr != text) dataModel.valueChangeStr = text
+                }
             }
 
+            // Tower label
             Label 
             { 
-                text: "Tower Label" 
+                text: 'Tower Label' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                text: dataModel.towerLabel
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabel != text) dataModel.towerLabel = text
+                }
             }
 
+            // Tower description
             Label 
             { 
-                text: "Tower Description" 
+                text: 'Tower Description' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: dataModel.towerDescription
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerDescription != text) dataModel.towerDescription = text
+                }
             }
         }
     }
 
     rightButtons: Button
     {
-        text: "OK"
+        text: 'OK'
         onClicked: dialog.accept()
     }
 
     leftButtons: Button
     {
-        text: "Cancel"
+        text: 'Cancel'
         onClicked: dialog.reject()
     }
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }
