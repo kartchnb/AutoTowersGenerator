@@ -119,7 +119,7 @@ class RetractTowerModel(ModelBase):
         return self._towerTypesTable[self.towerTypeIndex]['name']
     
     @pyqtProperty(str, notify=presetIndexChanged)
-    def towerTypLabel(self)->str:
+    def towerTypeLabel(self)->str:
         return self._towerTypesTable[self.towerTypeIndex]['label']
 
 
