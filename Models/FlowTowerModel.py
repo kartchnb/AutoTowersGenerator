@@ -51,6 +51,7 @@ class FlowTowerModel(ModelBase):
     def setPresetIndex(self, value)->None:
         self._presetIndex = int(value)
         self.presetIndexChanged.emit()
+        self.dialogIconChanged.emit()
 
     @pyqtProperty(int, notify=presetIndexChanged, fset=setPresetIndex)
     def presetIndex(self)->int:
@@ -97,6 +98,7 @@ class FlowTowerModel(ModelBase):
     def setTowerDesignIndex(self, value)->None:
         self._towerDesignIndex = int(value)
         self.towerDesignIndexChanged.emit()
+        self.dialogIconChanged.emit()
 
     @pyqtProperty(int, notify=towerDesignIndexChanged, fset=setTowerDesignIndex)
     def towerDesignIndex(self)->int:
