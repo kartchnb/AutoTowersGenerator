@@ -14,6 +14,8 @@ class RetractTowerModel(ModelBase):
 
     # The available retract tower presets
     _presetsTable = [
+        {'name': 'Retract Tower - Retract Distance 0.4-1.2', 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'starting value': 0.4, 'value change': 0.1, 'tower type': 'Distance'},
+        {'name': 'Retract Tower - Retract Distance 1.2-2.0', 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'starting value': 1.2, 'value change': 0.1, 'tower type': 'Distance'},
         {'name': 'Retract Tower - Retract Distance 1-6', 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'starting value': 1, 'value change': 1, 'tower type': 'Distance'},
         {'name': 'Retract Tower - Retract Distance 4-9', 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'starting value': 4, 'value change': 1, 'tower type': 'Distance'},
         {'name': 'Retract Tower - Retract Distance 7-12', 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'starting value': 7, 'value change': 1, 'tower type': 'Distance'},

@@ -1,5 +1,41 @@
 {
     "parameterSets": {
+        "Retract Tower - Retract Distance 0.4-1.2": {
+            "Base_Height": "0.84",
+            "Column_Label": "DST",
+            "Column_Label_Height_Multiplier": "0.3",
+            "Column_Label_Letter_Spacing_Multiplier": "1.0",
+            "Ending_Value": "1.2",
+            "Font": "Arial:style=Bold",
+            "Preview_Quality_Value": "24",
+            "Render_Quality_Value": "24",
+            "Section_Height": "8.4",
+            "Section_Label_Height_Multiplier": "0.3",
+            "Starting_Value": "0.4",
+            "Tower_Label": "RETRACT",
+            "Tower_Label_Height_Multiplier": "0.6",
+            "Tower_Width_Multiplier": "5.0",
+            "Value_Change": "0.1",
+            "Wall_Thickness": "0.6"
+        },
+        "Retract Tower - Retract Distance 1.2-2.0": {
+            "Base_Height": "0.84",
+            "Column_Label": "DST",
+            "Column_Label_Height_Multiplier": "0.3",
+            "Column_Label_Letter_Spacing_Multiplier": "1.0",
+            "Ending_Value": "2.0",
+            "Font": "Arial:style=Bold",
+            "Preview_Quality_Value": "24",
+            "Render_Quality_Value": "24",
+            "Section_Height": "8.4",
+            "Section_Label_Height_Multiplier": "0.3",
+            "Starting_Value": "1.2",
+            "Tower_Label": "RETRACT",
+            "Tower_Label_Height_Multiplier": "0.6",
+            "Tower_Width_Multiplier": "5.0",
+            "Value_Change": "0.1",
+            "Wall_Thickness": "0.6"
+        },
         "Retract Tower - Retract Distance 1-6": {
             "Base_Height": "0.84",
             "Column_Label": "DST",
