@@ -7,137 +7,196 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Flow Tower"
+    title: 'Flow Tower'
 
     minimumWidth: screenScaleFactor * 500
-    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize('default_margin').height) + UM.Theme.getSize('button').height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
     // Define the width of the number input text boxes
-    property int numberInputWidth: UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize('button').width
+
+
 
     RowLayout
     {
         id: contents
-        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
-        spacing: UM.Theme.getSize("default_margin").width
+        width: dialog.width - 2 * UM.Theme.getSize('default_margin').width
+        spacing: UM.Theme.getSize('default_margin').width
 
         Rectangle
         {
             Layout.preferredWidth: icon.width
             Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: UM.Theme.getColor("primary_button")
+            color: UM.Theme.getColor('primary_button')
 
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/" + selected_tower_model.model[selected_tower_model.currentIndex]["icon"])
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
 
+        // Preset
         GridLayout
         {
             columns: 2
-            rowSpacing: UM.Theme.getSize("default_lining").height
-            columnSpacing: UM.Theme.getSize("default_margin").width
+            rowSpacing: UM.Theme.getSize('default_lining').height
+            columnSpacing: UM.Theme.getSize('default_margin').width
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
+            // Preset option
+            Label
+            {
+                text: 'Preset'
+            }
+            ComboBox
+            {
+                Layout.fillWidth: true
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
+
+                onCurrentIndexChanged:
+                {
+                    dataModel.presetIndex = currentIndex
+                }
+            }
+
+            // The flow tower design
             Label 
             {
-                text: "Tower Model"
+                text: 'Tower Design'
+                visible: !dataModel.presetSelected
             }
             ComboBox
             {
                 id: selected_tower_model
-                layout.fillWidth: true
-                model: manager.towerModelOptionsModel
-                textRole: "value"
+                Layout.fillWidth: true
+                model: dataModel.towerDesignsModel
+                textRole: 'name'
+                visible: !dataModel.presetSelected
+                currentIndex: dataModel.towerDesignIndex
 
                 onCurrentIndexChanged:
                 {
-                    manager.towerModel = model[currentIndex]["value"]
+                    dataModel.towerDesignIndex = currentIndex
                 }
             }
+
+            // The starting flow rate
+            Label
             { 
-                text: "Starting Flow Rate %" 
+                text: 'Starting Flow %' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startFlowStr
-                onTextChanged: if (manager.startFlowStr != text) manager.startFlowStr = text
+                text: dataModel.startFlowPercentStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.startFlowPercentStr != text) dataModel.startFlowPercentStr = text
+                }
             }
 
+            // Ending flow rate
             Label 
             { 
-                text: "Ending Flow Rate %" 
+                text: 'Ending Flow %' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endFlowStr
-                onTextChanged: if (manager.endFlowStr != text) manager.endFlowStr = text
+                text: dataModel.endFlowPercentStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.endFlowPercentStr != text) dataModel.endFlowPercentStr = text
+                }
             }
 
             Label 
             { 
-                text: "Flow Rate % Change" 
+                text: 'Flow % Change' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegExpValidator { regExp: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.flowChangeStr
-                onTextChanged: if (manager.flowChangeStr != text) manager.flowChangeStr = text
+                text: dataModel.flowPercentChangeStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.flowPercentChangeStr != text) dataModel.flowPercentChangeStr = text
+                }
             }
     
             Label 
             { 
-                text: "Tower Label" 
+                text: 'Tower Label' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                text: dataModel.towerLabel
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabel != text) dataModel.towerLabel = text
+                }
             }
     
             Label 
             { 
-                text: "Tower Description" 
+                text: 'Tower Description' 
+                visible: !dataModel.presetSelected
             }
             TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: dataModel.towerDescription
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerDescription != text) dataModel.towerDescription = text
+                }
             }
         }
     }
 
     rightButtons: Button
     {
-        text: "OK"
+        text: 'OK'
         onClicked: dialog.accept()
     }
 
     leftButtons: Button
     {
-        text: "Cancel"
+        text: 'Cancel'
         onClicked: dialog.reject()
     }
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }

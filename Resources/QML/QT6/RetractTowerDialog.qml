@@ -80,7 +80,7 @@ UM.Dialog
                 }
             }
 
-            // Towertype
+            // Tower type
             UM.Label
             {
                 text: 'Tower Type'
@@ -142,6 +142,7 @@ UM.Dialog
                 visible: starting_value_mouse_area.containsMouse
             }
 
+            // Ending value
             UM.Label 
             { 
                 text: 'Ending ' + tower_type_selection.currentText
@@ -171,6 +172,7 @@ UM.Dialog
                 visible: ending_value_mouse_area.containsMouse
             }
 
+            // Value change
             UM.Label 
             { 
                 text: tower_type_selection.currentText + ' Change' 
@@ -200,6 +202,25 @@ UM.Dialog
                 visible: value_change_mouse_area.containsMouse
             }
 
+            // Tower label
+            UM.Label
+            {
+                text: 'Tower Label'
+                visible: !dataModel.presetSelected
+            }
+            Cura.TextField
+            {
+                Layout.fillWidth: true
+                text: dataModel.towerLabel
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabel != text) dataModel.towerLabel = text
+                }
+            }
+
+            // Tower description
             UM.Label 
             { 
                 text: 'Tower Description' 
