@@ -1,18 +1,13 @@
-import os
-import math
-
 # Import the correct version of PyQt
 try:
     from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 except ImportError:
     from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 
-from cura.CuraApplication import CuraApplication
-
-from UM.Application import Application
 from UM.Logger import Logger
 
 from .ControllerBase import ControllerBase
+from ..Models.RetractTowerModel import RetractTowerModel
 
 # Import the scripts that do the actual post-processing
 from ..Postprocessing import RetractSpeedTower_PostProcessing
@@ -21,52 +16,9 @@ from ..Postprocessing import RetractDistanceTower_PostProcessing
 
 
 class RetractTowerController(ControllerBase):
+
     _openScadFilename = 'retracttower.scad'
     _qmlFilename = 'RetractTowerDialog.qml'
-
-    _presetsTable = {
-        'Retract Tower - Retract Distance 1-6': {
-            'filename': 'Retract Tower - Retract Distance 1-6.stl',
-            'starting value': 1,
-            'value change': 1,
-            'tower type': 'Distance',
-       },
-
-        'Retract Tower - Retract Distance 4-9': {
-            'filename': 'Retract Tower - Retract Distance 4-9.stl',
-            'starting value': 4,
-            'value change': 1,
-            'tower type': 'Distance',
-        },
-
-        'Retract Tower - Retract Distance 7-12': {
-            'filename': 'Retract Tower - Retract Distance 7-12.stl',
-            'starting value': 7,
-            'value change': 1,
-            'tower type': 'Distance',
-        },
- 
-        'Retract Tower - Retract Speed 10-50': {
-            'filename': 'Retract Tower - Retract Speed 10-50.stl',
-            'starting value': 10,
-            'value change': 10,
-            'tower type': 'Speed',
-        },
-
-        'Retract Tower - Retract Speed 35-75': {
-            'filename': 'Retract Tower - Retract Speed 35-75.stl',
-            'starting value': 35,
-            'value change': 10,
-            'tower type': 'Speed',
-        },
-
-        'Retract Tower - Retract Speed 60-100': {
-            'filename': 'Retract Tower - Retract Speed 60-100.stl',
-            'starting value': 60,
-            'value change': 10,
-            'tower type': 'Speed',
-        },
-   }
 
     _criticalPropertiesTable = {
         'adaptive_layer_height_enabled': (ControllerBase.ContainerId.GLOBAL_CONTAINER_STACK, False),
@@ -75,163 +27,96 @@ class RetractTowerController(ControllerBase):
         'meshfix_union_all_remove_holes': (ControllerBase.ContainerId.ACTIVE_EXTRUDER_STACK, False),
     }
 
-    _towerTypesModel = [
-        {'value': 'Distance', 'label': 'DST'}, 
-        {'value': 'Speed', 'label': 'SPD'}, 
-    ]
 
 
-
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, pluginName):
-        super().__init__("Retraction Tower", guiPath, stlPath, loadStlCallback, generateAndLoadStlCallback, self._qmlFilename, self._presetsTable, self._criticalPropertiesTable, pluginName)
-
-
-
-    # The available tower types
-    @pyqtProperty(list)
-    def towerTypesModel(self):
-        return self._towerTypesModel
-
-
-
-    # The speed tower type 
-    _towerType = _towerTypesModel[0]['value']
-
-    towerTypeChanged = pyqtSignal()
-
-    def setTowerType(self, value)->None:
-        self._towerType = value
-        self.towerTypeChanged.emit()
-
-    @pyqtProperty(str, notify=towerTypeChanged, fset=setTowerType)
-    def towerType(self)->str:
-        return self._towerType
-
-
-
-    # The starting retraction value for the tower
-    _startValueStr = '1'
-
-    startValueStrChanged = pyqtSignal()
-
-    def setStartValueStr(self, value)->None:
-        self._startValueStr = value
-        self.startValueStrChanged.emit()
-
-    @pyqtProperty(str, notify=startValueStrChanged, fset=setStartValueStr)
-    def startValueStr(self)->str:
-        return self._startValueStr
-
-
-
-    # The ending retraction value for the tower
-    _endValueStr = '6'
-    
-    endValueStrChanged = pyqtSignal()
-
-    def setEndValueStr(self, value)->None:
-        self._endValueStr = value
-        self.endValueStrChanged.emit()
-
-    @pyqtProperty(str, notify=endValueStrChanged, fset=setEndValueStr)
-    def endValueStr(self)->str:
-        return self._endValueStr
-
-
-
-    # The amount to change the retraction value between tower sections
-    _valueChangeStr = '1'
-
-    valueChangeStrChanged = pyqtSignal()
-
-    def setValueChange(self, value)->None:
-        self._valueChangeStr = value
-        self.valueChangeStrChanged.emit()
-
-    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChange)
-    def valueChangeStr(self)->str:
-        return self._valueChangeStr
-
-
-
-    # The label to carve at the bottom of the tower
-    _towerLabelStr = _towerTypesModel[0]['label']
-
-    towerLabelStrChanged = pyqtSignal()
-    
-    def setTowerLabelStr(self, value)->None:
-        self._towerLabelStr = value
-        self.towerLabelStrChanged.emit()
-
-    @pyqtProperty(str, notify=towerLabelStrChanged, fset=setTowerLabelStr)
-    def towerLabelStr(self)->str:
-        return self._towerLabelStr
-
-
-
-    # The description to carve up the side of the tower
-    _towerDescriptionStr = 'RETRAC'
-
-    towerDescriptionStrChanged = pyqtSignal()
-    
-    def setTowerDescriptionStr(self, value)->None:
-        self._towerDescriptionStr = value
-        self.towerDescriptionStrChanged.emit()
-
-    @pyqtProperty(str, notify=towerDescriptionStrChanged, fset=setTowerDescriptionStr)
-    def towerDescriptionStr(self)->str:
-        return self._towerDescriptionStr
-
-
-
-    def _loadPreset(self, presetName)->None:
-        ''' Load a preset tower '''
-
-        # Load the preset table
-        try:
-            presetTable = self._presetsTable[presetName]
-        except KeyError:
-            Logger.log('e', f'A Retract Tower preset named "{presetName}" was requested, but has not been defined')
-            return
-
-        # Load the preset values
-        try:
-            stlFilePath = self._getStlFilePath(presetTable['filename'])
-            self._startValue = presetTable['starting value']
-            self._valueChange = presetTable['value change']
-            self._towerType = presetTable['tower type']
-        except KeyError as e:
-            Logger.log('e', f'The "{e.args[0]}" entry does not exit for the Retract Tower preset "{presetName}"')
-            return
-
-        # Use the nominal base and section heights for this preset tower
-        self._baseHeight = self._nominalBaseHeight
-        self._sectionHeight = self._nominalSectionHeight
-
-        # Determine the tower name
-        towerName = f'Preset {presetName}'
-
-        # Use the callback to load the preset STL file
-        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
+    def __init__(self, guiPath, stlPath, loadStlCallback, generateStlCallback, pluginName):
+        dataModel = RetractTowerModel(stlPath=stlPath)
+        super().__init__(name="Retraction Tower", guiPath=guiPath, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 
     @pyqtSlot()
     def dialogAccepted(self)->None:
         ''' This method is called by the dialog when the "Generate" button is clicked '''
-        # Determine the parameters for the tower
-        startValue = float(self.startValueStr)
-        endValue = float(self.endValueStr)
-        valueChange = float(self.valueChangeStr)
-        towerLabel = self.towerLabelStr
-        towerDescription = self.towerDescriptionStr
 
-        # Ensure the change amount has the correct sign
-        valueChange = self._correctChangeValueSign(valueChange, startValue, endValue)
+        if self._dataModel.presetSelected:
+            # Load a preset tower
+            self._loadPresetRetractTower()
+        else:
+            # Generate a custom tower using the user's settings
+            self.generateCustomRetractTower()
 
-        # Calculate the optimal base and section height, given the current printing layer height
-        baseHeight = self._calculateOptimalHeight(self._nominalBaseHeight)
-        sectionHeight = self._calculateOptimalHeight(self._nominalSectionHeight)
+
+
+    # This function is called by the main script when it's time to post-process the tower model
+    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
+        ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
+
+        # Gather the post-processing values
+        baseHeight = self._dataModel.optimalBaseHeight
+        sectionHeight = self._dataModel.optimalSectionHeight
+        initialLayerHeight = self._dataModel.initialLayerHeight
+        layerHeight = self._dataModel.layerHeight
+        startValue = self._dataModel.startValue
+        valueChange = self._dataModel.valueChange
+
+        # Call the retract speed post-processing script
+        if self._towerType == 'Speed':
+            output_gcode = RetractSpeedTower_PostProcessing.execute(
+                gcode=input_gcode, 
+                base_height=baseHeight,
+                section_height=sectionHeight, 
+                initial_layer_height=initialLayerHeight, 
+                layer_height=layerHeight, 
+                start_retract_speed=startValue, 
+                retract_speed_change=valueChange, 
+                enable_lcd_messages=enable_lcd_messages
+                )
+
+        # Call the retract distance post-processing script
+        else:
+            # Call the post-processing script
+            output_gcode = RetractDistanceTower_PostProcessing.execute(
+                gcode=input_gcode, 
+                base_height=baseHeight,
+                section_height=sectionHeight, 
+                initial_layer_height=initialLayerHeight, 
+                layer_height=layerHeight, 
+                start_retract_distance=startValue, 
+                retract_distance_change=valueChange, 
+                enable_lcd_messages=enable_lcd_messages
+                )
+
+        return output_gcode
+
+
+
+    def _loadPresetRetractTower(self)->None:
+        ''' Load a preset tower '''
+
+        # Determine the path of the STL file to load
+        stlFilePath = self._dataModel.presetFilePath
+
+        # Determine the tower name
+        towerName = f'Preset {self._dataModel.presetName}'
+
+        # Use the callback to load the preset STL file
+        self._loadStlCallback(self, towerName, stlFilePath, self.postProcess)
+
+
+
+    def generateCustomRetractTower(self)->None:
+        ''' This method is called by the dialog when the "Generate" button is clicked '''
+        
+        # Collect the tower customizations
+        openScadFilename = self._openScadFilename
+        startValue = self._dataModel.startValue
+        endValue = self._dataModel.endValue
+        valueChange = self._dataModel.valueChange
+        baseHeight = self._dataModel.optimalBaseHeight
+        sectionHeight = self._dataModel.optimalSectionHeight
+        towerLabel = self._dataModel.towerLabel
+        towerDescription = self._dataModel.towerDescription
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
@@ -243,50 +128,8 @@ class RetractTowerController(ControllerBase):
         openScadParameters ['Tower_Label'] = towerDescription
         openScadParameters ['Column_Label'] = towerLabel
 
-        # Record the tower settings that will be needed for post-processing
-        self._startValue = startValue
-        self._valueChange = valueChange
-        self._baseHeight = baseHeight
-        self._sectionHeight = sectionHeight
-
         # Determine the tower name
-        towerName = f'Custom Retraction Tower - {self._towerType} {startValue}-{endValue}x{valueChange}'
+        towerName = f'Custom Retraction Tower - {self._dataModel.towerTypeName} {startValue}-{endValue}x{valueChange}'
 
         # Send the filename and parameters to the model callback
-        self._generateAndLoadStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
-
-
-
-    # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
-        ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
-
-        # Call the retract speed post-processing script
-        if self._towerType == 'Speed':
-            output_gcode = RetractSpeedTower_PostProcessing.execute(
-                gcode=input_gcode, 
-                base_height=self._baseHeight, 
-                section_height=self._sectionHeight, 
-                initial_layer_height=self._initialLayerHeight, 
-                layer_height=self._layerHeight, 
-                start_retract_speed=self._startValue, 
-                retract_speed_change=self._valueChange, 
-                enable_lcd_messages=enable_lcd_messages
-                )
-
-        # Call the retract distance post-processing script
-        else:
-            # Call the post-processing script
-            output_gcode = RetractDistanceTower_PostProcessing.execute(
-                gcode=input_gcode, 
-                base_height=self._baseHeight, 
-                section_height=self._sectionHeight, 
-                initial_layer_height=self._initialLayerHeight, 
-                layer_height=self._layerHeight, 
-                relative_extrusion=self._relativeExtrusion,
-                start_retract_distance=self._startValue, 
-                retract_distance_change=self._valueChange, 
-                enable_lcd_messages=enable_lcd_messages
-                )
-
-        return output_gcode
+        self._generateStlCallback(self, towerName, openScadFilename, openScadParameters, self.postProcess)

@@ -217,7 +217,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Notify the user of the detected OpenScad version number and path
         else:
             message = f'Found OpenScad version {self._openScadInterface.OpenScadVersion} at {self._openScadInterface.OpenScadPath}'
-            Message(message, title=self._pluginName, message_type=Message.MessageType.POSITIVE).show()
+            Message(message, title=self._pluginName, message_type=Message.MessageType.POSITIVE, lifetime=5).show()
 
         self._openScadPathSettingChanged.emit()
 
@@ -275,7 +275,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the tower controllers '''
     
         if not ControllerClass in self._cachedControllerTable:
-            self._cachedControllerTable[ControllerClass] = ControllerClass(self._qmlPath, self._stlPath, self._loadStlCallback, self._generateAndLoadStlCallback, self._pluginName)
+            self._cachedControllerTable[ControllerClass] = ControllerClass(guiPath=self._qmlPath, stlPath=self._stlPath, loadStlCallback=self._loadStlCallback, generateStlCallback=self._generateStlCallback, pluginName=self._pluginName)
         return self._cachedControllerTable[ControllerClass]
 
 
@@ -284,46 +284,23 @@ class AutoTowersGenerator(QObject, Extension):
         # Add a menu for this plugin
         self.setMenuName('Auto Towers')
 
-        dividerCount = 0
-
         # Add menu entries for each tower controller
         for controllerClass in self._controllerClasses:
             controller = self._retrieveTowerController(controllerClass)
-
-            # Add a divider
-            if dividerCount >= 0:
-                self.addMenuItem(' ' * dividerCount, lambda:None)
-            dividerCount += 1
-
-            # Iterate over each of the tower controller presets
-            for presetName in controller.presetNames:
-                self.addMenuItem(f'{presetName}', lambda controllerClass=controllerClass, presetName=presetName: self._generateAutoTower(controllerClass, presetName))
-
-            # Add a custom tower entry
-            self.addMenuItem(f'Custom {controller.name}', lambda controllerClass=controllerClass: self._generateAutoTower(controllerClass))
+            self.addMenuItem(controller.name, lambda controllerClass=controllerClass: self._generateAutoTower(controllerClass))
 
         # Add a menu item for modifying plugin settings
-        self.addMenuItem(' ' * dividerCount, lambda: None)
-        dividerCount += 1
+        self.addMenuItem(' ', lambda: None)
         self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
 
 
 
-    def _generateAutoTower(self, controllerClass, presetName=''):
-        ''' Verifies print settings and generates the requested auto tower '''
-
-        # Custom auto towers cannot be generated unless OpenScad is correctly installed and configured
-        openscad_path_is_valid = self._openScadInterface.OpenScadPathValid
-        if presetName == '' and not openscad_path_is_valid:
-            Logger.log('d', f'The openScad path "{self._openScadInterface.OpenScadPath}" is invalid')
-            message = 'This functionality relies on OpenSCAD, which is not installed or configured correctly\n'
-            message += 'Please ensure OpenSCAD is installed (openscad.org) and that its path has been set correctly in this plugin\'s settings\n'
-            Message(message, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
-            return
+    def _generateAutoTower(self, controllerClass):
+        ''' Tell the current tower controller to generate a tower '''
 
         # Generate the auto tower
         currentTowerController = self._retrieveTowerController(controllerClass)
-        currentTowerController.generate(presetName)
+        currentTowerController.generate(customizable=self._openScadInterface.OpenScadPathValid)
 
 
 
@@ -333,8 +310,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Stop listening for callbacks
         self._towerControllerPostProcessingCallback = None
         Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
-        # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
-        # These callbacks are catching changes they shouldn't and removing towers inappropriately
+        # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're catching changes they shouldn't and removing towers inappropriately
         # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.disconnect(self._onPrintSettingChanged)
         # ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.disconnect(self._onExtruderPrintSettingChanged)
         CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.disconnect(self._onSceneChanged)
@@ -363,7 +339,7 @@ class AutoTowersGenerator(QObject, Extension):
                 restoredMessage = message + '\n' if not message is None else ''
                 restoredMessage += 'The following settings were restored:\n'
                 restoredMessage += '\n'.join([f'Restored {entry[0]} to {entry[1]}' for entry in restoredSettings])
-                Message(restoredMessage, title=self._pluginName).show()
+                Message(restoredMessage, title=self._pluginName, lifetime=5).show()
             self._currentTowerController = None
 
         CuraApplication.getInstance().processEvents()
@@ -410,7 +386,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    def _generateAndLoadStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
+    def _generateStlCallback(self, controller, towerName, openScadFilename, openScadParameters, postProcessingCallback)->None:
         ''' This callback is called by the tower model controller after a tower has been configured to generate an STL model from an OpenSCAD file '''
 
         # This could take up to a couple of minutes...
@@ -436,7 +412,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Make sure the STL file was generated
         if os.path.isfile(stlFilePath) == False:
             errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}"\nCommand output was\n"{self._openScadInterface.commandResult}"'
-            Message(errorMessage).show()
+            Message(errorMessage, title = self._pluginName, message_type=Message.MessageType.ERROR).show()
             Logger.log('e', errorMessage)
             self._waitDialog.hide()
             return
@@ -458,10 +434,10 @@ class AutoTowersGenerator(QObject, Extension):
             message = '\n'.join([f'Changed {entry[0]} from {entry[1]} to {entry[2]}' for entry in recommendedSettings])        
             if self.correctPrintSettings:
                 message = 'The following settings were changed:\n' + message
-                Message(message, title=self._pluginName).show()
+                Message(message, title=self._pluginName, lifetime=5).show()
             else:
                 message = 'The following setting changes are recommended\n' + message
-                Message(message, title=self._pluginName, message_type=Message.MessageType.WARNING).show()
+                Message(message, title=self._pluginName, message_type=Message.MessageType.WARNING, lifetime=5).show()
 
         # Record the new tower controller
         self._currentTowerController = controller
@@ -486,15 +462,15 @@ class AutoTowersGenerator(QObject, Extension):
         # Remove the model if the machine is changed
         CuraApplication.getInstance().getMachineManager().globalContainerChanged.connect(self._onMachineChanged)
 
-        # BAK: 25 Nov 2022 - Removing these callbacks for now, because they're giving me trouble...
-        # These callbacks are catching changes they shouldn't and removing towers inappropriately
-        # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
+        # BAK: 25 Nov 2022 - Removing the following callbacks for now, because they're catching changes they shouldn't and removing towers inappropriately
+
+        # # Remove the tower and post-processing if critical print settings (settings that are important for the AutoTower) are changed
         # CuraApplication.getInstance().getMachineManager().activeMachine.propertyChanged.connect(self._onPrintSettingChanged)
 
-        # # Remove the model if critical print settings (settings that are important for the AutoTower) are changed
+        # # Remove the tower and post-processing if critical print settings (settings that are important for the AutoTower) are changed
         # ExtruderManager.getInstance().getActiveExtruderStack().propertiesChanged.connect(self._onExtruderPrintSettingChanged)
 
-        # Remove the model if it is deleted or another model is added to the scene
+        # Remove the tower and post-processing if the model is deleted or another model is added to the scene
         CuraApplication.getInstance().getController().getScene().getRoot().childrenChanged.connect(self._onSceneChanged)
 
 
@@ -617,5 +593,5 @@ class AutoTowersGenerator(QObject, Extension):
 
         except IndexError:
             # This will be thrown if there is no gcode available
-            return
+            pass
         

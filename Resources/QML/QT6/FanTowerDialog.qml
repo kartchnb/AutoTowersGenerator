@@ -8,37 +8,40 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "Fan Tower"
+    title: 'Fan Tower'
 
-    buttonSpacing: UM.Theme.getSize("default_margin").width
+    buttonSpacing: UM.Theme.getSize('default_margin').width
     minimumWidth: screenScaleFactor * 445
-    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height) + UM.Theme.getSize("button").height
+    minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize('default_margin').height) + UM.Theme.getSize('button').height
     maximumHeight: minimumHeight
     width: minimumWidth
     height: minimumHeight
 
-    backgroundColor: UM.Theme.getColor("main_background")
+    backgroundColor: UM.Theme.getColor('main_background')
 
     // Define the width of the number input text boxes
-    property int numberInputWidth: UM.Theme.getSize("button").width
+    property int numberInputWidth: UM.Theme.getSize('button').width
+
+
 
     RowLayout
     {
         id: contents
-        width: dialog.width - 2 * UM.Theme.getSize("default_margin").width
-        spacing: UM.Theme.getSize("default_margin").width
+        width: dialog.width - 2 * UM.Theme.getSize('default_margin').width
+        spacing: UM.Theme.getSize('default_margin').width
 
+        // Display the icon for this tower
         Rectangle
         {
             Layout.preferredWidth: icon.width
             Layout.preferredHeight: icon.height
             Layout.fillHeight: true
-            color: UM.Theme.getColor("primary_button")
+            color: UM.Theme.getColor('primary_button')
 
             Image
             {
                 id: icon
-                source: Qt.resolvedUrl("../../Images/fantower_icon.png")
+                source: Qt.resolvedUrl('../../Images/' + dataModel.dialogIcon)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -47,15 +50,41 @@ UM.Dialog
         GridLayout
         {
             columns: 2
-            rowSpacing: UM.Theme.getSize("default_lining").height
-            columnSpacing: UM.Theme.getSize("default_margin").width
+            rowSpacing: UM.Theme.getSize('default_lining').height
+            columnSpacing: UM.Theme.getSize('default_margin').width
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
+            // Preset option
+            UM.Label
+            {
+                text: 'Fan Tower Preset'
+                MouseArea
+                {
+                    id: preset_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            Cura.ComboBox
+            {
+                Layout.fillWidth: true
+                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                textRole: 'name'
+                currentIndex: dataModel.presetIndex
+
+                onCurrentIndexChanged:
+                {
+                    dataModel.presetIndex = currentIndex
+                }
+            }
+
+            // Starting fan percent
             UM.Label 
             { 
-                text: "Starting Fan Speed %" 
+                text: 'Starting Fan Speed %' 
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: starting_fan_percent_mouse_area
@@ -66,19 +95,26 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.startFanSpeedStr
-                onTextChanged: if (manager.startFanSpeedStr != text) manager.startFanSpeedStr = text
+                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
+                text: dataModel.startFanPercentStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.startFanPercentStr != text) dataModel.startFanPercentStr = text
+                }
             }
             UM.ToolTip
             {
-                text: "The fan speed % for the first section of the tower.<p>This value will be changed for each section of the tower.<p>This should be a value between 0 and 100."
+                text: 'The fan speed % for the first section of the tower.<p>This value will be changed for each section of the tower.<p>This should be a value between 0 and 100.'
                 visible: starting_fan_percent_mouse_area.containsMouse
             }
 
+            // Ending fan percent
             UM.Label 
             { 
-                text: "Ending Fan Speed %" 
+                text: 'Ending Fan Speed %' 
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: ending_fan_percent_mouse_area
@@ -89,19 +125,26 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: manager.endFanSpeedStr
-                onTextChanged: if (manager.endFanSpeedStr != text) manager.endFanSpeedStr = text
+                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}(?:\.[0-9]+)?|100/ }
+                text: dataModel.endFanPercentStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.endFanPercentStr != text) dataModel.endFanPercentStr = text
+                }
             }
             UM.ToolTip
             {
-                text: "The fan speed % for the last section of the tower.<p>This should be a value between 0 and 100."
+                text: 'The fan speed % for the last section of the tower.<p>This should be a value between 0 and 100.'
                 visible: ending_fan_percent_mouse_area.containsMouse
             }
 
+            // Fan percent change
             UM.Label 
             { 
-                text: "Fan Speed % Change" 
+                text: 'Fan Speed % Change' 
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: fan_speed_change_mouse_area
@@ -112,19 +155,26 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.preferredWidth: numberInputWidth
-                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: manager.fanSpeedChangeStr
-                onTextChanged: if (manager.fanSpeedChangeStr != text) manager.fanSpeedChangeStr = text
+                validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]{1,2}(?:\.[0-9]+)?|[+-]?100/ }
+                text: dataModel.fanPercentChangeStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.fanPercentChangeStr != text) dataModel.fanPercentChangeStr = text
+                }
             }
             UM.ToolTip
             {
-                text: "The amount to change the fan speed % between sections of the tower.<p>In combination with the start end end fan speed %, this determines the number of sections in the tower."
+                text: 'The amount to change the fan speed % between sections of the tower.<p>In combination with the start end end fan speed %, this determines the number of sections in the tower.'
                 visible: fan_speed_change_mouse_area.containsMouse
             }
 
+            // The tower label
             UM.Label 
             { 
-                text: "Tower Label" 
+                text: 'Tower Label' 
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_label_mouse_area
@@ -136,18 +186,25 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /.{0,4}/ }
-                text: manager.towerLabelStr
-                onTextChanged: if (manager.towerLabelStr != text) manager.towerLabelStr = text
+                text: dataModel.towerLabelStr
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerLabelStr != text) dataModel.towerLabelStr = text
+                }
             }
             UM.ToolTip
             {
-                text: "An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less."
+                text: 'An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less.'
                 visible: tower_label_mouse_area.containsMouse
             }
 
+            // Tower description
             UM.Label 
             { 
-                text: "Tower Description" 
+                text: 'Tower Description' 
+                visible: !dataModel.presetSelected
                 MouseArea 
                 {
                     id: tower_description_mouse_area
@@ -158,18 +215,24 @@ UM.Dialog
             Cura.TextField
             {
                 Layout.fillWidth: true
-                text: manager.towerDescriptionStr
-                onTextChanged: if (manager.towerDescriptionStr != text) manager.towerDescriptionStr = text
+                text: dataModel.towerDescription
+                visible: !dataModel.presetSelected
+
+                onTextChanged: 
+                {
+                    if (dataModel.towerDescriptionStr != text) dataModel.towerDescriptionStr = text
+                }
             }
             UM.ToolTip
             {
-                text: "An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed."
+                text: 'An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed.'
                 visible: tower_description_mouse_area.containsMouse
             }
 
+            // Maintain fan value for bridges
             UM.Label
             {
-                text: "Maintain Value for Bridges"
+                text: 'Maintain Value for Bridges'
                 MouseArea 
                 {
                     id: maintain_bridge_value_mouse_area
@@ -180,12 +243,12 @@ UM.Dialog
             UM.CheckBox
             {
                 id: maintainBridgeValueCheckBox
-                checked: manager.maintainBridgeValue
-                onClicked: manager.maintainBridgeValue = checked
+                checked: dataModel.maintainBridgeValue
+                onClicked: dataModel.maintainBridgeValue = checked
             }
             UM.ToolTip
             {
-                text: "Selects whether the fan speed % for the current section is maintained while bridges are being printed."
+                text: 'Selects whether the fan speed % for the current section is maintained while bridges are being printed.'
                 visible: maintain_bridge_value_mouse_area.containsMouse
             }
         }
@@ -195,18 +258,18 @@ UM.Dialog
     [
         Cura.SecondaryButton
         {
-            text: "Cancel"
+            text: 'Cancel'
             onClicked: dialog.reject()
         },
         Cura.PrimaryButton
         {
-            text: "OK"
+            text: 'OK'
             onClicked: dialog.accept()
         }
     ]
 
     onAccepted:
     {
-        manager.dialogAccepted()
+        controller.dialogAccepted()
     }
 }
