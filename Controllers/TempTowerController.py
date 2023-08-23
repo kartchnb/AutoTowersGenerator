@@ -28,9 +28,9 @@ class TempTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateStlCallback, pluginName):
-        dataModel = TempTowerModel(stlPath=stlPath)
-        super().__init__(name='Temp Tower', guiPath=guiPath, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+    def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
+        dataModel = TempTowerModel(stlDir=stlDir)
+        super().__init__(name='Temp Tower', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 

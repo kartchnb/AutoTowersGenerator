@@ -180,5 +180,5 @@ class FanTowerModel(ModelBase):
     
 
 
-    def __init__(self, stlPath):
-        super().__init__(stlPath=stlPath)
+    def __init__(self, stlDir):
+        super().__init__(stlDir=stlDir)

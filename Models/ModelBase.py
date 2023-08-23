@@ -125,10 +125,10 @@ class ModelBase(QObject):
 
 
 
-    def __init__(self, stlPath):
+    def __init__(self, stlDir):
         super().__init__()
 
-        self._stlPath = stlPath
+        self._stlDir = stlDir
 
 
 
@@ -155,4 +155,4 @@ class ModelBase(QObject):
     def _buildStlFilePath(self, filename)->str:
         ''' Determine the full path to an STL file '''
 
-        return os.path.join(self._stlPath, filename)
+        return os.path.join(self._stlDir, filename)

@@ -24,12 +24,12 @@ class ControllerBase(QObject):
 
 
 
-    def __init__(self, name, guiPath, loadStlCallback, generateStlCallback, qmlFilename, criticalPropertiesTable, dataModel, pluginName):
+    def __init__(self, name, guiDir, loadStlCallback, generateStlCallback, qmlFilename, criticalPropertiesTable, dataModel, pluginName):
         super().__init__()
         
         self.name = name
 
-        self._guiPath = guiPath
+        self._guiDir = guiDir
 
         self._loadStlCallback = loadStlCallback
         self._generateStlCallback = generateStlCallback
@@ -95,7 +95,7 @@ class ControllerBase(QObject):
     def generate(self, customizable)->None:
         ''' Generate a tower - either a preset tower or a custom tower '''
 
-        qmlFilePath = os.path.join(self._guiPath, self._qmlFilename)
+        qmlFilePath = os.path.join(self._guiDir, self._qmlFilename)
         self._dialog = CuraApplication.getInstance().createQmlComponent(qmlFilePath, {'controller': self, 'dataModel': self._dataModel, 'enableCustom': customizable})
         self._dialog.show()
 

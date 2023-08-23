@@ -2,7 +2,6 @@ import os
 import platform
 import shutil
 import subprocess
-import tempfile
 
 from UM.Logger import Logger
 from UM.Message import Message
@@ -14,11 +13,12 @@ class OpenScadInterface:
 
 
 
-    def __init__(self, pluginName):
+    def __init__(self, pluginName, tempDir):
         self.errorMessage = ''
         self._openScadPath = ''
         self._pluginName = pluginName
         self._openscad_version = ''
+        self._tempDir = tempDir
 
 
 
@@ -210,8 +210,7 @@ class OpenScadInterface:
         if isSymLink:
             # Copy the file to the system's temporary directory
             fileName = os.path.basename(filePath)
-            tempDir = tempfile.gettempdir()
-            tempFilePath = os.path.join(tempDir, fileName)
+            tempFilePath = os.path.join(self._tempDir, fileName)
             shutil.copy2(filePath, tempFilePath)
             returnPath = tempFilePath
 

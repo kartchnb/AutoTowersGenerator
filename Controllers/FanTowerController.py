@@ -30,9 +30,9 @@ class FanTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateStlCallback, pluginName):
-        dataModel = FanTowerModel(stlPath=stlPath)
-        super().__init__(name='Fan Tower', guiPath=guiPath, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+    def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
+        dataModel = FanTowerModel(stlDir=stlDir)
+        super().__init__(name='Fan Tower', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 

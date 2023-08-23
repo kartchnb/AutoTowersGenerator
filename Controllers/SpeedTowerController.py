@@ -28,9 +28,9 @@ class SpeedTowerController(ControllerBase):
 
 
 
-    def __init__(self, guiPath, stlPath, loadStlCallback, generateStlCallback, pluginName):
-        dataModel = SpeedTowerModel(stlPath=stlPath)
-        super().__init__(name='Speed Tower', guiPath=guiPath, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+    def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
+        dataModel = SpeedTowerModel(stlDir=stlDir)
+        super().__init__(name='Speed Tower', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 

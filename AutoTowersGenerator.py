@@ -1,6 +1,6 @@
+import glob
 import os
 import platform
-import tempfile
 import traceback
 
 # Import the correct version of PyQt
@@ -70,7 +70,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     @property
-    def _pluginPath(self)->str:
+    def _pluginDir(self)->str:
         ''' Returns the path to the plugin directory '''
 
         return PluginRegistry.getInstance().getPluginPath(self.getPluginId())
@@ -81,23 +81,31 @@ class AutoTowersGenerator(QObject, Extension):
     def _openScadSourcePath(self)->str:
         ''' Returns the path to the OpenSCAD source models'''
 
-        return os.path.join(self._pluginPath, 'Resources', 'OpenScad')
+        return os.path.join(self._pluginDir, 'Resources', 'OpenScad')
 
 
     
     @property
-    def _qmlPath(self)->str:
-        ''' Returns the path to where the QML dialog files directory '''
+    def _qmlDir(self)->str:
+        ''' Returns the location of the QML dialog files directory '''
 
-        return os.path.join(self._pluginPath, 'Resources', 'QML', f'QT{PYQT_VERSION}')
+        return os.path.join(self._pluginDir, 'Resources', 'QML', f'QT{PYQT_VERSION}')
 
 
 
     @property
-    def _stlPath(self)->str:
-        ''' Returns the path where STL files are stored '''
+    def _stlDir(self)->str:
+        ''' Returns the directory where STL files are stored '''
 
-        return os.path.join(self._pluginPath, 'Resources', 'STL')
+        return os.path.join(self._pluginDir, 'Resources', 'STL')
+
+
+
+    @property
+    def _tempDir(self)->str:
+        ''' Returns the directory to use for temporary files '''
+
+        return os.path.join(self._pluginDir, 'tmp')
 
 
 
@@ -105,8 +113,7 @@ class AutoTowersGenerator(QObject, Extension):
     def _pluginSettingsFilePath(self)->str:
         ''' Returns the path to the plugin settings file '''
 
-        return os.path.join(self._pluginPath, 'pluginSettings.json')
-
+        return os.path.join(self._pluginDir, 'pluginSettings.json')
 
 
 
@@ -165,7 +172,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the OpenScad interface '''
 
         if self._cachedOpenScadInterface is None:
-            self._cachedOpenScadInterface = OpenScadInterface(self._pluginName)
+            self._cachedOpenScadInterface = OpenScadInterface(self._pluginName, self._tempDir)
 
         return self._cachedOpenScadInterface
 
@@ -275,7 +282,7 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Provides lazy instantiation of the tower controllers '''
     
         if not ControllerClass in self._cachedControllerTable:
-            self._cachedControllerTable[ControllerClass] = ControllerClass(guiPath=self._qmlPath, stlPath=self._stlPath, loadStlCallback=self._loadStlCallback, generateStlCallback=self._generateStlCallback, pluginName=self._pluginName)
+            self._cachedControllerTable[ControllerClass] = ControllerClass(guiDir=self._qmlDir, stlDir=self._stlDir, loadStlCallback=self._loadStlCallback, generateStlCallback=self._generateStlCallback, pluginName=self._pluginName)
         return self._cachedControllerTable[ControllerClass]
 
 
@@ -351,7 +358,7 @@ class AutoTowersGenerator(QObject, Extension):
             The QML file is assumed to be in the GUI directory             
             Returns a dialog object, with this object assigned as the "manager" '''
 
-        qml_file_path = os.path.join(self._qmlPath, qml_filename)
+        qml_file_path = os.path.join(self._qmlDir, qml_filename)
         dialog = Application.getInstance().createQmlComponent(qml_file_path, {'manager': self})
         return dialog
 
@@ -396,8 +403,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Compile the STL file name
         openScadFilePath = os.path.join(self._openScadSourcePath, openScadFilename)
         stlFilename = 'custom_autotower.stl'
-        stlOutputDir = tempfile.TemporaryDirectory()
-        stlFilePath = os.path.join(stlOutputDir.name, stlFilename)
+        stlFilePath = os.path.join(self._tempDir, stlFilename)
 
         # Generate the STL file
         # Since it can take a while to generate the STL file, this is done in a separate thread to allow the GUI to remain responsive
@@ -516,12 +522,10 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Called after plugins have been loaded
             Iniializing here means that Cura is fully ready '''
 
-
         self._pluginSettings = PluginSettings(self._pluginSettingsFilePath)
         # Init openscad path
         self._openScadInterface.SetOpenScadPath(self._pluginSettings.GetValue('openscad path'))        
         
-
         self._initializeMenu()
 
 
@@ -547,6 +551,10 @@ class AutoTowersGenerator(QObject, Extension):
             self._pluginSettings.SaveToFile(self._pluginSettingsFilePath)
         except AttributeError:
             pass
+
+        # Clear the temp directory
+        for file in glob.glob(os.path.join(self._tempDir, '*')):
+            os.remove(file)
 
         CuraApplication.getInstance().triggerNextExitCheck()        
 
