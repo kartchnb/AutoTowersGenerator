@@ -57,11 +57,12 @@ class RetractTowerController(ControllerBase):
         sectionHeight = self._dataModel.optimalSectionHeight
         initialLayerHeight = self._dataModel.initialLayerHeight
         layerHeight = self._dataModel.layerHeight
+        relativeExtrusion = self._dataModel.relativeExtrusion
         startValue = self._dataModel.startValue
         valueChange = self._dataModel.valueChange
 
         # Call the retract speed post-processing script
-        if self._towerType == 'Speed':
+        if self._dataModel.towerTypeName == 'Speed':
             output_gcode = RetractSpeedTower_PostProcessing.execute(
                 gcode=input_gcode, 
                 base_height=baseHeight,
@@ -82,6 +83,7 @@ class RetractTowerController(ControllerBase):
                 section_height=sectionHeight, 
                 initial_layer_height=initialLayerHeight, 
                 layer_height=layerHeight, 
+                relative_extrusion=relativeExtrusion,
                 start_retract_distance=startValue, 
                 retract_distance_change=valueChange, 
                 enable_lcd_messages=enable_lcd_messages
