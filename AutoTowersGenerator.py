@@ -312,7 +312,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ', lambda: None)
-        self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
+        self.addMenuItem(catalog.i18nc("@menu", "Settings"), lambda: self._displayPluginSettingsDialog())
 
 
 
