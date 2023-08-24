@@ -38,8 +38,9 @@ class OpenScadInterface:
     @property
     def OpenScadPath(self)->str:
         ''' Return the path to OpenScad - an attempt will be made to automatically determine it if needed '''
-        if self._openScadPath == '':
+        if self._openScadPath == '' or self._openScadPath == 'openscad':
             self._openScadPath = self._GetDefaultOpenScadPath()
+            Logger.log('e', f'default openscad path is "{self._openScadPath}"')
 
         return self._openScadPath
 
