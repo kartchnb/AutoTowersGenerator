@@ -27,8 +27,8 @@ class FlowTowerModel(ModelBase):
 
     # The available flow tower designs
     _towerDesignsTable = [
-        {'name': catalog.i18nc("@type", "Standard") , 'filename': 'temptower.scad', 'icon': 'flowtower_icon.png'}, 
-        {'name': catalog.i18nc("@type", "Spiral") , 'filename': 'flowtower.scad', 'icon': 'spiral_flowtower_icon.png'}, 
+        {'ident': 'Standard' , 'name': catalog.i18nc("@type", "Standard") , 'filename': 'temptower.scad', 'icon': 'flowtower_icon.png'}, 
+        {'ident': 'Spiral' , 'name': catalog.i18nc("@type", "Spiral") , 'filename': 'flowtower.scad', 'icon': 'spiral_flowtower_icon.png'}, 
     ]
 
 

@@ -303,7 +303,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _initializeMenu(self)->None:
         # Add a menu for this plugin
-        self.setMenuName('Auto Towers')
+        self.setMenuName(catalog.i18nc("@menu", "Auto Towers"))
 
         # Add menu entries for each tower controller
         for controllerClass in self._controllerClasses:
@@ -312,7 +312,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Add a menu item for modifying plugin settings
         self.addMenuItem(' ', lambda: None)
-        self.addMenuItem('Settings', lambda: self._displayPluginSettingsDialog())
+        self.addMenuItem(catalog.i18nc("@menu", "Settings"), lambda: self._displayPluginSettingsDialog())
 
 
 

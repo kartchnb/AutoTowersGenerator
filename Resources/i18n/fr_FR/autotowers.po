@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cura Html Doc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 13:13+0000\n"
-"PO-Revision-Date: 2023-08-24 15:16+0200\n"
+"POT-Creation-Date: 2023-08-24 14:19+0000\n"
+"PO-Revision-Date: 2023-08-24 16:26+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -16,6 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Virtaal 0.7.1\n"
+
+#: AutoTowersGenerator.py:315
+msgctxt "@menu"
+msgid "Settings"
+msgstr "Réglages"
 
 #: AutoTowersGenerator.py:361
 msgctxt "@msg"
@@ -46,6 +51,31 @@ msgstr "L'Auto Tower a été supprimée parce que l'extrudeur actif a changé"
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr "Suppression de l'autotower en raison de la fermeture de Cura"
+
+#: Controllers/RetractTowerController.py:42
+msgctxt "@test"
+msgid "Retraction Tower"
+msgstr "Tour de rétraction"
+
+#: Controllers/FanTowerController.py:43
+msgctxt "@test"
+msgid "Fan Tower"
+msgstr "Tour de ventilateur"
+
+#: Controllers/SpeedTowerController.py:40
+msgctxt "@test"
+msgid "Speed Tower"
+msgstr "Tour de vitesse"
+
+#: Controllers/BedLevelPatternContoller.py:46
+msgctxt "@test"
+msgid "Bed Level Pattern"
+msgstr "Test Mise à niveau plateau"
+
+#: Controllers/TempTowerController.py:40
+msgctxt "@test"
+msgid "Temp Tower"
+msgstr "Tour de température"
 
 #: Models/FlowTowerModel.py:24
 msgctxt "@model"
@@ -95,9 +125,7 @@ msgstr "Accélération"
 #: Models/SpeedTowerModel.py:33
 msgctxt "@type"
 msgid "Jerk"
-msgstr ""
-"Saccade\n"
-"Saccade"
+msgstr "Saccade"
 
 #: Models/SpeedTowerModel.py:34
 msgctxt "@type"
@@ -355,6 +383,16 @@ msgctxt "@label"
 msgid "Retract Tower Preset"
 msgstr "Tour de rétractation préréglée"
 
+#: Resources/QML/QT6/RetractTowerDialog.qml:76
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:74
+#: Resources/QML/QT6/FanTowerDialog.qml:76
+#: Resources/QML/QT6/SpeedTowerDialog.qml:74
+#: Resources/QML/QT6/TempTowerDialog.qml:73
+#: Resources/QML/QT6/FlowTowerDialog.qml:76
+msgctxt "@model"
+msgid "Custom"
+msgstr "Personnalisé"
+
 #: Resources/QML/QT6/RetractTowerDialog.qml:89
 #: Resources/QML/QT6/SpeedTowerDialog.qml:87
 msgctxt "@label"
@@ -441,15 +479,6 @@ msgstr ""
 msgctxt "@title"
 msgid "Bed Level Pattern"
 msgstr "Test Mise à niveau plateau"
-
-#: Resources/QML/QT6/BedLevelPatternDialog.qml:74
-#: Resources/QML/QT6/FanTowerDialog.qml:76
-#: Resources/QML/QT6/SpeedTowerDialog.qml:74
-#: Resources/QML/QT6/TempTowerDialog.qml:73
-#: Resources/QML/QT6/FlowTowerDialog.qml:76
-msgctxt "@model"
-msgid "Custom"
-msgstr "Personnalisé"
 
 #: Resources/QML/QT6/BedLevelPatternDialog.qml:87
 msgctxt "@label"

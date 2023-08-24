@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 13:50+0000\n"
+"POT-Creation-Date: 2023-08-24 14:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: AutoTowersGenerator.py:306
+msgctxt "@menu"
+msgid "Auto Towers"
+msgstr ""
+
+#: AutoTowersGenerator.py:315
+msgctxt "@menu"
+msgid "Settings"
+msgstr ""
 
 #: AutoTowersGenerator.py:361
 msgctxt "@msg"
@@ -45,6 +55,31 @@ msgstr ""
 #: AutoTowersGenerator.py:561
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
+msgstr ""
+
+#: Controllers/RetractTowerController.py:42
+msgctxt "@test"
+msgid "Retraction Tower"
+msgstr ""
+
+#: Controllers/FanTowerController.py:43
+msgctxt "@test"
+msgid "Fan Tower"
+msgstr ""
+
+#: Controllers/SpeedTowerController.py:40
+msgctxt "@test"
+msgid "Speed Tower"
+msgstr ""
+
+#: Controllers/BedLevelPatternContoller.py:46
+msgctxt "@test"
+msgid "Bed Level Pattern"
+msgstr ""
+
+#: Controllers/TempTowerController.py:40
+msgctxt "@test"
+msgid "Temp Tower"
 msgstr ""
 
 #: Models/FlowTowerModel.py:24

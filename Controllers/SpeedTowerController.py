@@ -4,7 +4,11 @@ try:
 except ImportError:
     from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, pyqtProperty
 
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ControllerBase import ControllerBase
 from ..Models.SpeedTowerModel import SpeedTowerModel
@@ -13,7 +17,10 @@ from ..Models.SpeedTowerModel import SpeedTowerModel
 from ..Postprocessing import PrintSpeedTower_PostProcessing
 from ..Postprocessing import MiscSpeedTower_PostProcessing
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class SpeedTowerController(ControllerBase):
 
@@ -30,7 +37,7 @@ class SpeedTowerController(ControllerBase):
 
     def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
         dataModel = SpeedTowerModel(stlDir=stlDir)
-        super().__init__(name='Speed Tower', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+        super().__init__(name=catalog.i18nc("@test", "Speed Tower"), guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 
