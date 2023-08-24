@@ -36,9 +36,7 @@ from .Controllers.RetractTowerController import RetractTowerController
 from .Controllers.SpeedTowerController import SpeedTowerController
 from .Controllers.TempTowerController import TempTowerController
 
-# Suggested solution from fieldOfView . in this discussion solved in Cura 4.9
-# https://github.com/5axes/Calibration-Shapes/issues/1
-# Cura are able to find the scripts from inside the plugin folder if the scripts are into a folder named resources
+# not sure it's necessar i18n could be store in a different place ?
 Resources.addSearchPath(
     os.path.join(os.path.abspath(os.path.dirname(__file__)),'Resources')
 )  # Plugin translation file import
@@ -232,12 +230,12 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Warn the user if the OpenScad path is not valid
         if not self._openScadInterface.OpenScadPathValid:
-            message = f'The OpenScad path "{self._openScadInterface.OpenScadPath}" is not valid'
+            message = f'{catalog.i18nc("@msg", "The OpenScad path")} "{self._openScadInterface.OpenScadPath}" {catalog.i18nc("@msg", "is not valid")}'
             Message(message, title=self._pluginName, message_type=Message.MessageType.ERROR).show()
 
         # Notify the user of the detected OpenScad version number and path
         else:
-            message = f'Found OpenScad version {self._openScadInterface.OpenScadVersion} at {self._openScadInterface.OpenScadPath}'
+            message = f'{catalog.i18nc("@msg", "Found OpenScad version")} {self._openScadInterface.OpenScadVersion} {catalog.i18nc("@msg", "at")} {self._openScadInterface.OpenScadPath}'
             Message(message, title=self._pluginName, message_type=Message.MessageType.POSITIVE, lifetime=5).show()
 
         self._openScadPathSettingChanged.emit()
@@ -359,7 +357,7 @@ class AutoTowersGenerator(QObject, Extension):
             if len(restoredSettings) > 0:
                 restoredMessage = message + '\n' if not message is None else ''
                 restoredMessage += catalog.i18nc("@msg", "The following settings were restored :\n")
-                restoredMessage += '\n'.join([f'Restored {entry[0]} to {entry[1]}' for entry in restoredSettings])
+                restoredMessage += '\n'.join([f'{catalog.i18nc("@msg", "Restored")} {entry[0]} {catalog.i18nc("@msg", "to")} {entry[1]}' for entry in restoredSettings])
                 Message(restoredMessage, title=self._pluginName, lifetime=5).show()
             self._currentTowerController = None
 
@@ -397,7 +395,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # If the file does not exist, display an error message
         if os.path.isfile(stlFilePath) == False:
-            errorMessage = f'The STL file "{stlFilePath}" does not exist'
+            errorMessage = f'{catalog.i18nc("@msg", "The STL file")} "{stlFilePath}" {catalog.i18nc("@msg", "does not exist")}'
             Logger.log('e', errorMessage)
             Message(errorMessage, title = self._pluginName, message_type=Message.MessageType.ERROR).show()
             return
@@ -431,7 +429,7 @@ class AutoTowersGenerator(QObject, Extension):
 
         # Make sure the STL file was generated
         if os.path.isfile(stlFilePath) == False:
-            errorMessage = f'Failed to generate "{stlFilePath}" from "{openScadFilename}"\nCommand output was\n"{self._openScadInterface.commandResult}"'
+            errorMessage = f'{catalog.i18nc("@msg", "Failed to generate")} "{stlFilePath}" {catalog.i18nc("@msg", "from")} "{openScadFilename}"\n{catalog.i18nc("@msg", "Command output was")}\n"{self._openScadInterface.commandResult}"'
             Message(errorMessage, title = self._pluginName, message_type=Message.MessageType.ERROR).show()
             Logger.log('e', errorMessage)
             self._waitDialog.hide()
@@ -451,7 +449,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Allow the tower controller to update Cura's settings to ensure it can be generated correctly
         recommendedSettings = controller.checkPrintSettings(self.correctPrintSettings)
         if len(recommendedSettings) > 0:
-            message = '\n'.join([f'Changed {entry[0]} from {entry[1]} to {entry[2]}' for entry in recommendedSettings])        
+            message = '\n'.join([f'{catalog.i18nc("@msg", "Changed")} {entry[0]} {catalog.i18nc("@msg", "from")} {entry[1]} {catalog.i18nc("@msg", "to")} {entry[2]}' for entry in recommendedSettings])        
             if self.correctPrintSettings:
                 message = catalog.i18nc("@msg", "The following settings were changed :\n") + message
                 Message(message, title=self._pluginName, lifetime=5).show()
@@ -510,7 +508,7 @@ class AutoTowersGenerator(QObject, Extension):
         if not self._currentTowerController is None:
             if self._currentTowerController.settingIsCritical(settingKey):
                 settingLabel = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(settingKey, 'label')
-                self._removeAutoTower(f'The Auto Tower was removed because the Cura setting "{settingLabel}" has changed since the tower was generated')
+                self._removeAutoTower(f'{catalog.i18nc("@msg", "The Auto Tower was removed because the Cura setting")} "{settingLabel}" {catalog.i18nc("@msg", "has changed since the tower was generated")}')
 
 
 
@@ -609,7 +607,7 @@ class AutoTowersGenerator(QObject, Extension):
                 try:
                     gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
                 except Exception as e:
-                    message = f'An exception occured during post-processing: {e}'
+                    message = f'{catalog.i18nc("@msg", "An exception occured during post-processing")} : {e}'
                     Message(f'{message}', title=self._pluginName, message_type=Message.MessageType.ERROR).show()
                     Logger.log('e', f'{message}\n{traceback.format_exc()}')
 

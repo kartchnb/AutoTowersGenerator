@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 17:05+0000\n"
+"POT-Creation-Date: 2023-08-24 17:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: AutoTowersGenerator.py:306
+#: AutoTowersGenerator.py:304
 msgctxt "@menu"
 msgid "Auto Towers"
 msgstr ""
 
-#: AutoTowersGenerator.py:315
+#: AutoTowersGenerator.py:313
 msgctxt "@menu"
 msgid "Settings"
 msgstr ""
 
-#: AutoTowersGenerator.py:361
+#: AutoTowersGenerator.py:359
 msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:456
+#: AutoTowersGenerator.py:454
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:459
+#: AutoTowersGenerator.py:457
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:502
+#: AutoTowersGenerator.py:500
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:520
+#: AutoTowersGenerator.py:518
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:561
+#: AutoTowersGenerator.py:559
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr ""
