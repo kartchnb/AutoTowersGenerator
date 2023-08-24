@@ -11,6 +11,8 @@ from cura.CuraApplication import CuraApplication
 
 from UM.Application import Application
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ControllerBase import ControllerBase
 from ..Models.FlowTowerModel import FlowTowerModel
@@ -18,6 +20,10 @@ from ..Models.FlowTowerModel import FlowTowerModel
 # Import the script that does the actual post-processing
 from ..Postprocessing import FlowTower_PostProcessing
 
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 
 class FlowTowerController(ControllerBase):
@@ -37,7 +43,7 @@ class FlowTowerController(ControllerBase):
 
     def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
         dataModel = FlowTowerModel(stlDir=stlDir)
-        super().__init__(name='Flow Tower', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+        super().__init__(name=catalog.i18nc("@test", "Flow Tower"), guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 
