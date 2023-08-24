@@ -33,8 +33,8 @@ class RetractTowerModel(ModelBase):
  
 
     _towerTypesTable = [
-        {'name': catalog.i18nc("@type","Distance") , 'label': 'DST'}, 
-        {'name': catalog.i18nc("@type","Speed") , 'label': 'SPD'}, 
+        {'ident': 'Distance' ,'name': catalog.i18nc("@type","Distance") , 'label': 'DST'}, 
+        {'ident': 'Speed' ,'name': catalog.i18nc("@type","Speed") , 'label': 'SPD'}, 
     ]
 
     # Make the presets availabe to QML
@@ -122,7 +122,7 @@ class RetractTowerModel(ModelBase):
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def towerTypeName(self)->str:
-        return self._towerTypesTable[self.towerTypeIndex]['name']
+        return self._towerTypesTable[self.towerTypeIndex]['ident']
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def towerTypeLabel(self)->str:
