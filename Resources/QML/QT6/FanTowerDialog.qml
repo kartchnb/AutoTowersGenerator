@@ -8,7 +8,10 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: 'Fan Tower'
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "Fan Tower")
 
     buttonSpacing: UM.Theme.getSize('default_margin').width
     minimumWidth: screenScaleFactor * 445
@@ -59,7 +62,7 @@ UM.Dialog
             // Preset option
             UM.Label
             {
-                text: 'Fan Tower Preset'
+                text: catalog.i18nc("@label", "Fan Tower Preset")
                 MouseArea
                 {
                     id: preset_mouse_area
@@ -83,7 +86,7 @@ UM.Dialog
             // Starting fan percent
             UM.Label 
             { 
-                text: 'Starting Fan Speed %' 
+                text: catalog.i18nc("@label", "Starting Fan Speed %")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -106,14 +109,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The fan speed % for the first section of the tower.<p>This value will be changed for each section of the tower.<p>This should be a value between 0 and 100.'
+                text: catalog.i18nc("@tooltip", "The fan speed % for the first section of the tower.<p>This value will be changed for each section of the tower.<p>This should be a value between 0 and 100.")
                 visible: starting_fan_percent_mouse_area.containsMouse
             }
 
             // Ending fan percent
             UM.Label 
             { 
-                text: 'Ending Fan Speed %' 
+                text: catalog.i18nc("@label", "Ending Fan Speed %")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -136,14 +139,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The fan speed % for the last section of the tower.<p>This should be a value between 0 and 100.'
+                text: catalog.i18nc("@tooltip", "The fan speed % for the last section of the tower.<p>This should be a value between 0 and 100.")
                 visible: ending_fan_percent_mouse_area.containsMouse
             }
 
             // Fan percent change
             UM.Label 
             { 
-                text: 'Fan Speed % Change' 
+                text: catalog.i18nc("@label", "Fan Speed % Change")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -166,14 +169,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The amount to change the fan speed % between sections of the tower.<p>In combination with the start end end fan speed %, this determines the number of sections in the tower.'
+                text: catalog.i18nc("@tooltip", "The amount to change the fan speed % between sections of the tower.<p>In combination with the start end end fan speed %, this determines the number of sections in the tower.")
                 visible: fan_speed_change_mouse_area.containsMouse
             }
 
             // The tower label
             UM.Label 
             { 
-                text: 'Tower Label' 
+                text: catalog.i18nc("@label", "Tower Label") 
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -196,14 +199,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less.'
+                text: catalog.i18nc("@tooltip", "An optional short label to carve into the base of the right column of the tower.<p>This must be four characters or less.")
                 visible: tower_label_mouse_area.containsMouse
             }
 
             // Tower description
             UM.Label 
             { 
-                text: 'Tower Description' 
+                text: catalog.i18nc("@label", "Tower Description")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -225,14 +228,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed.'
+                text: catalog.i18nc("@tooltip", "An optional label to carve up the left side of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed.")
                 visible: tower_description_mouse_area.containsMouse
             }
 
             // Maintain fan value for bridges
             UM.Label
             {
-                text: 'Maintain Value for Bridges'
+                text: catalog.i18nc("@label", "Maintain Value for Bridges")
                 MouseArea 
                 {
                     id: maintain_bridge_value_mouse_area
@@ -248,7 +251,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'Selects whether the fan speed % for the current section is maintained while bridges are being printed.'
+                text: catalog.i18nc("@label", "Selects whether the fan speed % for the current section is maintained while bridges are being printed.")
                 visible: maintain_bridge_value_mouse_area.containsMouse
             }
         }
@@ -258,12 +261,12 @@ UM.Dialog
     [
         Cura.SecondaryButton
         {
-            text: 'Cancel'
+            text: catalog.i18nc("@button", "Cancel")
             onClicked: dialog.reject()
         },
         Cura.PrimaryButton
         {
-            text: 'OK'
+            text: catalog.i18nc("@button", "OK")
             onClicked: dialog.accept()
         }
     ]
@@ -272,4 +275,5 @@ UM.Dialog
     {
         controller.dialogAccepted()
     }
+
 }

@@ -1,0 +1,596 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the AutoTowersGenerator package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoTowersGenerator\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-24 12:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: AutoTowersGenerator.py:361
+msgctxt "@msg"
+msgid "The following settings were restored :\n"
+msgstr ""
+
+#: AutoTowersGenerator.py:456
+msgctxt "@msg"
+msgid "The following settings were changed :\n"
+msgstr ""
+
+#: AutoTowersGenerator.py:459
+msgctxt "@msg"
+msgid "The following setting changes are recommended :\n"
+msgstr ""
+
+#: AutoTowersGenerator.py:502
+msgctxt "@msg"
+msgid "The Auto Tower was removed because the active machine was changed"
+msgstr ""
+
+#: AutoTowersGenerator.py:520
+msgctxt "@msg"
+msgid "The Auto Tower was removed because the active extruder changed"
+msgstr ""
+
+#: AutoTowersGenerator.py:561
+msgctxt "@msg"
+msgid "Removing the autotower because Cura is closing"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:13
+#: Resources/QML/QT6/TempTowerDialog.qml:14
+msgctxt "@title"
+msgid "Temperature Tower"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:60
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:63
+#: Resources/QML/QT6/SpeedTowerDialog.qml:63
+#: Resources/QML/QT6/FlowTowerDialog.qml:65
+msgctxt "@label"
+msgid "Preset"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:78
+#: Resources/QML/QT6/TempTowerDialog.qml:86
+msgctxt "@label"
+msgid "Starting Temperature"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:97
+#: Resources/QML/QT6/TempTowerDialog.qml:116
+msgctxt "@label"
+msgid "Ending Temperature"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:116
+#: Resources/QML/QT6/TempTowerDialog.qml:146
+msgctxt "@label"
+msgid "Temperature Change"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:135
+#: Resources/QML/QT6/RetractTowerDialog.qml:211
+#: Resources/QML/QT6/FanTowerDialog.qml:179
+#: Resources/QML/QT6/SpeedTowerDialog.qml:234
+#: Resources/QML/QT6/TempTowerDialog.qml:176
+#: Resources/QML/QT6/FlowTowerDialog.qml:210
+msgctxt "@label"
+msgid "Tower Label"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:154
+#: Resources/QML/QT6/RetractTowerDialog.qml:229
+#: Resources/QML/QT6/FanTowerDialog.qml:209
+#: Resources/QML/QT6/SpeedTowerDialog.qml:262
+#: Resources/QML/QT6/TempTowerDialog.qml:206
+#: Resources/QML/QT6/FlowTowerDialog.qml:240
+msgctxt "@label"
+msgid "Tower Description"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:173
+#: Resources/QML/QT6/RetractTowerDialog.qml:266
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:247
+#: Resources/QML/QT6/FanTowerDialog.qml:269
+#: Resources/QML/QT6/SpeedTowerDialog.qml:299
+#: Resources/QML/QT6/TempTowerDialog.qml:243
+#: Resources/QML/QT6/PluginSettingsDialog.qml:164
+#: Resources/QML/QT6/FlowTowerDialog.qml:277
+msgctxt "@button"
+msgid "OK"
+msgstr ""
+
+#: Resources/QML/QT5/TempTowerDialog.qml:179
+#: Resources/QML/QT6/RetractTowerDialog.qml:261
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:242
+#: Resources/QML/QT6/FanTowerDialog.qml:264
+#: Resources/QML/QT6/SpeedTowerDialog.qml:294
+#: Resources/QML/QT6/TempTowerDialog.qml:238
+#: Resources/QML/QT6/PluginSettingsDialog.qml:159
+#: Resources/QML/QT6/FlowTowerDialog.qml:272
+msgctxt "@button"
+msgid "Cancel"
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:14
+msgctxt "@title"
+msgid "Retraction Tower"
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:65
+msgctxt "@label"
+msgid "Retract Tower Preset"
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:89
+#: Resources/QML/QT6/SpeedTowerDialog.qml:87
+msgctxt "@label"
+msgid "Tower Type"
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:114
+msgctxt "@tooltip"
+msgid ""
+"The retraction chracteristic to change over the tower.<p>'Distance' changes "
+"the length of filament that is retracted or extruded.<p>'Speed' changes how "
+"quickly the filament is retracted or extruded."
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:121
+msgctxt "@label"
+msgid "Starting "
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:144
+msgctxt "@tooltip"
+msgid ""
+"The retraction value (speed or distance) for the first section of the tower."
+"<p>For 'Distance' towers, this is the length of filament retracted or "
+"extruded for each section.<p>For 'Speed' towers, this is the speed at which "
+"the filament is retracted or extruded."
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:151
+msgctxt "@label"
+msgid "Ending "
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:174
+msgctxt "@tooltip"
+msgid ""
+"The retraction value (speed or distance) for the last section of the tower."
+"<p>For 'Distance' towers, this is the length of filament retracted or "
+"extruded for each section.<p>For 'Speed' towers, this is the speed at which "
+"the filament is retracted or extruded."
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:181
+msgctxt "@label"
+msgid " Change"
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:204
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the retraction value (speed or distance) between tower "
+"sections.<p>In combination with the starting and ending values, this "
+"determines the number of sections in the tower."
+msgstr ""
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:251
+msgctxt "@label"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:14
+msgctxt "@title"
+msgid "Bed Level Pattern"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:87
+msgctxt "@label"
+msgid "Pattern"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:112
+msgctxt "@tooltip"
+msgid ""
+"The type of bed level Pattern to generate.<p>Each pattern covers different "
+"parts of the bed in different ways and some are faster than others.<p>The "
+"icon on the left side of this dialog will give an idea of what the bed level "
+"Pattern type will look like."
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:119
+msgctxt "@label"
+msgid "Bed Fill %"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:142
+msgctxt "@tooltip"
+msgid ""
+"This controls how much of the printer area the pattern should take up.<p>A "
+"value of 100 will result in the entire print area being used and may not "
+"work.<p>Values below 75 are probably not useful.<p>90 is a good default."
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:149
+msgctxt "@label"
+msgid "Number of Rings"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:172
+msgctxt "@tooltip"
+msgid "The number of concentric rings to generate in the pattern."
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:179
+msgctxt "@label"
+msgid "Size in Cells"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:202
+msgctxt "@tooltip"
+msgid "The size of the grid in cells."
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:209
+msgctxt "@label"
+msgid "Pad Size"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:232
+msgctxt "@tooltip"
+msgid "The size of each of the pads in the pattern."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:14
+msgctxt "@title"
+msgid "Fan Tower"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:65
+msgctxt "@label"
+msgid "Fan Tower Preset"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:89
+msgctxt "@label"
+msgid "Starting Fan Speed %"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:112
+#, javascript-format
+msgctxt "@tooltip"
+msgid ""
+"The fan speed % for the first section of the tower.<p>This value will be "
+"changed for each section of the tower.<p>This should be a value between 0 "
+"and 100."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:119
+msgctxt "@label"
+msgid "Ending Fan Speed %"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:142
+#, javascript-format
+msgctxt "@tooltip"
+msgid ""
+"The fan speed % for the last section of the tower.<p>This should be a value "
+"between 0 and 100."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:149
+msgctxt "@label"
+msgid "Fan Speed % Change"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:172
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the fan speed % between sections of the tower.<p>In "
+"combination with the start end end fan speed %, this determines the number "
+"of sections in the tower."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:202
+#: Resources/QML/QT6/TempTowerDialog.qml:199
+msgctxt "@tooltip"
+msgid ""
+"An optional short label to carve into the base of the right column of the "
+"tower.<p>This must be four characters or less."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:231
+#: Resources/QML/QT6/TempTowerDialog.qml:228
+msgctxt "@tooltip"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:238
+msgctxt "@label"
+msgid "Maintain Value for Bridges"
+msgstr ""
+
+#: Resources/QML/QT6/FanTowerDialog.qml:254
+#, javascript-format
+msgctxt "@label"
+msgid ""
+"Selects whether the fan speed % for the current section is maintained while "
+"bridges are being printed."
+msgstr ""
+
+#: Resources/QML/QT6/WaitDialog.qml:13
+msgctxt "@title"
+msgid "Generating the Tower"
+msgstr ""
+
+#: Resources/QML/QT6/WaitDialog.qml:50
+msgctxt "@label"
+msgid ""
+"Please wait while OpenSCAD generates the Auto Tower\n"
+"\n"
+"This may take a few minutes"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:14
+msgctxt "@title"
+msgid "Speed Tower"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:111
+msgctxt "@tooltip"
+msgid ""
+"The type of speed to vary across the tower.<p>'Print Speed' towers change "
+"the speed at which the nozzle moves while printing (equivalent to Cura's "
+"'print speed' setting).<p>'Acceleration' changes how fast the nozzle "
+"accelerates during printing.<p>The other towers are more specialized."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:118
+msgctxt "@label"
+msgid "Starting Speed"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:141
+msgctxt "@tooltip"
+msgid "The speed value for the first section of the tower."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:147
+msgctxt "@label"
+msgid "Ending Speed"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:170
+msgctxt "@tooltip"
+msgid "The speed value for the last section of the tower."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:176
+msgctxt "@label"
+msgid "Speed Change"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:199
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the speed between tower sections.<p>In combination with "
+"the starting and ending values, this determines the number of sections in "
+"the tower."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:205
+msgctxt "@label"
+msgid "Wing Length"
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:228
+msgctxt "@tooltip"
+msgid ""
+"The length of each 'wing' of the tower. Longer wings allow more time for the "
+"printer to get up to speed while printing, but results in more material "
+"being used."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:256
+msgctxt "@tooltip"
+msgid ""
+"An optional label to carve into the base of the tower.<p>This can be used, "
+"for example, to identify the purpose of the tower or the material being "
+"printed."
+msgstr ""
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:284
+msgctxt "@tooltip"
+msgid ""
+"An optional second description to carve into the base of the tower.<p>This "
+"is can be used to provide additional information about the tower - why you "
+"printed it, for instance."
+msgstr ""
+
+#: Resources/QML/QT6/TempTowerDialog.qml:62
+msgctxt "@label"
+msgid "Temp Tower Preset"
+msgstr ""
+
+#: Resources/QML/QT6/TempTowerDialog.qml:109
+msgctxt "@tooltip"
+msgid ""
+"The nozzle temperature for the first section of the tower.<p>It is good "
+"practice to make this temperature higher than the ending temperature."
+msgstr ""
+
+#: Resources/QML/QT6/TempTowerDialog.qml:139
+msgctxt "@tooltip"
+msgid ""
+"The nozzle temperature for the last section of the tower.<p>It is good "
+"practice to make this temperature lower than the starting temperature."
+msgstr ""
+
+#: Resources/QML/QT6/TempTowerDialog.qml:169
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the nozzle temperature between sections.<p>In "
+"combination with the starting and ending temperatures, this determines the "
+"number of sections in the tower."
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:15
+msgctxt "@title"
+msgid "AutoTowersGenerator v"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:15
+msgctxt "@title"
+msgid " Settings"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:59
+msgctxt "@label"
+msgid "OpenSCAD path"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:80
+msgctxt "@button"
+msgid "..."
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:86
+msgctxt "@tooltip"
+msgid ""
+"The path to the OpenSCAD executable.<p>If it is in the current path or "
+"installed in an expected location, the plugin should find it automatically."
+"<p>You can manually set or override the path here.<p>Clearing out this value "
+"will cause the plugin to attempt to automatically locate OpenSCAD again."
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:113
+msgctxt "@label"
+msgid "Correct print settings"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:128
+msgctxt "@tooltip"
+msgid ""
+"When checked, the plugin will automatically correct print settings for best "
+"results when printing the selected tower."
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:134
+msgctxt "@label"
+msgid "Enable LCD messages"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:149
+msgctxt "@tooltip"
+msgid ""
+"Selects whether tower parameter changes (temperature, speed, etc) are "
+"displayed to your printer's LCD.<p>Information is displayed using the M117 "
+"command, which can cause issues with some printers (The Dremel 3D45, for "
+"instance)<p>Deselect this if you are noticing issues."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:14
+msgctxt "@title"
+msgid "Flow Tower"
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:89
+msgctxt "@label"
+msgid "Tower Design"
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:113
+msgctxt "@tootip"
+msgid ""
+"The tower model to use.<p>The 'Classic' model is the same tower that is used "
+"by the temperature tower.<p>The 'Spiral' model is radically different and "
+"may suit certain materials or uses better.<p>In the end, either one should "
+"work just fine."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:120
+msgctxt "@label"
+msgid "Starting Flow %"
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:143
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The flow rate % for the first section of the tower.<p>This is equivalent to "
+"changing Cura's 'Flow' setting.<p>This value will be changed for each "
+"section of the tower<p>Rates less than 100 result in less filament being "
+"pushed through the nozzle.<p>Rates greater than 100 result in more filament "
+"being pushed through the nozzle.<p>It is good practice for the starting "
+"value to be higher than the ending value."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:150
+msgctxt "@label"
+msgid "Ending Flow Rate %"
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:173
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The flow rate % for the last section of the tower.<p>This is equivalent to "
+"changing Cura's 'Flow' setting.<p>Rates less than 100 result in less "
+"filament being pushed through the nozzle.<p>Rates greater than 100 result in "
+"more filament being pushed through the nozzle.<p>It is good practice for the "
+"ending value to be lower than the starting value."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:180
+msgctxt "@label"
+msgid "Flow Rate % Change"
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:203
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The amount to change the flow rate % between sections of the tower.<p>In "
+"combination with the start end end flow rates, this determines the number of "
+"sections in the tower."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:233
+msgctxt "@tootip"
+msgid ""
+"An optional short label to carve into the base of the right column of the "
+"tower.<p>This must be four characters or less."
+msgstr ""
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:262
+msgctxt "@tootip"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+
+#: Resources/QML/QT6/RemoveModelsButton.qml:12
+msgctxt "@text"
+msgid "Remove the AutoTower Model"
+msgstr ""

@@ -7,7 +7,10 @@ import UM 1.6 as UM
 UM.Dialog
 {
     id: dialog
-    title: "Generating the Tower"
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "Generating the Tower" )
 
     width: screenScaleFactor * 445
     height: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize("default_margin").height)
@@ -44,8 +47,9 @@ UM.Dialog
         UM.Label
         {
             Layout.fillWidth: true
-            text: "Please wait while OpenSCAD generates the Auto Tower\n\nThis may take a few minutes"
+            text: catalog.i18nc("@label", "Please wait while OpenSCAD generates the Auto Tower\n\nThis may take a few minutes")
             wrapMode: Text.Wrap
         }
     }
+	
 }
