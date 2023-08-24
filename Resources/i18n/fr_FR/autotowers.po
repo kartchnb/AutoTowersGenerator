@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cura Html Doc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 12:57+0000\n"
-"PO-Revision-Date: 2023-08-24 15:05+0200\n"
+"POT-Creation-Date: 2023-08-24 13:13+0000\n"
+"PO-Revision-Date: 2023-08-24 15:16+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -441,6 +441,15 @@ msgstr ""
 msgctxt "@title"
 msgid "Bed Level Pattern"
 msgstr "Test Mise à niveau plateau"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:74
+#: Resources/QML/QT6/FanTowerDialog.qml:76
+#: Resources/QML/QT6/SpeedTowerDialog.qml:74
+#: Resources/QML/QT6/TempTowerDialog.qml:73
+#: Resources/QML/QT6/FlowTowerDialog.qml:76
+msgctxt "@model"
+msgid "Custom"
+msgstr "Personnalisé"
 
 #: Resources/QML/QT6/BedLevelPatternDialog.qml:87
 msgctxt "@label"
