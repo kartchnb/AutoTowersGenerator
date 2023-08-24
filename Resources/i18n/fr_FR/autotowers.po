@@ -1009,6 +1009,10 @@ msgid "to"
 msgstr "en"
 
 msgctxt "@msg"
+msgid "from"
+msgstr "de"
+
+msgctxt "@msg"
 msgid "The STL file"
 msgstr "Le fichier STL"
 
