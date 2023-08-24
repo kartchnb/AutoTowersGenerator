@@ -4,29 +4,36 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
 
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class SpeedTowerModel(ModelBase):
 
     # The available speed tower presets
     _presetsTable = [
-        {'name': 'Speed Tower - Print Speed 20-100', 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': 20, 'speed change': 20, 'tower type': 'Print Speed'},
-        {'name': 'Speed Tower - Print Speed 50-150', 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': 50, 'speed change': 20, 'tower type': 'Print Speed'},
-        {'name': 'Speed Tower - Print Speed 100-200', 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': 100, 'speed change': 20, 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 20-100") , 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': 20, 'speed change': 20, 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 50-150") , 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': 50, 'speed change': 20, 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 100-200") , 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': 100, 'speed change': 20, 'tower type': 'Print Speed'},
     ]
 
     # The speed tower types that can been created
     _towerTypesModel = [
-        {'name': 'Print Speed', 'label': 'PRINT SPEED'}, 
-        {'name': 'Acceleration', 'label': 'ACCELERATION'}, 
-        {'name': 'Jerk', 'label': 'JERK'}, 
-        {'name': 'Junction', 'label': 'JUNCTION'}, 
-        {'name': 'Marlin Linear', 'label': 'MARLIN LINEAR'}, 
-        {'name': 'RepRap Pressure', 'label': 'REPRAP PRESSURE'},
+        {'name': catalog.i18nc("@type", "Print Speed") , 'label': 'PRINT SPEED'}, 
+        {'name': catalog.i18nc("@type", "Acceleration") , 'label': 'ACCELERATION'}, 
+        {'name': catalog.i18nc("@type", "Jerk") , 'label': 'JERK'}, 
+        {'name': catalog.i18nc("@type", "Junction") , 'label': 'JUNCTION'}, 
+        {'name': catalog.i18nc("@type", "Marlin Linear") , 'label': 'MARLIN LINEAR'}, 
+        {'name': catalog.i18nc("@type", "RepRap Pressure") , 'label': 'REPRAP PRESSURE'},
     ]
 
 

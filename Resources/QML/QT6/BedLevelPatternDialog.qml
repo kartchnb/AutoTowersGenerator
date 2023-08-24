@@ -71,7 +71,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': catalog.i18nc("@model", "Custom")}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 

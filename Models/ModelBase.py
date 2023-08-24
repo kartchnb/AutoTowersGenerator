@@ -13,8 +13,6 @@ from cura.Settings.ExtruderManager import ExtruderManager
 from UM.Application import Application
 from UM.Logger import Logger
 
-
-
 class ModelBase(QObject):
 
     # The initial values used for the base and section heights of the tower

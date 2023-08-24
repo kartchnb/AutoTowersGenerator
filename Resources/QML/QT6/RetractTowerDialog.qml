@@ -73,7 +73,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': catalog.i18nc("@model", "Custom")}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -118,7 +118,7 @@ UM.Dialog
             // Starting value
             UM.Label 
             { 
-                text: catalog.i18nc("@label","Starting ") +  catalog.i18nc("@label",tower_type_selection.currentText) 
+                text: catalog.i18nc("@label","Starting ") +  catalog.i18nc("@type",tower_type_selection.currentText) 
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -148,7 +148,7 @@ UM.Dialog
             // Ending value
             UM.Label 
             { 
-                text: catalog.i18nc("@label","Ending ") + catalog.i18nc("@label",tower_type_selection.currentText)
+                text: catalog.i18nc("@label","Ending ") + catalog.i18nc("@type",tower_type_selection.currentText)
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -178,7 +178,7 @@ UM.Dialog
             // Value change
             UM.Label 
             { 
-                text: catalog.i18nc("@label",tower_type_selection.currentText) + catalog.i18nc("@label"," Change")
+                text: catalog.i18nc("@type",tower_type_selection.currentText) + catalog.i18nc("@label"," Change")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {

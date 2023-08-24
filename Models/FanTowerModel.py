@@ -4,17 +4,24 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
 
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class FanTowerModel(ModelBase):
 
     # The available fan tower presets
     _presetsTable = [
-        {'name': 'Fan Tower - 0-100%', 'filename': 'Fan Tower - Fan 0-100.stl', 'start percent': 0, 'percent change': 20,}
+        {'name': catalog.i18nc("@model", "Fan Tower - 0-100%") , 'filename': 'Fan Tower - Fan 0-100.stl', 'start percent': 0, 'percent change': 20,}
     ]
 
 
