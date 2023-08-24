@@ -4,9 +4,12 @@ import Cura 1.7 as Cura
 Cura.SecondaryButton
 {
     height: UM.Theme.getSize("action_button").height
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
     tooltip:
     {
-        var tipText = "Remove the AutoTower Model";
+        var tipText = catalog.i18nc("@text", "Remove the AutoTower Model");
         return tipText
     }
     toolTipContentAlignment: UM.Enums.ContentAlignment.AlignLeft
@@ -14,4 +17,5 @@ Cura.SecondaryButton
     iconSource: Qt.resolvedUrl("../../Images/remove_tower_icon.svg")
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
+	
 }

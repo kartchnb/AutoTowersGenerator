@@ -9,7 +9,10 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: "AutoTowersGenerator v" + manager.pluginVersion + " Settings"
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "AutoTowersGenerator v") + manager.pluginVersion + catalog.i18nc("@title", " Settings")
 
     buttonSpacing: UM.Theme.getSize("default_margin").width
     minimumWidth: screenScaleFactor * 445
@@ -53,7 +56,7 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "OpenSCAD path" 
+                text: catalog.i18nc("@label", "OpenSCAD path")
                 MouseArea 
                 {
                     id: openscad_path_mouse_area
@@ -74,13 +77,13 @@ UM.Dialog
 
                 Cura.PrimaryButton
                 {
-                    text: "..."
+                    text: catalog.i18nc("@button", "...")
                     onClicked: fileDialog.open()
                 }
             }
             UM.ToolTip
             {
-                text: "The path to the OpenSCAD executable.<p>If it is in the current path or installed in an expected location, the plugin should find it automatically.<p>You can manually set or override the path here.<p>Clearing out this value will cause the plugin to attempt to automatically locate OpenSCAD again."
+                text: catalog.i18nc("@tooltip", "The path to the OpenSCAD executable.<p>If it is in the current path or installed in an expected location, the plugin should find it automatically.<p>You can manually set or override the path here.<p>Clearing out this value will cause the plugin to attempt to automatically locate OpenSCAD again.")
                 visible: openscad_path_mouse_area.containsMouse
             }
             FileDialog
@@ -107,7 +110,7 @@ UM.Dialog
 
             UM.Label 
             { 
-                text: "Correct print settings" 
+                text: catalog.i18nc("@label", "Correct print settings")
                 MouseArea 
                 {
                     id: correct_print_settings_mouse_area
@@ -122,13 +125,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "When checked, the plugin will automatically correct print settings for best results when printing the selected tower."
+                text: catalog.i18nc("@tooltip", "When checked, the plugin will automatically correct print settings for best results when printing the selected tower.")
                 visible: correct_print_settings_mouse_area.containsMouse
             }
 
             UM.Label 
             { 
-                text: "Enable LCD messages" 
+                text: catalog.i18nc("@label", "Enable LCD messages")
                 MouseArea 
                 {
                     id: enable_lcd_messages_mouse_area
@@ -143,7 +146,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: "Selects whether tower parameter changes (temperature, speed, etc) are displayed to your printer's LCD.<p>Information is displayed using the M117 command, which can cause issues with some printers (The Dremel 3D45, for instance)<p>Deselect this if you are noticing issues."
+                text: catalog.i18nc("@tooltip", "Selects whether tower parameter changes (temperature, speed, etc) are displayed to your printer's LCD.<p>Information is displayed using the M117 command, which can cause issues with some printers (The Dremel 3D45, for instance)<p>Deselect this if you are noticing issues.")
                 visible: enable_lcd_messages_mouse_area.containsMouse
             }
         }
@@ -153,12 +156,12 @@ UM.Dialog
     [
         Cura.SecondaryButton
         {
-            text: "Cancel"
+            text: catalog.i18nc("@button", "Cancel")
             onClicked: dialog.reject()
         },
         Cura.PrimaryButton
         {
-            text: "OK"
+            text: catalog.i18nc("@button", "OK")
             onClicked: dialog.accept()
         }
     ]

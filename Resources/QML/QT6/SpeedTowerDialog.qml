@@ -8,7 +8,10 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: 'Speed Tower'
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "Speed Tower")
 
     buttonSpacing: UM.Theme.getSize('default_margin').width
     minimumWidth: screenScaleFactor * 445
@@ -21,8 +24,6 @@ UM.Dialog
 
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
-
-
 
     RowLayout
     {
@@ -59,7 +60,7 @@ UM.Dialog
             // Preset option
             UM.Label
             {
-                text: 'Preset'
+                text: catalog.i18nc("@label", "Preset")
                 MouseArea
                 {
                     id: preset_mouse_area
@@ -83,7 +84,7 @@ UM.Dialog
             // Tower type option
             UM.Label
             {
-                text: 'Tower Type'
+                text: catalog.i18nc("@label", "Tower Type")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -107,14 +108,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The type of speed to vary across the tower.<p>"Print Speed" towers change the speed at which the nozzle moves while printing (equivalent to Cura\'s "print speed" setting).<p>"Acceleration" changes how fast the nozzle accelerates during printing.<p>The other towers are more specialized.'
+                text: catalog.i18nc("@tooltip", "The type of speed to vary across the tower.<p>\'Print Speed\' towers change the speed at which the nozzle moves while printing (equivalent to Cura\'s \'print speed\' setting).<p>\'Acceleration\' changes how fast the nozzle accelerates during printing.<p>The other towers are more specialized.")
                 visible: tower_type_mouse_area.containsMouse
             }
 
             // Start speed
             UM.Label 
             { 
-                text: 'Starting Speed' 
+                text: catalog.i18nc("@label", "Starting Speed")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -137,13 +138,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The speed value for the first section of the tower.'
+                text: catalog.i18nc("@tooltip", "The speed value for the first section of the tower.")
                 visible: starting_speed_mouse_area.containsMouse
             }
 
             UM.Label 
             { 
-                text: 'Ending Speed' 
+                text: catalog.i18nc("@label", "Ending Speed")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -166,13 +167,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The speed value for the last section of the tower.'
+                text: catalog.i18nc("@tooltip", "The speed value for the last section of the tower.")
                 visible: ending_speed_mouse_area.containsMouse
             }
 
             UM.Label 
             { 
-                text: 'Speed Change' 
+                text: catalog.i18nc("@label", "Speed Change") 
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -195,13 +196,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The amount to change the speed between tower sections.<p>In combination with the starting and ending values, this determines the number of sections in the tower.'
+                text: catalog.i18nc("@tooltip", "The amount to change the speed between tower sections.<p>In combination with the starting and ending values, this determines the number of sections in the tower.")
                 visible: speed_change_mouse_area.containsMouse
             }
 
             UM.Label 
             { 
-                text: 'Wing Length' 
+                text: catalog.i18nc("@label", "Wing Length") 
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -224,13 +225,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The length of each "wing" of the tower. Longer wings allow more time for the printer to get up to speed while printing, but results in more material being used.'
+                text: catalog.i18nc("@tooltip", "The length of each \'wing\' of the tower. Longer wings allow more time for the printer to get up to speed while printing, but results in more material being used.")
                 visible: wing_length_mouse_area.containsMouse
             }
     
             UM.Label 
             { 
-                text: 'Tower Label' 
+                text: catalog.i18nc("@label", "Tower Label")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -252,13 +253,13 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'An optional label to carve into the base of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed.'
+                text: catalog.i18nc("@tooltip", "An optional label to carve into the base of the tower.<p>This can be used, for example, to identify the purpose of the tower or the material being printed.")
                 visible: tower_label_mouse_Area.containsMouse
             }
     
             UM.Label 
             { 
-                text: 'Tower Description' 
+                text: catalog.i18nc("@label", "Tower Description")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -280,7 +281,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'An optional second description to carve into the base of the tower.<p>This is can be used to provide additional information about the tower - why you printed it, for instance.'
+                text: catalog.i18nc("@tooltip", "An optional second description to carve into the base of the tower.<p>This is can be used to provide additional information about the tower - why you printed it, for instance.")
                 visible: description_label_mouse_area.containsMouse
             }
         }
@@ -290,12 +291,12 @@ UM.Dialog
     [
         Cura.SecondaryButton
         {
-            text: 'Cancel'
+            text: catalog.i18nc("@button", "Cancel")
             onClicked: dialog.reject()
         },
         Cura.PrimaryButton
         {
-            text: 'OK'
+            text: catalog.i18nc("@button", "OK")
             onClicked: dialog.accept()
         }
     ]
@@ -304,4 +305,5 @@ UM.Dialog
     {
         controller.dialogAccepted()
     }
+	
 }

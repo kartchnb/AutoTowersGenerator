@@ -1,0 +1,32 @@
+name: "Update i18n template"
+
+on:
+  [push]
+
+jobs:
+  update-pot:
+    name: "Update i18n template"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: ConorMacBride/install-package@v1
+        with:
+          apt: gettext
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - run: mkdir -p i18n
+      - name: Find strings in Python files
+        run: xgettext --package-name='AutoTowersGenerator' -o Resources/i18n/autotowers.pot                 --language=python     --from-code=UTF-8 -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 -ki18ncp:1c,2,3 $(find -L . -name \*.py)
+      - name: Find strings in QML files
+        run: xgettext --package-name='AutoTowersGenerator' -o Resources/i18n/autotowers.pot --join-existing --language=javascript --from-code=UTF-8 -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 -ki18ncp:1c,2,3 $(find -L . -name \*.qml)
+      - run: git add --intent-to-add i18n
+      - name: Check diff
+        id: git_diff
+        run: echo "##[set-output name=numstat;]$(git diff --numstat i18n)"
+
+      - if: ${{steps.git_diff.outputs.numstat != '1 1 Resources/i18n/autotowers.pot'}}
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update i18n template for autotowers.pot
