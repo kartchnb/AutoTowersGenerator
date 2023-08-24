@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 13:06+0000\n"
+"POT-Creation-Date: 2023-08-24 13:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -419,6 +419,15 @@ msgstr ""
 #: Resources/QML/QT6/BedLevelPatternDialog.qml:14
 msgctxt "@title"
 msgid "Bed Level Pattern"
+msgstr ""
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:74
+#: Resources/QML/QT6/FanTowerDialog.qml:76
+#: Resources/QML/QT6/SpeedTowerDialog.qml:74
+#: Resources/QML/QT6/TempTowerDialog.qml:73
+#: Resources/QML/QT6/FlowTowerDialog.qml:76
+msgctxt "@model"
+msgid "Custom"
 msgstr ""
 
 #: Resources/QML/QT6/BedLevelPatternDialog.qml:87
