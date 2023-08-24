@@ -28,12 +28,12 @@ class SpeedTowerModel(ModelBase):
 
     # The speed tower types that can been created
     _towerTypesModel = [
-        {'name': catalog.i18nc("@type", "Print Speed") , 'label': 'PRINT SPEED'}, 
-        {'name': catalog.i18nc("@type", "Acceleration") , 'label': 'ACCELERATION'}, 
-        {'name': catalog.i18nc("@type", "Jerk") , 'label': 'JERK'}, 
-        {'name': catalog.i18nc("@type", "Junction") , 'label': 'JUNCTION'}, 
-        {'name': catalog.i18nc("@type", "Marlin Linear") , 'label': 'MARLIN LINEAR'}, 
-        {'name': catalog.i18nc("@type", "RepRap Pressure") , 'label': 'REPRAP PRESSURE'},
+        {'ident': 'Print Speed' ,'name': catalog.i18nc("@type", "Print Speed") , 'label': 'PRINT SPEED'}, 
+        {'ident': 'Acceleration' , 'name': catalog.i18nc("@type", "Acceleration") , 'label': 'ACCELERATION'}, 
+        {'ident': 'Jerk' , 'name': catalog.i18nc("@type", "Jerk") , 'label': 'JERK'}, 
+        {'ident': 'Junction' , 'name': catalog.i18nc("@type", "Junction") , 'label': 'JUNCTION'}, 
+        {'ident': 'Marlin Linear' , 'name': catalog.i18nc("@type", "Marlin Linear") , 'label': 'MARLIN LINEAR'}, 
+        {'ident': 'RepRap Pressure' , 'name': catalog.i18nc("@type", "RepRap Pressure") , 'label': 'REPRAP PRESSURE'},
     ]
 
 
@@ -129,7 +129,7 @@ class SpeedTowerModel(ModelBase):
     @pyqtProperty(str, notify=towerTypeIndexChanged)
     def towerTypeName(self)->str:
         try:
-            return self._towerTypesModel[self.towerTypeIndex]['name']
+            return self._towerTypesModel[self.towerTypeIndex]['ident']
         except IndexError:
             return 'Custom'
 
