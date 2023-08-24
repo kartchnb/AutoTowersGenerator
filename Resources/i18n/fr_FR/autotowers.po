@@ -997,12 +997,16 @@ msgid "is not valid"
 msgstr "n'est pas valide"
 
 msgctxt "@msg"
+msgid "Changed"
+msgstr "Modification"
+
+msgctxt "@msg"
 msgid "Restored"
 msgstr "Restauré"
 
 msgctxt "@msg"
 msgid "to"
-msgstr "à"
+msgstr "en"
 
 msgctxt "@msg"
 msgid "The STL file"
