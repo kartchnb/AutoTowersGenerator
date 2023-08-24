@@ -18,14 +18,19 @@ msgstr ""
 "X-Generator: Virtaal 0.7.1\n"
 
 #: RetractTower.py
-msgctxt "@label"
+msgctxt "@type"
 msgid "Speed"
 msgstr "Vitesse"
 
 #: RetractTower.py
-msgctxt "@label"
+msgctxt "@type"
 msgid "Distance"
 msgstr "Distance"
+
+#: RetractTowerModel.py
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 0.4-1.2"
+msgstr "Tour de rétractation - Distance de rétractation 0,4-1,2"
 
 #: AutoTowersGenerator.py:361
 msgctxt "@msg"

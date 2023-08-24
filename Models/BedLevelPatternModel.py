@@ -4,33 +4,39 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
 
+import os
 
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class BedLevelPatternModel(ModelBase):
 
     # The available bed level presets
     _presetsTable = [
-        {'name': 'Bed Size 220x220', 'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
-        {'name': 'Bed Size 200x200', 'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
-        {'name': 'Bed Size 180x180', 'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
-        {'name': 'Bed Size 150x150', 'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': catalog.i18nc("@model", "Bed Size 220x220") , 'filename': 'Bed Level Pattern - Spiral Squares 220x220.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': catalog.i18nc("@model", "Bed Size 200x200") , 'filename': 'Bed Level Pattern - Spiral Squares 200x200.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': catalog.i18nc("@model", "Bed Size 180x180") , 'filename': 'Bed Level Pattern - Spiral Squares 180x180.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
+        {'name': catalog.i18nc("@model", "Bed Size 150x150") , 'filename': 'Bed Level Pattern - Spiral Squares 150x150.stl', 'icon': 'bedlevelpattern_spiral_squares_icon.png'},
     ]
 
     # The available bed level patterns
     _patternsTable = [
-        {'name': 'Spiral Squares', 'icon': 'bedlevelpattern_spiral_squares_icon.png'}, 
-        {'name': 'Concentric Squares', 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
-        {'name': 'Concentric Circles', 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
-        {'name': 'X in Square', 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
-        {'name': 'Circle in Square', 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
-        {'name': 'Grid', 'icon': 'bedlevelpattern_grid_icon.png'}, 
-        {'name': 'Padded Grid', 'icon': 'bedlevelpattern_padded_grid_icon.png'},
-        {'name': 'Five Circles', 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Spiral Squares") , 'icon': 'bedlevelpattern_spiral_squares_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Concentric Squares") , 'icon': 'bedlevelpattern_concentric_squares_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Concentric Circles") , 'icon': 'bedlevelpattern_concentric_circles_icon.png'},
+        {'name': catalog.i18nc("@pattern", "X in Square") , 'icon': 'bedlevelpattern_x_in_square_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Circle in Square") , 'icon': 'bedlevelpattern_circle_in_square_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Grid") , 'icon': 'bedlevelpattern_grid_icon.png'}, 
+        {'name': catalog.i18nc("@pattern", "Padded Grid") , 'icon': 'bedlevelpattern_padded_grid_icon.png'},
+        {'name': catalog.i18nc("@pattern", "Five Circles") , 'icon': 'bedlevelpattern_five_circles_icon.png'}, 
     ]
 
 

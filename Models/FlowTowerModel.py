@@ -3,24 +3,32 @@ try:
     from PyQt6.QtCore import pyqtSignal, pyqtProperty
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
+    
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class FlowTowerModel(ModelBase):
 
     # The available flow tower presets
     _presetsTable = [
-        {'name': 'Flow Tower - Flow 115-85', 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': 115, 'flow change': -5},
-        {'name': 'Flow Tower (Spiral) - Flow 115-85', 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': 115, 'flow change': -5},
+        {'name': catalog.i18nc("@model", "Flow Tower - Flow 115-85") , 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': 115, 'flow change': -5},
+        {'name': catalog.i18nc("@model", "Flow Tower (Spiral) - Flow 115-85") , 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': 115, 'flow change': -5},
     ]
 
     # The available flow tower designs
     _towerDesignsTable = [
-        {'name': 'Standard', 'filename': 'temptower.scad', 'icon': 'flowtower_icon.png'}, 
-        {'name': 'Spiral', 'filename': 'flowtower.scad', 'icon': 'spiral_flowtower_icon.png'}, 
+        {'name': catalog.i18nc("@type", "Standard") , 'filename': 'temptower.scad', 'icon': 'flowtower_icon.png'}, 
+        {'name': catalog.i18nc("@type", "Spiral") , 'filename': 'flowtower.scad', 'icon': 'spiral_flowtower_icon.png'}, 
     ]
 
 

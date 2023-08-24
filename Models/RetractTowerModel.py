@@ -4,34 +4,38 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
 
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class RetractTowerModel(ModelBase):
 
     # The available retract tower presets
     _presetsTable = [
-        {'name': 'Retract Tower - Retract Distance 0.4-1.2', 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'starting value': 0.4, 'value change': 0.1, 'tower type': 'Distance'},
-        {'name': 'Retract Tower - Retract Distance 1.2-2.0', 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'starting value': 1.2, 'value change': 0.1, 'tower type': 'Distance'},
-        {'name': 'Retract Tower - Retract Distance 1-6', 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'starting value': 1, 'value change': 1, 'tower type': 'Distance'},
-        {'name': 'Retract Tower - Retract Distance 4-9', 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'starting value': 4, 'value change': 1, 'tower type': 'Distance'},
-        {'name': 'Retract Tower - Retract Distance 7-12', 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'starting value': 7, 'value change': 1, 'tower type': 'Distance'},
-        {'name': 'Retract Tower - Retract Speed 10-50', 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'starting value': 10, 'value change': 10, 'tower type': 'Speed'},
-        {'name': 'Retract Tower - Retract Speed 35-75', 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'starting value': 35, 'value change': 10, 'tower type': 'Speed'},
-        {'name': 'Retract Tower - Retract Speed 60-100', 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'starting value': 60, 'value change': 10, 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 0.4-1.2") , 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'starting value': 0.4, 'value change': 0.1, 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1.2-2.0") , 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'starting value': 1.2, 'value change': 0.1, 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1-6") , 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'starting value': 1, 'value change': 1, 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 4-9") , 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'starting value': 4, 'value change': 1, 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 7-12") , 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'starting value': 7, 'value change': 1, 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 10-50") , 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'starting value': 10, 'value change': 10, 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 35-75") , 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'starting value': 35, 'value change': 10, 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 60-100") , 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'starting value': 60, 'value change': 10, 'tower type': 'Speed'},
     ]
  
 
-
     _towerTypesTable = [
-        {'name': 'Distance', 'label': 'DST'}, 
-        {'name': 'Speed', 'label': 'SPD'}, 
+        {'name': catalog.i18nc("@type","Distance") , 'label': 'DST'}, 
+        {'name': catalog.i18nc("@type","Speed") , 'label': 'SPD'}, 
     ]
-
-
 
     # Make the presets availabe to QML
     presetsModelChanged = pyqtSignal()
