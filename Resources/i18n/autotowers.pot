@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 14:28+0000\n"
+"POT-Creation-Date: 2023-08-24 14:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,6 +75,11 @@ msgstr ""
 #: Controllers/BedLevelPatternContoller.py:46
 msgctxt "@test"
 msgid "Bed Level Pattern"
+msgstr ""
+
+#: Controllers/FlowTowerController.py:46
+msgctxt "@test"
+msgid "Flow Tower"
 msgstr ""
 
 #: Controllers/TempTowerController.py:40
