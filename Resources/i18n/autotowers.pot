@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 12:20+0000\n"
+"POT-Creation-Date: 2023-08-24 12:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,6 +45,226 @@ msgstr ""
 #: AutoTowersGenerator.py:561
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
+msgstr ""
+
+#: Models/FlowTowerModel.py:24
+msgctxt "@model"
+msgid "Flow Tower - Flow 115-85"
+msgstr ""
+
+#: Models/FlowTowerModel.py:25
+msgctxt "@model"
+msgid "Flow Tower (Spiral) - Flow 115-85"
+msgstr ""
+
+#: Models/FlowTowerModel.py:30
+msgctxt "@type"
+msgid "Standard"
+msgstr ""
+
+#: Models/FlowTowerModel.py:31
+msgctxt "@type"
+msgid "Spiral"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:24
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 20-100"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:25
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 50-150"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:26
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 100-200"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:31
+msgctxt "@type"
+msgid "Print Speed"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:32
+msgctxt "@type"
+msgid "Acceleration"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:33
+msgctxt "@type"
+msgid "Jerk"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:34
+msgctxt "@type"
+msgid "Junction"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:35
+msgctxt "@type"
+msgid "Marlin Linear"
+msgstr ""
+
+#: Models/SpeedTowerModel.py:36
+msgctxt "@type"
+msgid "RepRap Pressure"
+msgstr ""
+
+#: Models/TempTowerModel.py:24
+msgctxt "@model"
+msgid "Temperature Tower - ABA"
+msgstr ""
+
+#: Models/TempTowerModel.py:25
+msgctxt "@model"
+msgid "Temperature Tower - ABS"
+msgstr ""
+
+#: Models/TempTowerModel.py:26
+msgctxt "@model"
+msgid "Temperature Tower - Nylon"
+msgstr ""
+
+#: Models/TempTowerModel.py:27
+msgctxt "@model"
+msgid "Temperature Tower - PC"
+msgstr ""
+
+#: Models/TempTowerModel.py:28
+msgctxt "@model"
+msgid "Temperature Tower - PETG"
+msgstr ""
+
+#: Models/TempTowerModel.py:29
+msgctxt "@model"
+msgid "Temperature Tower - PLA"
+msgstr ""
+
+#: Models/TempTowerModel.py:30
+msgctxt "@model"
+msgid "Temperature Tower - PLA+"
+msgstr ""
+
+#: Models/TempTowerModel.py:31
+msgctxt "@model"
+msgid "Temperature Tower - TPU"
+msgstr ""
+
+#: Models/RetractTowerModel.py:24
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 0.4-1.2"
+msgstr ""
+
+#: Models/RetractTowerModel.py:25
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 1.2-2.0"
+msgstr ""
+
+#: Models/RetractTowerModel.py:26
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 1-6"
+msgstr ""
+
+#: Models/RetractTowerModel.py:27
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 4-9"
+msgstr ""
+
+#: Models/RetractTowerModel.py:28
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 7-12"
+msgstr ""
+
+#: Models/RetractTowerModel.py:29
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 10-50"
+msgstr ""
+
+#: Models/RetractTowerModel.py:30
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 35-75"
+msgstr ""
+
+#: Models/RetractTowerModel.py:31
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 60-100"
+msgstr ""
+
+#: Models/RetractTowerModel.py:36
+msgctxt "@type"
+msgid "Distance"
+msgstr ""
+
+#: Models/RetractTowerModel.py:37
+msgctxt "@type"
+msgid "Speed"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:24
+msgctxt "@model"
+msgid "Bed Size 220x220"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:25
+msgctxt "@model"
+msgid "Bed Size 200x200"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:26
+msgctxt "@model"
+msgid "Bed Size 180x180"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:27
+msgctxt "@model"
+msgid "Bed Size 150x150"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:32
+msgctxt "@pattern"
+msgid "Spiral Squares"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:33
+msgctxt "@pattern"
+msgid "Concentric Squares"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:34
+msgctxt "@pattern"
+msgid "Concentric Circles"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:35
+msgctxt "@pattern"
+msgid "X in Square"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:36
+msgctxt "@pattern"
+msgid "Circle in Square"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:37
+msgctxt "@pattern"
+msgid "Grid"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:38
+msgctxt "@pattern"
+msgid "Padded Grid"
+msgstr ""
+
+#: Models/BedLevelPatternModel.py:39
+msgctxt "@pattern"
+msgid "Five Circles"
+msgstr ""
+
+#: Models/FanTowerModel.py:24
+msgctxt "@model"
+msgid "Fan Tower - 0-100%"
 msgstr ""
 
 #: Resources/QML/QT5/TempTowerDialog.qml:13
