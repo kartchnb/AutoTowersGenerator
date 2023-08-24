@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 13:48+0000\n"
+"POT-Creation-Date: 2023-08-24 14:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,6 +45,11 @@ msgstr ""
 #: AutoTowersGenerator.py:561
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
+msgstr ""
+
+#: Controllers/RetractTowerController.py:42
+msgctxt "@test"
+msgid "Retraction Tower"
 msgstr ""
 
 #: Models/FlowTowerModel.py:24
