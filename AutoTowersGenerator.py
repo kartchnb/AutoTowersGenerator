@@ -36,9 +36,7 @@ from .Controllers.RetractTowerController import RetractTowerController
 from .Controllers.SpeedTowerController import SpeedTowerController
 from .Controllers.TempTowerController import TempTowerController
 
-# Suggested solution from fieldOfView . in this discussion solved in Cura 4.9
-# https://github.com/5axes/Calibration-Shapes/issues/1
-# Cura are able to find the scripts from inside the plugin folder if the scripts are into a folder named resources
+# not sure it's necessar i18n could be store in a different place ?
 Resources.addSearchPath(
     os.path.join(os.path.abspath(os.path.dirname(__file__)),'Resources')
 )  # Plugin translation file import
