@@ -80,7 +80,7 @@ msgstr "Test Mise à niveau plateau"
 #: Controllers/FlowTowerController.py:46
 msgctxt "@test"
 msgid "Flow Tower"
-msgstr "Tour de ventilateur"
+msgstr "Tour de débit"
 
 #: Controllers/TempTowerController.py:40
 msgctxt "@test"
