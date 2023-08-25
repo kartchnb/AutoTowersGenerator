@@ -980,62 +980,77 @@ msgctxt "@text"
 msgid "Remove the AutoTower Model"
 msgstr "Retirer le modèle AutoTower"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "Found OpenScad version"
 msgstr "Version d'OpenScad trouvée"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "at"
 msgstr "dans"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "The OpenScad path"
 msgstr "Le chemin OpenScad"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "is not valid"
 msgstr "n'est pas valide"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "Changed"
 msgstr "Modification"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "Restored"
 msgstr "Restauré"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "to"
 msgstr "en"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "from"
 msgstr "de"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "The STL file"
 msgstr "Le fichier STL"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "does not exist"
 msgstr "n'existe pas"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the Cura setting"
 msgstr "La tour auto a été supprimée parce que le paramètre Cura"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "has changed since the tower was generated"
 msgstr "a changé depuis la création de la tour"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "Failed to generate"
 msgstr "Échec de la génération"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "Command output was"
 msgstr "La sortie de la commande était"
 
+#: AutoTowersGenerator.py
 msgctxt "@msg"
 msgid "An exception occured during post-processing"
 msgstr "Une exception s'est produite pendant le post-traitement"
