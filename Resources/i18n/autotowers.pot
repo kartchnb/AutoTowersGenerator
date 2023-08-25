@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 18:01+0000\n"
+"POT-Creation-Date: 2023-08-25 03:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -232,12 +232,12 @@ msgctxt "@model"
 msgid "Retract Tower - Retract Speed 60-100"
 msgstr ""
 
-#: Models/RetractTowerModel.py:36
+#: Models/RetractTowerModel.py:35
 msgctxt "@type"
 msgid "Distance"
 msgstr ""
 
-#: Models/RetractTowerModel.py:37
+#: Models/RetractTowerModel.py:36
 msgctxt "@type"
 msgid "Speed"
 msgstr ""
