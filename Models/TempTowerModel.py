@@ -14,14 +14,14 @@ class TempTowerModel(ModelBase):
 
     # The available temp tower presets
     _presetsTable = [
-        {'name': 'Temperature Tower - ABA', 'filename': 'Temperature Tower - ABA.stl', 'start temp': 260, 'temp change': -5},
-        {'name': 'Temperature Tower - ABS', 'filename': 'Temperature Tower - ABS.stl', 'start temp': 250, 'temp change': -5},
-        {'name': 'Temperature Tower - Nylon', 'filename': 'Temperature Tower - Nylon.stl', 'start temp': 260, 'temp change': -5},
-        {'name': 'Temperature Tower - PC', 'filename': 'Temperature Tower - PC.stl', 'start temp': 310, 'temp change': -5},
-        {'name': 'Temperature Tower - PETG', 'filename': 'Temperature Tower - PETG.stl', 'start temp': 250, 'temp change': -5},
-        {'name': 'Temperature Tower - PLA', 'filename': 'Temperature Tower - PLA.stl', 'start temp': 220, 'temp change': -5},
-        {'name': 'Temperature Tower - PLA+', 'filename': 'Temperature Tower - PLA+.stl', 'start temp': 230, 'temp change': -5},
-        {'name': 'Temperature Tower - TPU', 'filename': 'Temperature Tower - TPU.stl', 'start temp': 230, 'temp change': -5},
+        {'name': 'Temperature Tower - ABA', 'filename': 'Temperature Tower - ABA.stl', 'start temp': '260', 'temp change': '-5'},
+        {'name': 'Temperature Tower - ABS', 'filename': 'Temperature Tower - ABS.stl', 'start temp': '250', 'temp change': '-5'},
+        {'name': 'Temperature Tower - Nylon', 'filename': 'Temperature Tower - Nylon.stl', 'start temp': '260', 'temp change': '-5'},
+        {'name': 'Temperature Tower - PC', 'filename': 'Temperature Tower - PC.stl', 'start temp': '310', 'temp change': '-5'},
+        {'name': 'Temperature Tower - PETG', 'filename': 'Temperature Tower - PETG.stl', 'start temp': '250', 'temp change': '-5'},
+        {'name': 'Temperature Tower - PLA', 'filename': 'Temperature Tower - PLA.stl', 'start temp': '220', 'temp change': '-5'},
+        {'name': 'Temperature Tower - PLA+', 'filename': 'Temperature Tower - PLA+.stl', 'start temp': '230', 'temp change': '-5'},
+        {'name': 'Temperature Tower - TPU', 'filename': 'Temperature Tower - TPU.stl', 'start temp': '230', 'temp change': '-5'},
     ]
 
 
@@ -64,13 +64,21 @@ class TempTowerModel(ModelBase):
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
     
-    @pyqtProperty(float, notify=presetIndexChanged)
-    def presetStartTemp(self)->float:
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetStartTempStr(self)->str:
         return self._presetsTable[self.presetIndex]['start temp']
     
     @pyqtProperty(float, notify=presetIndexChanged)
-    def presetTempChange(self)->float:
+    def presetStartTemp(self)->float:
+        return float(self.presetStartTempStr)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetTempChangeStr(self)->str:
         return self._presetsTable[self.presetIndex]['temp change']
+    
+    @pyqtProperty(float, notify=presetIndexChanged)
+    def presetTempChange(self)->float:
+        return float(self.presetTempChangeStr)
     
 
 
@@ -84,59 +92,67 @@ class TempTowerModel(ModelBase):
 
 
     # The starting temperature value for the tower
-    _startTemperatureStr = '220'
+    _startTempStr = '220'
 
-    startTemperatureStrChanged = pyqtSignal()
+    startTempStrChanged = pyqtSignal()
     
-    def setStartTemperatureStr(self, value)->None:
-        self._startTemperatureStr = value
-        self.startTemperatureStrChanged.emit()
+    def setStartTempStr(self, value)->None:
+        self._startTempStr = value
+        self.startTempStrChanged.emit()
 
-    @pyqtProperty(str, notify=startTemperatureStrChanged, fset=setStartTemperatureStr)
-    def startTemperatureStr(self)->str:
-        return self._startTemperatureStr
+    @pyqtProperty(str, notify=startTempStrChanged, fset=setStartTempStr)
+    def startTempStr(self)->str:
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetStartTempStr
+        else:
+            return self._startTempStr
 
-    @pyqtProperty(float, notify=startTemperatureStrChanged)
-    def startTemperature(self)->float:
-        return float(self.startTemperatureStr)
+    @pyqtProperty(float, notify=startTempStrChanged)
+    def startTemp(self)->float:
+        return float(self.startTempStr)
 
 
 
     # The ending temperature value for the tower
-    _endTemperatureStr = '180'
+    _endTempStr = '180'
 
-    endTemperatureStrChanged = pyqtSignal()
+    endTempStrChanged = pyqtSignal()
     
-    def setEndTemperatureStr(self, value)->None:
-        self._endTemperatureStr = value
-        self.endTemperatureStrChanged.emit()
+    def setEndTempStr(self, value)->None:
+        self._endTempStr = value
+        self.endTempStrChanged.emit()
 
-    @pyqtProperty(str, notify=endTemperatureStrChanged, fset=setEndTemperatureStr)
-    def endTemperatureStr(self)->str:
-        return self._endTemperatureStr
+    @pyqtProperty(str, notify=endTempStrChanged, fset=setEndTempStr)
+    def endTempStr(self)->str:
+        return self._endTempStr
 
-    @pyqtProperty(float, notify=endTemperatureStrChanged)
-    def endTemperature(self)->float:
-        return float(self.endTemperatureStr)
+    @pyqtProperty(float, notify=endTempStrChanged)
+    def endTemp(self)->float:
+        return float(self.endTempStr)
 
 
 
     # The amount to change the temperature between tower sections
-    _temperatureChangeStr = '-5'
+    _tempChangeStr = '-5'
 
-    temperatureChangeStrChanged = pyqtSignal()
+    tempChangeStrChanged = pyqtSignal()
     
-    def setTemperatureChangeStr(self, value)->None:
-        self._temperatureChangeStr = value
-        self.temperatureChangeStrChanged.emit()
+    def setTempChangeStr(self, value)->None:
+        self._tempChangeStr = value
+        self.tempChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=temperatureChangeStrChanged, fset=setTemperatureChangeStr)
-    def temperatureChangeStr(self)->str:
-        return self._temperatureChangeStr
+    @pyqtProperty(str, notify=tempChangeStrChanged, fset=setTempChangeStr)
+    def tempChangeStr(self)->str:
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetTempChangeStr
+        else:
+            return self._tempChangeStr
 
-    @pyqtProperty(float, notify=temperatureChangeStrChanged)
-    def temperatureChange(self)->float:
-        return float(self.temperatureChangeStr)
+    @pyqtProperty(float, notify=tempChangeStrChanged)
+    def tempChange(self)->float:
+        return float(self.tempChangeStr)
 
 
 

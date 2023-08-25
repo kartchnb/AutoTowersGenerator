@@ -60,9 +60,10 @@ class RetractTowerController(ControllerBase):
         relativeExtrusion = self._dataModel.relativeExtrusion
         startValue = self._dataModel.startValue
         valueChange = self._dataModel.valueChange
+        towerType = self._dataModel.towerTypeName
 
         # Call the retract speed post-processing script
-        if self._dataModel.towerTypeName == 'Speed':
+        if towerType == 'Speed':
             output_gcode = RetractSpeedTower_PostProcessing.execute(
                 gcode=input_gcode, 
                 base_height=baseHeight,
@@ -75,7 +76,7 @@ class RetractTowerController(ControllerBase):
                 )
 
         # Call the retract distance post-processing script
-        else:
+        elif towerType == 'Distance':
             # Call the post-processing script
             output_gcode = RetractDistanceTower_PostProcessing.execute(
                 gcode=input_gcode, 
@@ -88,6 +89,10 @@ class RetractTowerController(ControllerBase):
                 retract_distance_change=valueChange, 
                 enable_lcd_messages=enable_lcd_messages
                 )
+        
+        # Since I keep messing this up, raise an error if the tower type is unrecognized
+        else:
+            raise Exception(f'Unrecognized retraction tower type "{towerType}"')
 
         return output_gcode
 

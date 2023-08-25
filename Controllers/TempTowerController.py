@@ -56,8 +56,8 @@ class TempTowerController(ControllerBase):
         sectionHeight = self._dataModel.optimalSectionHeight
         initialLayerHeight = self._dataModel.initialLayerHeight
         layerHeight = self._dataModel.layerHeight
-        startTemperature = self._dataModel.startTemperature
-        temperatureChange = self._dataModel.temperatureChange
+        startTemp = self._dataModel.startTemp
+        tempChange = self._dataModel.tempChange
 
         # Call the post-processing script
         gcode = TempTower_PostProcessing.execute(
@@ -66,8 +66,8 @@ class TempTowerController(ControllerBase):
             section_height=sectionHeight,
             initial_layer_height=initialLayerHeight,
             layer_height=layerHeight,
-            start_temp=startTemperature,
-            temp_change=temperatureChange,
+            start_temp=startTemp,
+            temp_change=tempChange,
             enable_lcd_messages=enable_lcd_messages
             )
 
@@ -94,9 +94,9 @@ class TempTowerController(ControllerBase):
 
         # Collect data from the data model
         openScadFilename = self._openScadFilename
-        startTemperature = self._dataModel.startTemperature
-        endTemperature = self._dataModel.endTemperature
-        temperatureChange = self._dataModel.temperatureChange
+        startTemp = self._dataModel.startTemp
+        endTemp = self._dataModel.endTemp
+        tempChange = self._dataModel.tempChange
         baseHeight = self._dataModel.optimalBaseHeight
         sectionHeight = self._dataModel.optimalSectionHeight
         towerLabel = self._dataModel.towerLabel
@@ -104,16 +104,16 @@ class TempTowerController(ControllerBase):
 
         # Compile the parameters to send to OpenSCAD
         openScadParameters = {}
-        openScadParameters ['Starting_Value'] = startTemperature
-        openScadParameters ['Ending_Value'] = endTemperature
-        openScadParameters ['Value_Change'] = temperatureChange
+        openScadParameters ['Starting_Value'] = startTemp
+        openScadParameters ['Ending_Value'] = endTemp
+        openScadParameters ['Value_Change'] = tempChange
         openScadParameters ['Base_Height'] = baseHeight
         openScadParameters ['Section_Height'] = sectionHeight
         openScadParameters ['Column_Label'] = towerLabel
         openScadParameters ['Tower_Label'] = towerDescription
 
         # Determine the tower name
-        towerName = f'Custom Temp Tower - {startTemperature}-{endTemperature}x{temperatureChange}'
+        towerName = f'Custom Temp Tower - {startTemp}-{endTemp}x{tempChange}'
 
         # Send the filename and parameters to the model callback
         self._generateStlCallback(self, towerName, self._openScadFilename, openScadParameters, self.postProcess)
