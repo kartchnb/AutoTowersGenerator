@@ -3,27 +3,33 @@ try:
     from PyQt6.QtCore import pyqtSignal, pyqtProperty
 except ImportError:
     from PyQt5.QtCore import pyqtSignal, pyqtProperty
+    
+import os
 
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
 
 from .ModelBase import ModelBase
 
-
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 class TempTowerModel(ModelBase):
 
     # The available temp tower presets
     _presetsTable = [
-        {'name': 'Temperature Tower - ABA', 'filename': 'Temperature Tower - ABA.stl', 'start temp': '260', 'temp change': '-5'},
-        {'name': 'Temperature Tower - ABS', 'filename': 'Temperature Tower - ABS.stl', 'start temp': '250', 'temp change': '-5'},
-        {'name': 'Temperature Tower - Nylon', 'filename': 'Temperature Tower - Nylon.stl', 'start temp': '260', 'temp change': '-5'},
-        {'name': 'Temperature Tower - PC', 'filename': 'Temperature Tower - PC.stl', 'start temp': '310', 'temp change': '-5'},
-        {'name': 'Temperature Tower - PETG', 'filename': 'Temperature Tower - PETG.stl', 'start temp': '250', 'temp change': '-5'},
-        {'name': 'Temperature Tower - PLA', 'filename': 'Temperature Tower - PLA.stl', 'start temp': '220', 'temp change': '-5'},
-        {'name': 'Temperature Tower - PLA+', 'filename': 'Temperature Tower - PLA+.stl', 'start temp': '230', 'temp change': '-5'},
-        {'name': 'Temperature Tower - TPU', 'filename': 'Temperature Tower - TPU.stl', 'start temp': '230', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - ABA") , 'filename': 'Temperature Tower - ABA.stl', 'start temp': '260', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - ABS") , 'filename': 'Temperature Tower - ABS.stl', 'start temp': '250', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - Nylon") , 'filename': 'Temperature Tower - Nylon.stl', 'start temp': '260', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - PC") , 'filename': 'Temperature Tower - PC.stl', 'start temp': '310', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - PETG") , 'filename': 'Temperature Tower - PETG.stl', 'start temp': '250', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - PLA") , 'filename': 'Temperature Tower - PLA.stl', 'start temp': '220', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - PLA+") , 'filename': 'Temperature Tower - PLA+.stl', 'start temp': '230', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - TPU") , 'filename': 'Temperature Tower - TPU.stl', 'start temp': '230', 'temp change': '-5'},
     ]
-
 
 
     # Make the presets availabe to QML

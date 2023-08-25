@@ -1,0 +1,1041 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the CuraHtmlDoc package.
+# 5axes <5axes@free.fr>, 2023.
+msgid ""
+msgstr ""
+"Project-Id-Version: Cura Html Doc\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-24 14:33+0000\n"
+"PO-Revision-Date: 2023-08-24 19:38+0200\n"
+"Last-Translator: 5axes <5axes@free.fr>\n"
+"Language-Team: 5axes\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+
+#: AutoTowersGenerator.py:306
+msgctxt "@menu"
+msgid "Auto Towers"
+msgstr "Tours Auto"
+
+#: AutoTowersGenerator.py:315
+msgctxt "@menu"
+msgid "Settings"
+msgstr "Réglages"
+
+#: AutoTowersGenerator.py:361
+msgctxt "@msg"
+msgid "The following settings were restored :\n"
+msgstr "Les paramètres suivants ont été rétablis :\n"
+
+#: AutoTowersGenerator.py:456
+msgctxt "@msg"
+msgid "The following settings were changed :\n"
+msgstr "Les paramètres suivants ont été modifiés :\n"
+
+#: AutoTowersGenerator.py:459
+msgctxt "@msg"
+msgid "The following setting changes are recommended :\n"
+msgstr "Il est recommandé de modifier les paramètres suivants :\n"
+
+#: AutoTowersGenerator.py:502
+msgctxt "@msg"
+msgid "The Auto Tower was removed because the active machine was changed"
+msgstr "L'Auto Tower a été supprimée parce que la machine active a été modifiée"
+
+#: AutoTowersGenerator.py:520
+msgctxt "@msg"
+msgid "The Auto Tower was removed because the active extruder changed"
+msgstr "L'Auto Tower a été supprimée parce que l'extrudeur actif a changé"
+
+#: AutoTowersGenerator.py:561
+msgctxt "@msg"
+msgid "Removing the autotower because Cura is closing"
+msgstr "Suppression de l'autotower en raison de la fermeture de Cura"
+
+#: Controllers/RetractTowerController.py:42
+msgctxt "@test"
+msgid "Retraction Tower"
+msgstr "Tour de rétraction"
+
+#: Controllers/FanTowerController.py:43
+msgctxt "@test"
+msgid "Fan Tower"
+msgstr "Tour de ventilateur"
+
+#: Controllers/SpeedTowerController.py:40
+msgctxt "@test"
+msgid "Speed Tower"
+msgstr "Tour de vitesse"
+
+#: Controllers/BedLevelPatternContoller.py:46
+msgctxt "@test"
+msgid "Bed Level Pattern"
+msgstr "Test Mise à niveau plateau"
+
+#: Controllers/FlowTowerController.py:46
+msgctxt "@test"
+msgid "Flow Tower"
+msgstr "Tour de débit"
+
+#: Controllers/TempTowerController.py:40
+msgctxt "@test"
+msgid "Temp Tower"
+msgstr "Tour de température"
+
+#: Models/FlowTowerModel.py:24
+msgctxt "@model"
+msgid "Flow Tower - Flow 115-85"
+msgstr "Tour de débit - Débit 115-85"
+
+#: Models/FlowTowerModel.py:25
+msgctxt "@model"
+msgid "Flow Tower (Spiral) - Flow 115-85"
+msgstr "Tour de débit (spirale) - Débit 115-85"
+
+#: Models/FlowTowerModel.py:30
+msgctxt "@type"
+msgid "Standard"
+msgstr "Standard"
+
+#: Models/FlowTowerModel.py:31
+msgctxt "@type"
+msgid "Spiral"
+msgstr "Spirale"
+
+#: Models/SpeedTowerModel.py:24
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 20-100"
+msgstr "Tour de vitesse - Vitesse d'impression 20-100"
+
+#: Models/SpeedTowerModel.py:25
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 50-150"
+msgstr "Tour de vitesse - Vitesse d'impression 50-150"
+
+#: Models/SpeedTowerModel.py:26
+msgctxt "@model"
+msgid "Speed Tower - Print Speed 100-200"
+msgstr "Tour de vitesse - Vitesse d'impression 100-200"
+
+#: Models/SpeedTowerModel.py:31
+msgctxt "@type"
+msgid "Print Speed"
+msgstr "Vitesse d’impression"
+
+#: Models/SpeedTowerModel.py:32
+msgctxt "@type"
+msgid "Acceleration"
+msgstr "Accélération"
+
+#: Models/SpeedTowerModel.py:33
+msgctxt "@type"
+msgid "Jerk"
+msgstr "Saccade"
+
+#: Models/SpeedTowerModel.py:34
+msgctxt "@type"
+msgid "Junction"
+msgstr "Jonction"
+
+#: Models/SpeedTowerModel.py:35
+msgctxt "@type"
+msgid "Marlin Linear"
+msgstr "Marlin Linear"
+
+#: Models/SpeedTowerModel.py:36
+msgctxt "@type"
+msgid "RepRap Pressure"
+msgstr "Pression RepRap"
+
+#: Models/TempTowerModel.py:24
+msgctxt "@model"
+msgid "Temperature Tower - ABA"
+msgstr "Tour de température - ABA"
+
+#: Models/TempTowerModel.py:25
+msgctxt "@model"
+msgid "Temperature Tower - ABS"
+msgstr "Tour de température - ABS"
+
+#: Models/TempTowerModel.py:26
+msgctxt "@model"
+msgid "Temperature Tower - Nylon"
+msgstr "Tour de température - Nylon"
+
+#: Models/TempTowerModel.py:27
+msgctxt "@model"
+msgid "Temperature Tower - PC"
+msgstr "Tour de température - PC"
+
+#: Models/TempTowerModel.py:28
+msgctxt "@model"
+msgid "Temperature Tower - PETG"
+msgstr "Tour de température - PETG"
+
+#: Models/TempTowerModel.py:29
+msgctxt "@model"
+msgid "Temperature Tower - PLA"
+msgstr "Tour de température - PLA"
+
+#: Models/TempTowerModel.py:30
+msgctxt "@model"
+msgid "Temperature Tower - PLA+"
+msgstr "Tour de température - PLA+"
+
+#: Models/TempTowerModel.py:31
+msgctxt "@model"
+msgid "Temperature Tower - TPU"
+msgstr "Tour de température - TPU"
+
+#: Models/RetractTowerModel.py:24
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 0.4-1.2"
+msgstr "Tour de rétraction - Distance de rétraction 0.4-1.2"
+
+#: Models/RetractTowerModel.py:25
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 1.2-2.0"
+msgstr "Tour de rétraction - Distance de rétraction 1.2-2"
+
+#: Models/RetractTowerModel.py:26
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 1-6"
+msgstr "Tour de rétraction - Distance de rétraction 1-6"
+
+#: Models/RetractTowerModel.py:27
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 4-9"
+msgstr "Tour de rétraction - Distance de rétraction  4-9"
+
+#: Models/RetractTowerModel.py:28
+msgctxt "@model"
+msgid "Retract Tower - Retract Distance 7-12"
+msgstr "Tour de rétraction - Distance de rétraction 7-12"
+
+#: Models/RetractTowerModel.py:29
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 10-50"
+msgstr "Tour de rétraction - Vitesse de rétraction 10-50"
+
+#: Models/RetractTowerModel.py:30
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 35-75"
+msgstr "Tour de rétraction - Vitesse de rétraction  35-75"
+
+#: Models/RetractTowerModel.py:31
+msgctxt "@model"
+msgid "Retract Tower - Retract Speed 60-100"
+msgstr "Tour de rétraction - Vitesse de rétraction 60-100"
+
+#: Models/RetractTowerModel.py:36
+msgctxt "@type"
+msgid "Distance"
+msgstr "Distance"
+
+#: Models/RetractTowerModel.py:37
+msgctxt "@type"
+msgid "Speed"
+msgstr "Vitesse"
+
+#: Models/BedLevelPatternModel.py:24
+msgctxt "@model"
+msgid "Bed Size 220x220"
+msgstr "Plateau 220x220"
+
+#: Models/BedLevelPatternModel.py:25
+msgctxt "@model"
+msgid "Bed Size 200x200"
+msgstr "Plateau 200x200"
+
+#: Models/BedLevelPatternModel.py:26
+msgctxt "@model"
+msgid "Bed Size 180x180"
+msgstr "Plateau 180x180"
+
+#: Models/BedLevelPatternModel.py:27
+msgctxt "@model"
+msgid "Bed Size 150x150"
+msgstr "Plateau 150x150"
+
+#: Models/BedLevelPatternModel.py:32
+msgctxt "@pattern"
+msgid "Spiral Squares"
+msgstr "Carrés en spirale"
+
+#: Models/BedLevelPatternModel.py:33
+msgctxt "@pattern"
+msgid "Concentric Squares"
+msgstr "Carrés concentriques"
+
+#: Models/BedLevelPatternModel.py:34
+msgctxt "@pattern"
+msgid "Concentric Circles"
+msgstr "Cercles concentriques"
+
+#: Models/BedLevelPatternModel.py:35
+msgctxt "@pattern"
+msgid "X in Square"
+msgstr "X dans Carré"
+
+#: Models/BedLevelPatternModel.py:36
+msgctxt "@pattern"
+msgid "Circle in Square"
+msgstr "Cercle dans carré"
+
+#: Models/BedLevelPatternModel.py:37
+msgctxt "@pattern"
+msgid "Grid"
+msgstr "Grille"
+
+#: Models/BedLevelPatternModel.py:38
+msgctxt "@pattern"
+msgid "Padded Grid"
+msgstr "Grille et pastille"
+
+#: Models/BedLevelPatternModel.py:39
+msgctxt "@pattern"
+msgid "Five Circles"
+msgstr "Cinq cercles"
+
+#: Models/FanTowerModel.py:24
+msgctxt "@model"
+msgid "Fan Tower - 0-100%"
+msgstr "Tour de ventilateur - 0-100%"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:13
+#: Resources/QML/QT6/TempTowerDialog.qml:14
+msgctxt "@title"
+msgid "Temperature Tower"
+msgstr "Tour de Température"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:60
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:63
+#: Resources/QML/QT6/SpeedTowerDialog.qml:63
+#: Resources/QML/QT6/FlowTowerDialog.qml:65
+msgctxt "@label"
+msgid "Preset"
+msgstr "Réglages"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:78
+#: Resources/QML/QT6/TempTowerDialog.qml:86
+msgctxt "@label"
+msgid "Starting Temperature"
+msgstr "Température départ"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:97
+#: Resources/QML/QT6/TempTowerDialog.qml:116
+msgctxt "@label"
+msgid "Ending Temperature"
+msgstr "Température fin"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:116
+#: Resources/QML/QT6/TempTowerDialog.qml:146
+msgctxt "@label"
+msgid "Temperature Change"
+msgstr "Température changement"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:135
+#: Resources/QML/QT6/RetractTowerDialog.qml:211
+#: Resources/QML/QT6/FanTowerDialog.qml:179
+#: Resources/QML/QT6/SpeedTowerDialog.qml:234
+#: Resources/QML/QT6/TempTowerDialog.qml:176
+#: Resources/QML/QT6/FlowTowerDialog.qml:210
+msgctxt "@label"
+msgid "Tower Label"
+msgstr "Label Tour"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:154
+#: Resources/QML/QT6/RetractTowerDialog.qml:229
+#: Resources/QML/QT6/FanTowerDialog.qml:209
+#: Resources/QML/QT6/SpeedTowerDialog.qml:262
+#: Resources/QML/QT6/TempTowerDialog.qml:206
+#: Resources/QML/QT6/FlowTowerDialog.qml:240
+msgctxt "@label"
+msgid "Tower Description"
+msgstr "Description Tour"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:173
+#: Resources/QML/QT6/RetractTowerDialog.qml:266
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:247
+#: Resources/QML/QT6/FanTowerDialog.qml:269
+#: Resources/QML/QT6/SpeedTowerDialog.qml:299
+#: Resources/QML/QT6/TempTowerDialog.qml:243
+#: Resources/QML/QT6/PluginSettingsDialog.qml:164
+#: Resources/QML/QT6/FlowTowerDialog.qml:277
+msgctxt "@button"
+msgid "OK"
+msgstr "OK"
+
+#: Resources/QML/QT5/TempTowerDialog.qml:179
+#: Resources/QML/QT6/RetractTowerDialog.qml:261
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:242
+#: Resources/QML/QT6/FanTowerDialog.qml:264
+#: Resources/QML/QT6/SpeedTowerDialog.qml:294
+#: Resources/QML/QT6/TempTowerDialog.qml:238
+#: Resources/QML/QT6/PluginSettingsDialog.qml:159
+#: Resources/QML/QT6/FlowTowerDialog.qml:272
+msgctxt "@button"
+msgid "Cancel"
+msgstr "Annuler"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:14
+msgctxt "@title"
+msgid "Retraction Tower"
+msgstr "Tour de rétraction"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:65
+msgctxt "@label"
+msgid "Retract Tower Preset"
+msgstr "Tour de rétractation préréglée"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:76
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:74
+#: Resources/QML/QT6/FanTowerDialog.qml:76
+#: Resources/QML/QT6/SpeedTowerDialog.qml:74
+#: Resources/QML/QT6/TempTowerDialog.qml:73
+#: Resources/QML/QT6/FlowTowerDialog.qml:76
+msgctxt "@model"
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:89
+#: Resources/QML/QT6/SpeedTowerDialog.qml:87
+msgctxt "@label"
+msgid "Tower Type"
+msgstr "Type de tour"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:114
+msgctxt "@tooltip"
+msgid ""
+"The retraction chracteristic to change over the tower.<p>'Distance' changes "
+"the length of filament that is retracted or extruded.<p>'Speed' changes how "
+"quickly the filament is retracted or extruded."
+msgstr ""
+"La caractéristique de rétraction varie en fonction de la tour.<p>La "
+"\"Distance\" modifie la longueur du filament qui est rétracté ou extrudé.<p>La "
+"\"vitesse\" modifie la vitesse à laquelle le filament est rétracté ou "
+"extrudé."
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:121
+msgctxt "@label"
+msgid "Starting "
+msgstr "Début "
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:144
+msgctxt "@tooltip"
+msgid ""
+"The retraction value (speed or distance) for the first section of the tower."
+"<p>For 'Distance' towers, this is the length of filament retracted or "
+"extruded for each section.<p>For 'Speed' towers, this is the speed at which "
+"the filament is retracted or extruded."
+msgstr ""
+"La valeur de rétraction (vitesse ou distance) pour la première section de la "
+"tour.<p>Pour les tours \"Distance\", il s'agit de la longueur de filament "
+"rétractée ou extrudée pour chaque section.<p>Pour les tours 'Vitesse', il "
+"s'agit de la vitesse à laquelle le filament est rétracté ou extrudé."
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:151
+msgctxt "@label"
+msgid "Ending "
+msgstr "Fin "
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:174
+msgctxt "@tooltip"
+msgid ""
+"The retraction value (speed or distance) for the last section of the tower."
+"<p>For 'Distance' towers, this is the length of filament retracted or "
+"extruded for each section.<p>For 'Speed' towers, this is the speed at which "
+"the filament is retracted or extruded."
+msgstr ""
+"La valeur de rétraction (vitesse ou distance) pour la dernière section de la "
+"tour.<p>Pour les tours \"Distance\", il s'agit de la longueur de filament "
+"rétractée ou extrudée pour chaque section.<p>Pour les tours \"Vitesse\", il "
+"s'agit de la vitesse à laquelle le filament est rétracté ou extrudé."
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:181
+msgctxt "@label"
+msgid " Change"
+msgstr " Changement"
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:204
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the retraction value (speed or distance) between tower "
+"sections.<p>In combination with the starting and ending values, this "
+"determines the number of sections in the tower."
+msgstr ""
+"Montant permettant de modifier la valeur de rétraction (vitesse ou distance) "
+"entre les sections de l'échafaudage.<p>En combinaison avec les valeurs de "
+"départ et d'arrivée, cela détermine le nombre de sections dans "
+"l'échafaudage."
+
+#: Resources/QML/QT6/RetractTowerDialog.qml:251
+msgctxt "@label"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+"Une étiquette facultative à graver sur le côté gauche de la tour.<p>Elle "
+"peut être utilisée, par exemple, pour identifier l'objet de la tour ou le "
+"matériau à imprimer."
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:14
+msgctxt "@title"
+msgid "Bed Level Pattern"
+msgstr "Test Mise à niveau plateau"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:87
+msgctxt "@label"
+msgid "Pattern"
+msgstr "Motif"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:112
+msgctxt "@tooltip"
+msgid ""
+"The type of bed level Pattern to generate.<p>Each pattern covers different "
+"parts of the bed in different ways and some are faster than others.<p>The "
+"icon on the left side of this dialog will give an idea of what the bed level "
+"Pattern type will look like."
+msgstr ""
+"Le type de motif de mise à niveau de plateau à générer.<p>Chaque motif "
+"couvre différentes parties du plateau de différentes manières et certains "
+"sont plus rapides que d'autres.<p>L'icône à gauche de cette boîte de "
+"dialogue donne une idée de ce à quoi ressemblera le type de motif au niveau "
+"du plateau."
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:119
+msgctxt "@label"
+msgid "Bed Fill %"
+msgstr "Remplissage plateau %"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:142
+msgctxt "@tooltip"
+msgid ""
+"This controls how much of the printer area the pattern should take up.<p>A "
+"value of 100 will result in the entire print area being used and may not "
+"work.<p>Values below 75 are probably not useful.<p>90 is a good default."
+msgstr ""
+"Cette valeur permet de contrôler l'étendue de la zone d'impression que le "
+"motif doit occuper.<p>Une valeur de 100 entraînera l'utilisation de la "
+"totalité de la zone d'impression et risque de ne pas fonctionner.<p>Les "
+"valeurs inférieures à 75 ne sont probablement pas utiles.<p>90 est une bonne "
+"valeur par défaut."
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:149
+msgctxt "@label"
+msgid "Number of Rings"
+msgstr "Nombre d'anneaux"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:172
+msgctxt "@tooltip"
+msgid "The number of concentric rings to generate in the pattern."
+msgstr "Le nombre d'anneaux concentriques à générer dans le motif."
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:179
+msgctxt "@label"
+msgid "Size in Cells"
+msgstr "Nombre de cellules"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:202
+msgctxt "@tooltip"
+msgid "The size of the grid in cells."
+msgstr "Nombre de cellules définissant la grille."
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:209
+msgctxt "@label"
+msgid "Pad Size"
+msgstr "Nb des cellules"
+
+#: Resources/QML/QT6/BedLevelPatternDialog.qml:232
+msgctxt "@tooltip"
+msgid "The size of each of the pads in the pattern."
+msgstr "La taille de chacun des carré du modèle."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:14
+msgctxt "@title"
+msgid "Fan Tower"
+msgstr "Tour de ventilateur"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:65
+msgctxt "@label"
+msgid "Fan Tower Preset"
+msgstr "Tour de ventilateur Préréglage"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:89
+msgctxt "@label"
+msgid "Starting Fan Speed %"
+msgstr "Vitesse de démarrage du ventilateur %"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:112
+#, javascript-format
+msgctxt "@tooltip"
+msgid ""
+"The fan speed % for the first section of the tower.<p>This value will be "
+"changed for each section of the tower.<p>This should be a value between 0 "
+"and 100."
+msgstr ""
+"La vitesse du ventilateur en % pour la première section de la tour.<p>Cette "
+"valeur sera modifiée pour chaque section de la tour.<p>Cette valeur doit "
+"être comprise entre 0 et 100."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:119
+msgctxt "@label"
+msgid "Ending Fan Speed %"
+msgstr "Vitesse de fin du ventilateur %"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:142
+#, javascript-format
+msgctxt "@tooltip"
+msgid ""
+"The fan speed % for the last section of the tower.<p>This should be a value "
+"between 0 and 100."
+msgstr ""
+"La vitesse du ventilateur en % pour la dernière section de la tour.<p>Cette "
+"valeur doit être comprise entre 0 et 100."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:149
+msgctxt "@label"
+msgid "Fan Speed % Change"
+msgstr "Vitesse du ventilateur % de changement"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:172
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the fan speed % between sections of the tower.<p>In "
+"combination with the start end end fan speed %, this determines the number "
+"of sections in the tower."
+msgstr ""
+"Montant permettant de modifier la vitesse du ventilateur en % entre les "
+"sections de l'échafaudage.<p>En combinaison avec le % de vitesse du "
+"ventilateur au début et à la fin, ceci détermine le nombre de sections dans "
+"la tour."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:202
+#: Resources/QML/QT6/TempTowerDialog.qml:199
+msgctxt "@tooltip"
+msgid ""
+"An optional short label to carve into the base of the right column of the "
+"tower.<p>This must be four characters or less."
+msgstr ""
+"Une courte étiquette facultative à graver à la base de la colonne droite de "
+"la tour.<p>Elle ne doit pas dépasser quatre caractères."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:231
+#: Resources/QML/QT6/TempTowerDialog.qml:228
+msgctxt "@tooltip"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+"Une étiquette facultative à graver sur le côté gauche de la tour.<p>Elle "
+"peut être utilisée, par exemple, pour identifier l'objet de la tour ou le "
+"matériau à imprimer."
+
+#: Resources/QML/QT6/FanTowerDialog.qml:238
+msgctxt "@label"
+msgid "Maintain Value for Bridges"
+msgstr "Maintenir la valeur pour les ponts"
+
+#: Resources/QML/QT6/FanTowerDialog.qml:254
+#, javascript-format
+msgctxt "@label"
+msgid ""
+"Selects whether the fan speed % for the current section is maintained while "
+"bridges are being printed."
+msgstr ""
+"Sélectionne si la vitesse du ventilateur % pour la section en cours est "
+"maintenue pendant l'impression des ponts."
+
+#: Resources/QML/QT6/WaitDialog.qml:13
+msgctxt "@title"
+msgid "Generating the Tower"
+msgstr "Génération de la tour"
+
+#: Resources/QML/QT6/WaitDialog.qml:50
+msgctxt "@label"
+msgid ""
+"Please wait while OpenSCAD generates the Auto Tower\n"
+"\n"
+"This may take a few minutes"
+msgstr ""
+"Veuillez patienter pendant qu'OpenSCAD génère la Tour de test\n"
+"\n"
+"Cela peut prendre quelques minutes"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:14
+msgctxt "@title"
+msgid "Speed Tower"
+msgstr "Tour de vitesse"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:111
+msgctxt "@tooltip"
+msgid ""
+"The type of speed to vary across the tower.<p>'Print Speed' towers change "
+"the speed at which the nozzle moves while printing (equivalent to Cura's "
+"'print speed' setting).<p>'Acceleration' changes how fast the nozzle "
+"accelerates during printing.<p>The other towers are more specialized."
+msgstr ""
+"Le type de vitesse à faire varier dans la tour.<p>Les tours \"Vitesse "
+"d'impression\" modifient la vitesse à laquelle la buse se déplace pendant "
+"l'impression (équivalent au paramètre \"vitesse d'impression\" de "
+"Cura).<p>L'accélération modifie la vitesse à laquelle la buse accélère "
+"pendant l'impression.<p>Les autres tours sont plus spécialisées."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:118
+msgctxt "@label"
+msgid "Starting Speed"
+msgstr "Vitesse de début"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:141
+msgctxt "@tooltip"
+msgid "The speed value for the first section of the tower."
+msgstr "Valeur de la vitesse pour la première section de la tour."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:147
+msgctxt "@label"
+msgid "Ending Speed"
+msgstr "Vitesse de fin"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:170
+msgctxt "@tooltip"
+msgid "The speed value for the last section of the tower."
+msgstr "Valeur de la vitesse pour la dernière section de la tour."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:176
+msgctxt "@label"
+msgid "Speed Change"
+msgstr "Changement de vitesse"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:199
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the speed between tower sections.<p>In combination with "
+"the starting and ending values, this determines the number of sections in "
+"the tower."
+msgstr ""
+"Montant permettant de modifier la vitesse entre les sections de la "
+"tour.<p>En combinaison avec les valeurs de départ et d'arrivée, cela "
+"détermine le nombre de sections dans la tour."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:205
+msgctxt "@label"
+msgid "Wing Length"
+msgstr "Longueur de l'aile"
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:228
+msgctxt "@tooltip"
+msgid ""
+"The length of each 'wing' of the tower. Longer wings allow more time for the "
+"printer to get up to speed while printing, but results in more material "
+"being used."
+msgstr ""
+"La longueur de chaque \"aile\" de la tour. Des ailes plus longues permettent à "
+"l'imprimante d'avoir plus de temps pour atteindre sa vitesse d'impression, "
+"mais entraînent l'utilisation d'une plus grande quantité de matériau."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:256
+msgctxt "@tooltip"
+msgid ""
+"An optional label to carve into the base of the tower.<p>This can be used, "
+"for example, to identify the purpose of the tower or the material being "
+"printed."
+msgstr ""
+"Une étiquette facultative à graver à la base de la tour.<p>Elle peut être "
+"utilisée, par exemple, pour identifier l'objet de la tour ou le matériau "
+"imprimé."
+
+#: Resources/QML/QT6/SpeedTowerDialog.qml:284
+msgctxt "@tooltip"
+msgid ""
+"An optional second description to carve into the base of the tower.<p>This "
+"is can be used to provide additional information about the tower - why you "
+"printed it, for instance."
+msgstr ""
+"Une deuxième description facultative à graver à la base de la tour.<p>Elle "
+"peut être utilisée pour fournir des informations supplémentaires sur la tour "
+"- pourquoi vous l'avez imprimée, par exemple."
+
+#: Resources/QML/QT6/TempTowerDialog.qml:62
+msgctxt "@label"
+msgid "Temp Tower Preset"
+msgstr "Réglages Tour Température"
+
+#: Resources/QML/QT6/TempTowerDialog.qml:109
+msgctxt "@tooltip"
+msgid ""
+"The nozzle temperature for the first section of the tower.<p>It is good "
+"practice to make this temperature higher than the ending temperature."
+msgstr ""
+"Température de la buse pour la première section de la tour.<p>Il est "
+"souhaitable que cette température soit plus élevée que la température "
+"finale."
+
+#: Resources/QML/QT6/TempTowerDialog.qml:139
+msgctxt "@tooltip"
+msgid ""
+"The nozzle temperature for the last section of the tower.<p>It is good "
+"practice to make this temperature lower than the starting temperature."
+msgstr ""
+"Température de la buse pour la dernière section de la tour.<p>Il est "
+"souhaitable que cette température soit inférieure à la température de "
+"départ."
+
+#: Resources/QML/QT6/TempTowerDialog.qml:169
+msgctxt "@tooltip"
+msgid ""
+"The amount to change the nozzle temperature between sections.<p>In "
+"combination with the starting and ending temperatures, this determines the "
+"number of sections in the tower."
+msgstr ""
+"Montant de la modification de la température de la buse entre les "
+"sections.\\<p>En combinaison avec les températures de départ et d'arrivée, "
+"cela détermine le nombre de sections dans la tour."
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:15
+msgctxt "@title"
+msgid "AutoTowersGenerator v"
+msgstr "AutoTowersGenerator v"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:15
+msgctxt "@title"
+msgid " Settings"
+msgstr " Réglages"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:59
+msgctxt "@label"
+msgid "OpenSCAD path"
+msgstr "Chemin d'accès à OpenSCAD"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:80
+msgctxt "@button"
+msgid "..."
+msgstr "..."
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:86
+msgctxt "@tooltip"
+msgid ""
+"The path to the OpenSCAD executable.<p>If it is in the current path or "
+"installed in an expected location, the plugin should find it automatically."
+"<p>You can manually set or override the path here.<p>Clearing out this value "
+"will cause the plugin to attempt to automatically locate OpenSCAD again."
+msgstr ""
+"Le chemin d'accès à l'exécutable OpenSCAD.<p>S'il se trouve dans le chemin "
+"actuel ou s'il est installé à un emplacement prévu, le plugin devrait le "
+"trouver automatiquement.<p>Vous pouvez définir manuellement ou remplacer le "
+"chemin ici.<p>En supprimant cette valeur, le plugin tentera à nouveau de "
+"localiser automatiquement OpenSCAD."
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:113
+msgctxt "@label"
+msgid "Correct print settings"
+msgstr "Paramètres d'impression corrects"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:128
+msgctxt "@tooltip"
+msgid ""
+"When checked, the plugin will automatically correct print settings for best "
+"results when printing the selected tower."
+msgstr ""
+"Si cette option est cochée, le plugin corrigera automatiquement les "
+"paramètres d'impression pour obtenir les meilleurs résultats lors de "
+"l'impression de la tour sélectionnée."
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:134
+msgctxt "@label"
+msgid "Enable LCD messages"
+msgstr "Activer les messages sur l'écran LCD"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:149
+msgctxt "@tooltip"
+msgid ""
+"Selects whether tower parameter changes (temperature, speed, etc) are "
+"displayed to your printer's LCD.<p>Information is displayed using the M117 "
+"command, which can cause issues with some printers (The Dremel 3D45, for "
+"instance)<p>Deselect this if you are noticing issues."
+msgstr ""
+"Sélectionne si les changements de paramètres de la tour (température, "
+"vitesse, etc.) sont affichés sur l'écran LCD de votre imprimante.<p>Les "
+"informations sont affichées à l'aide de la commande M117, ce qui peut poser "
+"des problèmes avec certaines imprimantes (la Dremel 3D45, par "
+"exemple)<p>Désélectionnez cette option si vous constatez des problèmes."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:14
+msgctxt "@title"
+msgid "Flow Tower"
+msgstr "Tour de débit"
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:89
+msgctxt "@label"
+msgid "Tower Design"
+msgstr "Conception de la tour"
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:113
+msgctxt "@tootip"
+msgid ""
+"The tower model to use.<p>The 'Classic' model is the same tower that is used "
+"by the temperature tower.<p>The 'Spiral' model is radically different and "
+"may suit certain materials or uses better.<p>In the end, either one should "
+"work just fine."
+msgstr ""
+"Le modèle de tour à utiliser.<p>Le modèle 'Classique' est le même que celui "
+"utilisé par la tour de température.<p>Le modèle 'Spiral' est radicalement "
+"différent et peut mieux convenir à certains matériaux ou à certaines "
+"utilisations.<p>En fin de compte, l'un ou l'autre convient parfaitement."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:120
+msgctxt "@label"
+msgid "Starting Flow %"
+msgstr "Débit de départ %"
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:143
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The flow rate % for the first section of the tower.<p>This is equivalent to "
+"changing Cura's 'Flow' setting.<p>This value will be changed for each "
+"section of the tower<p>Rates less than 100 result in less filament being "
+"pushed through the nozzle.<p>Rates greater than 100 result in more filament "
+"being pushed through the nozzle.<p>It is good practice for the starting "
+"value to be higher than the ending value."
+msgstr ""
+"Le débit % pour la première section de la tour.<p>Cela équivaut à modifier "
+"le paramètre 'Flow' de Cura.<p>Cette valeur sera modifiée pour chaque "
+"section de la tour<p>Les taux inférieurs à 100 entraînent une diminution de "
+"la quantité de filament poussé à travers la buse.<p>Les taux supérieurs à "
+"100 entraînent une plus grande quantité de filament à travers la buse.<p>Il "
+"est souhaitable que la valeur de départ soit supérieure à la valeur "
+"d'arrivée."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:150
+msgctxt "@label"
+msgid "Ending Flow Rate %"
+msgstr "Débit final %"
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:173
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The flow rate % for the last section of the tower.<p>This is equivalent to "
+"changing Cura's 'Flow' setting.<p>Rates less than 100 result in less "
+"filament being pushed through the nozzle.<p>Rates greater than 100 result in "
+"more filament being pushed through the nozzle.<p>It is good practice for the "
+"ending value to be lower than the starting value."
+msgstr ""
+"Le taux de débit % pour la dernière section de la tour.<p>Cela équivaut à "
+"modifier le paramètre 'Flow' de Cura.<p>Les taux inférieurs à 100 entraînent "
+"une diminution de la quantité de filament poussé à travers la buse.<p>Les "
+"taux supérieurs à 100 entraînent une plus grande quantité de filament à "
+"travers la buse.<p>Il est souhaitable que la valeur finale soit inférieure à "
+"la valeur initiale."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:180
+msgctxt "@label"
+msgid "Flow Rate % Change"
+msgstr "Débit % de variation"
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:203
+#, javascript-format
+msgctxt "@tootip"
+msgid ""
+"The amount to change the flow rate % between sections of the tower.<p>In "
+"combination with the start end end flow rates, this determines the number of "
+"sections in the tower."
+msgstr ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed.La quantité de variation du débit en % entre les sections de "
+"la tour.<p>En combinaison avec les débits de début et de fin, cela détermine "
+"le nombre de sections dans la tour."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:233
+msgctxt "@tootip"
+msgid ""
+"An optional short label to carve into the base of the right column of the "
+"tower.<p>This must be four characters or less."
+msgstr ""
+"Une courte étiquette facultative à graver à la base de la colonne droite de "
+"la tour.<p>Une courte étiquette facultative à graver dans la base de la "
+"colonne droite de la tour.<p>Elle doit comporter quatre caractères ou moins."
+
+#: Resources/QML/QT6/FlowTowerDialog.qml:262
+msgctxt "@tootip"
+msgid ""
+"An optional label to carve up the left side of the tower.<p>This can be "
+"used, for example, to identify the purpose of the tower or the material "
+"being printed."
+msgstr ""
+"Une étiquette facultative à graver sur le côté gauche de la tour.<p>Elle "
+"peut être utilisée, par exemple, pour identifier l'objet de la tour ou le "
+"matériau à imprimer."
+
+#: Resources/QML/QT6/RemoveModelsButton.qml:12
+msgctxt "@text"
+msgid "Remove the AutoTower Model"
+msgstr "Retirer le modèle AutoTower"
+
+msgctxt "@msg"
+msgid "Found OpenScad version"
+msgstr "Version d'OpenScad trouvée"
+
+msgctxt "@msg"
+msgid "at"
+msgstr "dans"
+
+msgctxt "@msg"
+msgid "The OpenScad path"
+msgstr "Le chemin OpenScad"
+
+msgctxt "@msg"
+msgid "is not valid"
+msgstr "n'est pas valide"
+
+msgctxt "@msg"
+msgid "Changed"
+msgstr "Modification"
+
+msgctxt "@msg"
+msgid "Restored"
+msgstr "Restauré"
+
+msgctxt "@msg"
+msgid "to"
+msgstr "en"
+
+msgctxt "@msg"
+msgid "from"
+msgstr "de"
+
+msgctxt "@msg"
+msgid "The STL file"
+msgstr "Le fichier STL"
+
+msgctxt "@msg"
+msgid "does not exist"
+msgstr "n'existe pas"
+
+msgctxt "@msg"
+msgid "The Auto Tower was removed because the Cura setting"
+msgstr "La tour auto a été supprimée parce que le paramètre Cura"
+
+msgctxt "@msg"
+msgid "has changed since the tower was generated"
+msgstr "a changé depuis la création de la tour"
+
+msgctxt "@msg"
+msgid "Failed to generate"
+msgstr "Échec de la génération"
+
+msgctxt "@msg"
+msgid "Command output was"
+msgstr "La sortie de la commande était"
+
+msgctxt "@msg"
+msgid "An exception occured during post-processing"
+msgstr "Une exception s'est produite pendant le post-traitement"

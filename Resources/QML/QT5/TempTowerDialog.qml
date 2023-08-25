@@ -7,7 +7,10 @@ import UM 1.2 as UM
 UM.Dialog
 {
     id: dialog
-    title: 'Temperature Tower'
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "Temperature Tower")
 
     minimumWidth: screenScaleFactor * 500
     minimumHeight: (screenScaleFactor * contents.childrenRect.height) + (2 * UM.Theme.getSize('default_margin').height) + UM.Theme.getSize('button').height
@@ -54,7 +57,7 @@ UM.Dialog
             // Preset option
             Label
             {
-                text: 'Preset'
+                text: catalog.i18nc("@label", "Preset")
             }
             ComboBox
             {
@@ -72,7 +75,7 @@ UM.Dialog
             // Starting temperature
             Label
             {
-                text: 'Starting Temperature'
+                text: catalog.i18nc("@label", "Starting Temperature")
                 visible: !dataModel.presetSelected
             }
             TextField
@@ -91,7 +94,7 @@ UM.Dialog
             // Ending temperature
             Label
             {
-                text: 'Ending Temperature'
+                text: catalog.i18nc("@label", "Ending Temperature")
                 visible: !dataModel.presetSelected
             }
             TextField
@@ -110,7 +113,7 @@ UM.Dialog
             // Temperature change
             Label
             {
-                text: 'Temperature Change'
+                text: catalog.i18nc("@label", "Temperature Change")
                 visible: !dataModel.presetSelected
             }
             TextField
@@ -129,7 +132,7 @@ UM.Dialog
             // Tower label
             Label
             {
-                text: 'Tower Label'
+                text: catalog.i18nc("@label", "Tower Label")
                 visible: !dataModel.presetSelected
             }
             TextField
@@ -148,7 +151,7 @@ UM.Dialog
             // Tower description
             Label
             {
-                text: 'Tower Description'
+                text: catalog.i18nc("@label", "Tower Description")
                 visible: !dataModel.presetSelected
             }
             TextField
@@ -167,13 +170,13 @@ UM.Dialog
 
     rightButtons: Button
     {
-        text: 'OK'
+        text: catalog.i18nc("@button", "OK")
         onClicked: dialog.accept()
     }
 
     leftButtons: Button
     {
-        text: 'Cancel'
+        text: catalog.i18nc("@button", "Cancel")
         onClicked: dialog.reject()
     }
 
@@ -181,4 +184,5 @@ UM.Dialog
     {
         controller.dialogAccepted()
     }
+
 }

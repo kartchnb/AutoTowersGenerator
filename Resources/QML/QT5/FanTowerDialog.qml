@@ -190,4 +190,5 @@ UM.Dialog
     {
         controller.dialogAccepted()
     }
+
 }

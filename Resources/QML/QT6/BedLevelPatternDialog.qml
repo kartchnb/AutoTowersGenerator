@@ -8,7 +8,10 @@ import Cura 1.7 as Cura
 UM.Dialog
 {
     id: dialog
-    title: 'Bed Level Pattern'
+	
+	property variant catalog: UM.I18nCatalog { name: "autotowers" }
+	
+    title: catalog.i18nc("@title", "Bed Level Pattern")
 
     buttonSpacing: UM.Theme.getSize('default_margin').width
     minimumWidth: screenScaleFactor * 445
@@ -22,8 +25,6 @@ UM.Dialog
     // Define the width of the number input text boxes
     property int numberInputWidth: UM.Theme.getSize('button').width
     
-
-
     RowLayout
     {
         id: contents
@@ -59,7 +60,7 @@ UM.Dialog
             // Preset option
             UM.Label
             {
-                text: 'Preset'
+                text: catalog.i18nc("@label", "Preset")
                 MouseArea
                 {
                     id: preset_mouse_area
@@ -70,7 +71,7 @@ UM.Dialog
             Cura.ComboBox
             {
                 Layout.fillWidth: true
-                model: enableCustom ? dataModel.presetsModel.concat({'name': 'Custom'}) : dataModel.presetsModel
+                model: enableCustom ? dataModel.presetsModel.concat({'name': catalog.i18nc("@model", "Custom")}) : dataModel.presetsModel
                 textRole: 'name'
                 currentIndex: dataModel.presetIndex
 
@@ -83,7 +84,7 @@ UM.Dialog
             // Bed level pattern option
             UM.Label
             {
-                text: 'Pattern'
+                text: catalog.i18nc("@label", "Pattern")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -108,14 +109,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The type of bed level Pattern to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level Pattern type will look like.'
+                text: catalog.i18nc("@tooltip", "The type of bed level Pattern to generate.<p>Each pattern covers different parts of the bed in different ways and some are faster than others.<p>The icon on the left side of this dialog will give an idea of what the bed level Pattern type will look like.")
                 visible: pattern_mouse_area.containsMouse
             }
 
             // Bed fill %
             UM.Label
             {
-                text: 'Bed Fill %'
+                text: catalog.i18nc("@label", "Bed Fill %")
                 visible: !dataModel.presetSelected
                 MouseArea 
                 {
@@ -138,14 +139,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'This controls how much of the printer area the pattern should take up.<p>A value of 100 will result in the entire print area being used and may not work.<p>Values below 75 are probably not useful.<p>90 is a good default.'
+                text: catalog.i18nc("@tooltip", "This controls how much of the printer area the pattern should take up.<p>A value of 100 will result in the entire print area being used and may not work.<p>Values below 75 are probably not useful.<p>90 is a good default.")
                 visible: bed_inset_mouse_area.containsMouse
             }
 
             // The number of rings
             UM.Label
             {
-                text: 'Number of Rings'
+                text: catalog.i18nc("@label", "Number of Rings")
                 visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Spiral Squares' || selected_pattern.currentText == 'Concentric Squares' || selected_pattern.currentText == 'Concentric Circles')
                 MouseArea 
                 {
@@ -168,14 +169,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The number of concentric rings to generate in the pattern.'
+                text: catalog.i18nc("@tooltip", "The number of concentric rings to generate in the pattern.")
                 visible: number_of_squares_mouse_area.containsMouse
             }
 
             // Size in cells
             UM.Label
             {
-                text: 'Size in Cells'
+                text: catalog.i18nc("@label", "Size in Cells")
                 visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Grid' || selected_pattern.currentText == 'Padded Grid')
                 MouseArea 
                 {
@@ -198,14 +199,14 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The size of the grid in cells.'
+                text: catalog.i18nc("@tooltip", "The size of the grid in cells.")
                 visible: size_in_cells_mouse_area.containsMouse
             }
 
             // Pad size
             UM.Label
             {
-                text: 'Pad Size'
+                text: catalog.i18nc("@label", "Pad Size")
                 visible: !dataModel.presetSelected && (selected_pattern.currentText == 'Padded Grid')
                 MouseArea 
                 {
@@ -228,7 +229,7 @@ UM.Dialog
             }
             UM.ToolTip
             {
-                text: 'The size of each of the pads in the pattern.'
+                text: catalog.i18nc("@tooltip", "The size of each of the pads in the pattern.")
                 visible: pad_size_mouse_area.containsMouse
             }
         }
@@ -238,12 +239,12 @@ UM.Dialog
     [
         Cura.SecondaryButton
         {
-            text: 'Cancel'
+            text: catalog.i18nc("@button", "Cancel")
             onClicked: dialog.reject()
         },
         Cura.PrimaryButton
         {
-            text: 'OK'
+            text: catalog.i18nc("@button", "OK")
             onClicked: dialog.accept()
         }
     ]
@@ -252,4 +253,5 @@ UM.Dialog
     {
         controller.dialogAccepted()
     }
+
 }

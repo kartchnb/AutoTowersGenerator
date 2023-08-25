@@ -4,11 +4,20 @@ try:
 except ImportError:
     from PyQt5.QtCore import pyqtSlot
 
+import os
+
 from UM.Logger import Logger
+from UM.i18n import i18nCatalog
+from UM.Resources import Resources
+
 
 from .ControllerBase import ControllerBase
 from ..Models.BedLevelPatternModel import BedLevelPatternModel
 
+Resources.addSearchPath(
+    os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..'),'Resources')
+)  # Plugin translation file import
+catalog = i18nCatalog("autotowers")
 
 
 class BedLevelPatternController(ControllerBase):
@@ -34,7 +43,7 @@ class BedLevelPatternController(ControllerBase):
 
     def __init__(self, guiDir, stlDir, loadStlCallback, generateStlCallback, pluginName):
         dataModel = BedLevelPatternModel(stlDir=stlDir)
-        super().__init__(name='Bed Level Pattern', guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
+        super().__init__(name=catalog.i18nc("@test", "Bed Level Pattern"), guiDir=guiDir, loadStlCallback=loadStlCallback, generateStlCallback=generateStlCallback, qmlFilename=self._qmlFilename, criticalPropertiesTable=self._criticalPropertiesTable, dataModel=dataModel, pluginName=pluginName)
 
 
 
