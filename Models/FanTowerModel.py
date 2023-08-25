@@ -21,7 +21,7 @@ class FanTowerModel(ModelBase):
 
     # The available fan tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Fan Tower - 0-100%") , 'filename': 'Fan Tower - Fan 0-100.stl', 'start percent': 0, 'percent change': 20,}
+        {'name': catalog.i18nc("@model", "Fan Tower - 0-100%") , 'filename': 'Fan Tower - Fan 0-100.stl', 'start percent': '0', 'percent change': '20',}
     ]
 
 
@@ -64,13 +64,21 @@ class FanTowerModel(ModelBase):
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
     
-    @pyqtProperty(float, notify=presetIndexChanged)
-    def presetStartPercent(self)->float:
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetStartPercentStr(self)->str:
         return self._presetsTable[self.presetIndex]['start percent']
     
     @pyqtProperty(float, notify=presetIndexChanged)
-    def presetPercentChange(self)->float:
+    def presetStartPercent(self)->float:
+        return float(self.presetStartPercentStr)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetPercentChangeStr(self)->str:
         return self._presetsTable[self.presetIndex]['percent change']
+    
+    @pyqtProperty(float, notify=presetIndexChanged)
+    def presetPercentChange(self)->float:
+        return float(self.presetPercentChangeStr)
     
 
 
@@ -94,7 +102,11 @@ class FanTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=startFanPercentStrChanged, fset=setstartFanPercentStr)
     def startFanPercentStr(self)->str:
-        return self._startFanPercentStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetStartPercentStr
+        else:
+            return self._startFanPercentStr
     
     @pyqtProperty(float, notify=startFanPercentStrChanged)
     def startFanPercent(self)->float:
@@ -132,7 +144,11 @@ class FanTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=fanPercentChangeStrChanged, fset=setFanPercentChangeStr)
     def fanPercentChangeStr(self)->str:
-        return self._fanPercentChangeStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetPercentChangeStr
+        else:
+            return self._fanPercentChangeStr
 
     @pyqtProperty(float, notify=fanPercentChangeStrChanged)
     def fanPercentChange(self)->float:

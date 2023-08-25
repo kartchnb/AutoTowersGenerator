@@ -21,13 +21,13 @@ class SpeedTowerModel(ModelBase):
 
     # The available speed tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 20-100") , 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': 20, 'speed change': 20, 'tower type': 'Print Speed'},
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 50-150") , 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': 50, 'speed change': 20, 'tower type': 'Print Speed'},
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 100-200") , 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': 100, 'speed change': 20, 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 20-100"), 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': '20', 'speed change': '20', 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 50-150"), 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': '50', 'speed change': '20', 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 100-200"), 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': '100', 'speed change': '20', 'tower type': 'Print Speed'},
     ]
 
     # The speed tower types that can been created
-    _towerTypesModel = [
+    _towerTypesTable = [
         {'ident': 'Print Speed' ,'name': catalog.i18nc("@type", "Print Speed") , 'label': 'PRINT SPEED'}, 
         {'ident': 'Acceleration' , 'name': catalog.i18nc("@type", "Acceleration") , 'label': 'ACCELERATION'}, 
         {'ident': 'Jerk' , 'name': catalog.i18nc("@type", "Jerk") , 'label': 'JERK'}, 
@@ -52,7 +52,7 @@ class SpeedTowerModel(ModelBase):
 
     @pyqtProperty(list, notify=towerTypesModelChanged)
     def towerTypesModel(self):
-        return self._towerTypesModel
+        return self._towerTypesTable
 
 
 
@@ -85,13 +85,25 @@ class SpeedTowerModel(ModelBase):
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
     
-    @pyqtProperty(float, notify=presetIndexChanged)
-    def presetStartPercent(self)->float:
-        return self._presetsTable[self.presetIndex]['start percent']
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetStartSpeedStr(self)->str:
+        return self._presetsTable[self.presetIndex]['start speed']
     
     @pyqtProperty(float, notify=presetIndexChanged)
-    def presetPercentChange(self)->float:
-        return self._presetsTable[self.presetIndex]['percent change']
+    def presetStartSpeed(self)->float:
+        return float(self.presetStartSpeedStr)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetSpeedChangeStr(self)->str:
+        return self._presetsTable[self.presetIndex]['speed change']
+    
+    @pyqtProperty(float, notify=presetIndexChanged)
+    def presetSpeedChange(self)->float:
+        return float(self.presetSpeedChange)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetTowerTypeName(self)->str:
+        return self._presetsTable[self.presetIndex]['tower type']
     
 
 
@@ -110,32 +122,24 @@ class SpeedTowerModel(ModelBase):
     towerTypeIndexChanged = pyqtSignal()
 
     def setTowerTypeIndex(self, value)->None:
-        newTowerTypeIndex = int(value)
-
-        # The goal here is to keep the tower label in sync with the selected tower type unless the user has manually changed the label
-        # Only update the tower label if it matches the name of the currently selected tower type
-        if self._towerLabel == self._towerTypesModel[self._towerTypeIndex]['label']:
-            # Update the tower label to match the newly-selected tower type
-            self.setTowerLabel(self._towerTypesModel[newTowerTypeIndex]['label'])
-
-        # Now, actually update the tower type index
-        self._towerTypeIndex = newTowerTypeIndex
+        self._towerTypeIndex = int(value)
         self.towerTypeIndexChanged.emit()
 
     @pyqtProperty(int, notify=towerTypeIndexChanged, fset=setTowerTypeIndex)
     def towerTypeIndex(self)->int:
-        return self._towerTypeIndex
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return next((i for i, item in enumerate(self._towerTypesTable) if item["name"] == self.presetTowerTypeName), None)
+        else:
+            return self._towerTypeIndex
     
     @pyqtProperty(str, notify=towerTypeIndexChanged)
     def towerTypeName(self)->str:
-        try:
-            return self._towerTypesModel[self.towerTypeIndex]['ident']
-        except IndexError:
-            return 'Custom'
+        return self._towerTypesTable[self.towerTypeIndex]['ident']
 
     @pyqtProperty(str, notify=towerTypeIndexChanged)
     def towerTypeFilename(self)->str:
-        return self._presetsTable[self._towerTypesModel]['filename']
+        return self._presetsTable[self._towerTypesTable]['filename']
 
     @pyqtProperty(str, notify=towerTypeIndexChanged)
     def towerTypeFilePath(self)->str:
@@ -143,15 +147,15 @@ class SpeedTowerModel(ModelBase):
 
     @pyqtProperty(float, notify=towerTypeIndexChanged)
     def towerTypeStartValue(self)->float:
-        return float(self._presetsTable[self._towerTypesModel]['start value'])
+        return float(self._presetsTable[self._towerTypesTable]['start value'])
 
     @pyqtProperty(float, notify=towerTypeIndexChanged)
     def towerTypeValueChange(self)->float:
-        return float(self._presetsTable[self._towerTypesModel]['value change'])
+        return float(self._presetsTable[self._towerTypesTable]['value change'])
 
     @pyqtProperty(str, notify=towerTypeIndexChanged)
     def towerTypeTowerType(self)->str:
-        return self._presetsTable[self._towerTypesModel]['tower type']
+        return self._presetsTable[self._towerTypesTable]['tower type']
 
 
 
@@ -166,7 +170,11 @@ class SpeedTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=startSpeedStrChanged, fset=setStartSpeedStr)
     def startSpeedStr(self)->str:
-        return self._startSpeedStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetStartSpeedStr
+        else:
+            return self._startSpeedStr
 
     @pyqtProperty(float, notify=startSpeedStrChanged)
     def startSpeed(self)->float:
@@ -204,7 +212,11 @@ class SpeedTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=speedChangeStrChanged, fset=setSpeedChangeStr)
     def speedChangeStr(self)->str:
-        return self._speedChangeStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetSpeedChangeStr
+        else:
+            return self._speedChangeStr
 
     @pyqtProperty(float, notify=speedChangeStrChanged)
     def speedChange(self)->float:
@@ -232,7 +244,7 @@ class SpeedTowerModel(ModelBase):
 
 
     # The label to add to the tower
-    _towerLabel = _towerTypesModel[0]['label']
+    _towerLabel = _towerTypesTable[0]['label']
 
     towerLabelChanged = pyqtSignal()
     

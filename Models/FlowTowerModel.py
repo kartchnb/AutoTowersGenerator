@@ -21,8 +21,8 @@ class FlowTowerModel(ModelBase):
 
     # The available flow tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Flow Tower - Flow 115-85") , 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': 115, 'flow change': -5},
-        {'name': catalog.i18nc("@model", "Flow Tower (Spiral) - Flow 115-85") , 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': 115, 'flow change': -5},
+        {'name': catalog.i18nc("@model", "Flow Tower - Flow 115-85") , 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Standard'},
+        {'name': catalog.i18nc("@model", "Flow Tower (Spiral) - Flow 115-85") , 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Spiral'},
     ]
 
     # The available flow tower designs
@@ -43,9 +43,9 @@ class FlowTowerModel(ModelBase):
 
 
     # Make the flow tower designs available to QML
-    towerDesignsChanged = pyqtSignal()
+    towerDesignsModelChanged = pyqtSignal()
 
-    @pyqtProperty(list, notify=towerDesignsChanged)
+    @pyqtProperty(list, notify=towerDesignsModelChanged)
     def towerDesignsModel(self):
         return self._towerDesignsTable
     
@@ -85,17 +85,26 @@ class FlowTowerModel(ModelBase):
     def presetTowerDesign(self)->str:
         return self._presetsTable[self.presetIndex]['tower design']
     
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetStartFlowPercentStr(self)->str:
+        return self._presetsTable[self.presetIndex]['start flow']
+    
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetStartFlowPercent(self)->float:
-        return float(self._presetsTable[self.presetIndex]['start flow'])
+        return float(self.presetStartFlowPercentStr)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetFlowPercentChangeStr(self)->str:
+        return self._presetsTable[self.presetIndex]['flow change']
     
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetFlowPercentChange(self)->float:
-        return float(self._presetsTable[self.presetIndex]['flow change'])
+        return float(self.presetFlowPercentChangeStr)
         
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetIcon(self)->str:
         return self._presetsTable[self.presetIndex]['icon']
+
 
 
     # The selected tower design
@@ -110,7 +119,11 @@ class FlowTowerModel(ModelBase):
 
     @pyqtProperty(int, notify=towerDesignIndexChanged, fset=setTowerDesignIndex)
     def towerDesignIndex(self)->int:
-        return self._towerDesignIndex
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return next((i for i, item in enumerate(self._towerDesignsTable) if item["name"] == self.presetTowerDesign), None)
+        else:
+            return self._towerDesignIndex
     
     @pyqtProperty(str, notify=towerDesignIndexChanged)
     def towerDesignName(self)->str:
@@ -149,7 +162,11 @@ class FlowTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=startFlowPercentStrChanged, fset=setStartFlowPercentStr)
     def startFlowPercentStr(self)->str:
-        return self._startFlowPercentStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetStartFlowPercentStr
+        else:
+            return self._startFlowPercentStr
     
     @pyqtProperty(float, notify=startFlowPercentStrChanged)
     def startFlowPercent(self)->float:
@@ -187,7 +204,11 @@ class FlowTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=flowPercentChangeStrChanged, fset=setFlowPercentChangeStr)
     def flowPercentChangeStr(self)->str:
-        return self._flowPercentChangeStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetFlowPercentChangeStr
+        else:
+            return self._flowPercentChangeStr
     
     @pyqtProperty(float, notify=flowPercentChangeStrChanged)
     def flowPercentChange(self)->float:

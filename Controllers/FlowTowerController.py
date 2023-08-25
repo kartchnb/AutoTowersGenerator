@@ -65,7 +65,6 @@ class FlowTowerController(ControllerBase):
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Determine the post-processing values
-        currentFlowRate = self._flowRate
         baseHeight = self._dataModel.optimalBaseHeight
         sectionHeight = self._dataModel.optimalSectionHeight
         initialLayerHeight = self._dataModel.initialLayerHeight

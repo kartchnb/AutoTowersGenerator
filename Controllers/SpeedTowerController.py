@@ -68,7 +68,7 @@ class SpeedTowerController(ControllerBase):
         towerType = self._dataModel.towerTypeName
 
         # Call the post-processing script for print speed towers
-        if self._towerType == 'Print Speed':
+        if towerType == 'Print Speed':
             currentPrintSpeed = self._dataModel.printSpeed
 
             gcode = PrintSpeedTower_PostProcessing.execute(

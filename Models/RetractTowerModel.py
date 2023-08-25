@@ -21,17 +21,16 @@ class RetractTowerModel(ModelBase):
 
     # The available retract tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 0.4-1.2") , 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'starting value': 0.4, 'value change': 0.1, 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1.2-2.0") , 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'starting value': 1.2, 'value change': 0.1, 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1-6") , 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'starting value': 1, 'value change': 1, 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 4-9") , 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'starting value': 4, 'value change': 1, 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 7-12") , 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'starting value': 7, 'value change': 1, 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 10-50") , 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'starting value': 10, 'value change': 10, 'tower type': 'Speed'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 35-75") , 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'starting value': 35, 'value change': 10, 'tower type': 'Speed'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 60-100") , 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'starting value': 60, 'value change': 10, 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 0.4-1.2") , 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'starting value': '0.4', 'value change': '0.1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1.2-2.0") , 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'starting value': '1.2', 'value change': '0.1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1-6") , 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'starting value': '1', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 4-9") , 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'starting value': '4', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 7-12") , 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'starting value': '7', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 10-50") , 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'starting value': '10', 'value change': '10', 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 35-75") , 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'starting value': '35', 'value change': '10', 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 60-100") , 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'starting value': '60', 'value change': '10', 'tower type': 'Speed'},
     ]
  
-
     _towerTypesTable = [
         {'ident': 'Distance' ,'name': catalog.i18nc("@type","Distance") , 'label': 'DST'}, 
         {'ident': 'Speed' ,'name': catalog.i18nc("@type","Speed") , 'label': 'SPD'}, 
@@ -84,16 +83,24 @@ class RetractTowerModel(ModelBase):
     def presetFilePath(self)->str:
         return self._buildStlFilePath(self.presetFileName)
     
-    @pyqtProperty(float, notify=presetIndexChanged)
-    def presetStartValue(self)->float:
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetStartValueStr(self)->str:
         return self._presetsTable[self.presetIndex]['start value']
     
     @pyqtProperty(float, notify=presetIndexChanged)
-    def presetValueChange(self)->float:
-        return self._presetsTable[self.presetIndex]['value change']
+    def presetStartValue(self)->float:
+        return float(self.presetStartValueStr)
     
     @pyqtProperty(str, notify=presetIndexChanged)
-    def presetValueTowerType(self)->str:
+    def presetValueChangeStr(self)->str:
+        return self._presetsTable[self.presetIndex]['value change']
+    
+    @pyqtProperty(float, notify=presetIndexChanged)
+    def presetValueChange(self)->float:
+        return float(self.presetValueChangeStr)
+    
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def presetTowerTypeName(self)->str:
         return self._presetsTable[self.presetIndex]['tower type']
     
 
@@ -118,7 +125,11 @@ class RetractTowerModel(ModelBase):
 
     @pyqtProperty(int, notify=towerTypeIndexChanged, fset=setTowerTypeIndex)
     def towerTypeIndex(self)->int:
-        return self._towerTypeIndex
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return next((i for i, item in enumerate(self._towerTypesTable) if item["name"] == self.presetTowerTypeName), None)
+        else:
+            return self._towerTypeIndex
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def towerTypeName(self)->str:
@@ -141,7 +152,11 @@ class RetractTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=startValueStrChanged, fset=setStartValueStr)
     def startValueStr(self)->str:
-        return self._startValueStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetStartValueStr
+        else:
+            return self._startValueStr
     
     @pyqtProperty(float, notify=startValueStrChanged)
     def startValue(self)->float:
@@ -179,7 +194,11 @@ class RetractTowerModel(ModelBase):
 
     @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChange)
     def valueChangeStr(self)->str:
-        return self._valueChangeStr
+        # Allow the preset to override this setting
+        if self.presetSelected:
+            return self.presetValueChangeStr
+        else:
+            return self._valueChangeStr
 
     @pyqtProperty(float, notify=valueChangeStrChanged)
     def valueChange(self)->float:

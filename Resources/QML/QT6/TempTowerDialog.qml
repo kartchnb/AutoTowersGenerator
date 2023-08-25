@@ -96,12 +96,12 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: dataModel.startTemperatureStr
+                text: dataModel.startTempStr
                 visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
-                    if (dataModel.startTemperatureStr != text) dataModel.startTemperatureStr = text
+                    if (dataModel.startTempStr != text) dataModel.startTempStr = text
                 }
             }
             UM.ToolTip
@@ -126,12 +126,12 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[0-9]*(\.[0-9]+)?/ }
-                text: dataModel.endTemperatureStr
+                text: dataModel.endTempStr
                 visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
-                    if (dataModel.endTemperatureStr != text) dataModel.endTemperatureStr = text
+                    if (dataModel.endTempStr != text) dataModel.endTempStr = text
                 }
             }
             UM.ToolTip
@@ -156,12 +156,12 @@ UM.Dialog
             {
                 Layout.preferredWidth: numberInputWidth
                 validator: RegularExpressionValidator { regularExpression: /[+-]?[0-9]*(\.[0-9]+)?/ }
-                text: dataModel.temperatureChangeStr
+                text: dataModel.tempChangeStr
                 visible: !dataModel.presetSelected
 
                 onTextChanged:
                 {
-                    if (dataModel.temperatureChangeStr != text) dataModel.temperatureChangeStr = text
+                    if (dataModel.tempChangeStr != text) dataModel.tempChangeStr = text
                 }
             }
             UM.ToolTip
