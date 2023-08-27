@@ -354,11 +354,11 @@ class AutoTowersGenerator(QObject, Extension):
         # Clean up after the AutoTower
         if not self._currentTowerController is None:
             restoredSettings = self._currentTowerController.cleanup()
-            if len(restoredSettings) > 0 or not message is None :
-                restoredMessage = message + '\n' if not message is None else ''
-                restoredMessage += catalog.i18nc("@msg", "The following settings were restored :\n")
-                restoredMessage += '\n'.join([f'{catalog.i18nc("@msg", "Restored")} {entry[0]} {catalog.i18nc("@msg", "to")} {entry[1]}' for entry in restoredSettings])
-                Message(restoredMessage, title=self._pluginName, lifetime=5).show()
+            if len(restoredSettings) > 0:
+                message = message + '\n' if not message is None else ''
+                message += catalog.i18nc("@msg", "The following settings were restored :\n")
+                message += '\n'.join([f'{catalog.i18nc("@msg", "Restored")} {entry[0]} {catalog.i18nc("@msg", "to")} {entry[1]}' for entry in restoredSettings])
+            if Message is not None: Message(message, title=self._pluginName, lifetime=5).show()
             self._currentTowerController = None
 
         CuraApplication.getInstance().processEvents()
