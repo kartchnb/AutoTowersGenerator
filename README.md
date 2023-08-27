@@ -99,19 +99,15 @@ After installing using either method, Cura will need to be restarted.  After res
 
 # Some Final Notes
  
- - Preset towers are designed to work best with the most common layer heights that I use: 0.10, 0.12, 0.20, 0.24, and 0.30.  The plugin will accomodate for other layer heights, but may not work perfectly.
-
 - There is no need to add a post-processing script after creating the tower.  The post-processing is automatically done for you!  
 
 - To remove the tower and its post-processing, you can either select the model in Cura and delete it, or click the "A" button that will show up next to Cura's slicing button.
 
 - Depending on the tower that you select, this plugin may adjust some of your settings automatically (for example, to turn off supports when printing temperature towers).  These settings should be restored just as automatically when you remove the tower or close Cura.
 
-- Although this plugin can be used without having OpenSCAD installed, you'll get much more flexibility and power out of it if you do.  Download and install from [openscad.org](https://openscad.org/).
+- Although this plugin provides a variety of preconfigured towers that can easily be printed and used, if you have OpenSCAD installed, it provides the ability to customize towers for your specific needs.  Note that custom towers are not available when running the flatpak version of Cura regardless of whether OpenSCAD is installed or not.  OpenSCAD can be downloaded and installed from [openscad.org](https://openscad.org/).
 
-- I owe a huge debt to 5axes and his [Calibration Shapes plugin](https://marketplace.ultimaker.com/app/cura/plugins/5axes/CalibrationShapes).  The post-processing code was adapted directly from his plugin and I learned a lot from reviewing his code.  If you haven't installed his plugin yet, stop reading this and install it now.
-
-- Although I've attempted to maintain compatibility with Cura version 4.13.0, I haven't tested with anything earlier than Cura 5.0.0 for some time now and can't guarantee that it still works.  If you find compatibility issues, please let me know.
+- I owe a huge debt to 5axes and his [Calibration Shapes plugin](https://marketplace.ultimaker.com/app/cura/plugins/5axes/CalibrationShapes).  He has contributed code, advice, and a French translation.  The post-processing code was adapted directly from his plugin and I learned a lot from reviewing his code.  If you haven't installed his plugin yet, stop reading this and install it now.
 
 - I gladly welcome bug reports or ideas for enhancements and try to respond as quickly as I can.
 
