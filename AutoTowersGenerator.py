@@ -325,7 +325,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _removeAutoTower(self, message = None)->None:
         ''' Removes the generated Auto Tower and post-processing callbacks '''
-            
+        
         # Stop listening for callbacks
         self._towerControllerPostProcessingCallback = None
         Application.getInstance().getOutputDeviceManager().writeStarted.disconnect(self._postProcessCallback)
@@ -354,7 +354,7 @@ class AutoTowersGenerator(QObject, Extension):
         # Clean up after the AutoTower
         if not self._currentTowerController is None:
             restoredSettings = self._currentTowerController.cleanup()
-            if len(restoredSettings) > 0:
+            if len(restoredSettings) > 0 or not message is None :
                 restoredMessage = message + '\n' if not message is None else ''
                 restoredMessage += catalog.i18nc("@msg", "The following settings were restored :\n")
                 restoredMessage += '\n'.join([f'{catalog.i18nc("@msg", "Restored")} {entry[0]} {catalog.i18nc("@msg", "to")} {entry[1]}' for entry in restoredSettings])
@@ -495,8 +495,7 @@ class AutoTowersGenerator(QObject, Extension):
 
     def _onMachineChanged(self)->None:
         ''' Listen for machine changes made after an Auto Tower is generated 
-            In this case, the Auto Tower needs to be removed and regenerated '''
-
+            In this case, the Auto Tower needs to be removed and regenerated '''           
         self._removeAutoTower(catalog.i18nc("@msg", "The Auto Tower was removed because the active machine was changed"))
 
 
