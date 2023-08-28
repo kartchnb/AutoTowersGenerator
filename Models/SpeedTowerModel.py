@@ -99,7 +99,7 @@ class SpeedTowerModel(ModelBase):
     
     @pyqtProperty(float, notify=presetIndexChanged)
     def presetSpeedChange(self)->float:
-        return float(self.presetSpeedChange)
+        return float(self.presetSpeedChangeStr)
     
     @pyqtProperty(str, notify=presetIndexChanged)
     def presetTowerTypeName(self)->str:
