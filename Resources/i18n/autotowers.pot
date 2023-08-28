@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 07:38+0000\n"
+"POT-Creation-Date: 2023-08-28 07:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -864,79 +864,3 @@ msgstr ""
 msgctxt "@text"
 msgid "Remove the AutoTower Model"
 msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Found OpenScad version"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "at"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "The OpenScad path"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "is not valid"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Changed"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Restored"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "to"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "from"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "The STL file"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "does not exist"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "The Auto Tower was removed because the Cura setting"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "has changed since the tower was generated"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Failed to generate"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Command output was"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "An exception occured during post-processing"
-msgstr ""
-
