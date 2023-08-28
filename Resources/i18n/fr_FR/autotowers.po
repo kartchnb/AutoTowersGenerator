@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cura Html Doc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 07:38+0000\n"
-"PO-Revision-Date: 2023-08-28 09:40+0200\n"
+"POT-Creation-Date: 2023-08-28 10:30+0000\n"
+"PO-Revision-Date: 2023-08-28 12:39+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Virtaal 0.7.1\n"
 
-#: AutoTowersGenerator.py:304
+#: AutoTowersGenerator.py:315
 msgctxt "@menu"
 msgid "Auto Towers"
 msgstr "Tours Auto"
 
-#: AutoTowersGenerator.py:313
+#: AutoTowersGenerator.py:324
 msgctxt "@menu"
 msgid "Settings"
 msgstr "Réglages"
 
-#: AutoTowersGenerator.py:359
+#: AutoTowersGenerator.py:370
 msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr "Les paramètres suivants ont été rétablis :\n"
 
-#: AutoTowersGenerator.py:454
+#: AutoTowersGenerator.py:465
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr "Les paramètres suivants ont été modifiés :\n"
 
-#: AutoTowersGenerator.py:457
+#: AutoTowersGenerator.py:468
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr "Il est recommandé de modifier les paramètres suivants :\n"
 
-#: AutoTowersGenerator.py:499
+#: AutoTowersGenerator.py:510
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr "L'Auto Tower a été supprimée parce que la machine active a été modifiée"
 
-#: AutoTowersGenerator.py:517
+#: AutoTowersGenerator.py:528
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr "L'Auto Tower a été supprimée parce que l'extrudeur actif a changé"
 
-#: AutoTowersGenerator.py:558
+#: AutoTowersGenerator.py:569
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr "Suppression de l'autotower en raison de la fermeture de Cura"
@@ -365,7 +365,7 @@ msgstr "Description Tour"
 #: Resources/QML/QT6/FanTowerDialog.qml:269
 #: Resources/QML/QT6/SpeedTowerDialog.qml:299
 #: Resources/QML/QT6/TempTowerDialog.qml:243
-#: Resources/QML/QT6/PluginSettingsDialog.qml:164
+#: Resources/QML/QT6/PluginSettingsDialog.qml:185
 #: Resources/QML/QT6/FlowTowerDialog.qml:277
 msgctxt "@button"
 msgid "OK"
@@ -377,7 +377,7 @@ msgstr "OK"
 #: Resources/QML/QT6/FanTowerDialog.qml:264
 #: Resources/QML/QT6/SpeedTowerDialog.qml:294
 #: Resources/QML/QT6/TempTowerDialog.qml:238
-#: Resources/QML/QT6/PluginSettingsDialog.qml:159
+#: Resources/QML/QT6/PluginSettingsDialog.qml:180
 #: Resources/QML/QT6/FlowTowerDialog.qml:272
 msgctxt "@button"
 msgid "Cancel"
@@ -865,6 +865,26 @@ msgstr ""
 "informations sont affichées à l'aide de la commande M117, ce qui peut poser "
 "des problèmes avec certaines imprimantes (la Dremel 3D45, par "
 "exemple)<p>Désélectionnez cette option si vous constatez des problèmes."
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:155
+msgctxt "@label"
+msgid "Advanced GCode Comments"
+msgstr "Commentaires avancés dans le GCode"
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:170
+msgctxt "@tooltip"
+msgid ""
+"If enabled, this option allows more comments to be added to the modified "
+"GCode.<p>The use of more comments allows better control of the modifications "
+"made, but increases the size of the final code."
+msgstr ""
+"Si elle est activée, cette option permet d'ajouter plus de commentaires au "
+"code GC modifié. <p>L'utilisation de plus de commentaires permet un meilleur "
+"contrôle des modifications apportées, mais augmente la taille du code "
+"final.Si elle est activée, cette option permet d'ajouter plus de "
+"commentaires au Gcode modifié. <p>L'utilisation de plus de commentaires "
+"permet un meilleur contrôle des modifications apportées, mais augmente la "
+"taille du code final."
 
 #: Resources/QML/QT6/FlowTowerDialog.qml:14
 msgctxt "@title"
