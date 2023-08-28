@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 07:42+0000\n"
+"POT-Creation-Date: 2023-08-28 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: AutoTowersGenerator.py:304
+#: AutoTowersGenerator.py:315
 msgctxt "@menu"
 msgid "Auto Towers"
 msgstr ""
 
-#: AutoTowersGenerator.py:313
+#: AutoTowersGenerator.py:324
 msgctxt "@menu"
 msgid "Settings"
 msgstr ""
 
-#: AutoTowersGenerator.py:359
+#: AutoTowersGenerator.py:370
 msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:454
+#: AutoTowersGenerator.py:465
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:457
+#: AutoTowersGenerator.py:468
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:499
+#: AutoTowersGenerator.py:510
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:517
+#: AutoTowersGenerator.py:528
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:558
+#: AutoTowersGenerator.py:569
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr ""
@@ -365,7 +365,7 @@ msgstr ""
 #: Resources/QML/QT6/FanTowerDialog.qml:269
 #: Resources/QML/QT6/SpeedTowerDialog.qml:299
 #: Resources/QML/QT6/TempTowerDialog.qml:243
-#: Resources/QML/QT6/PluginSettingsDialog.qml:164
+#: Resources/QML/QT6/PluginSettingsDialog.qml:185
 #: Resources/QML/QT6/FlowTowerDialog.qml:277
 msgctxt "@button"
 msgid "OK"
@@ -377,7 +377,7 @@ msgstr ""
 #: Resources/QML/QT6/FanTowerDialog.qml:264
 #: Resources/QML/QT6/SpeedTowerDialog.qml:294
 #: Resources/QML/QT6/TempTowerDialog.qml:238
-#: Resources/QML/QT6/PluginSettingsDialog.qml:159
+#: Resources/QML/QT6/PluginSettingsDialog.qml:180
 #: Resources/QML/QT6/FlowTowerDialog.qml:272
 msgctxt "@button"
 msgid "Cancel"
@@ -777,6 +777,19 @@ msgid ""
 "displayed to your printer's LCD.<p>Information is displayed using the M117 "
 "command, which can cause issues with some printers (The Dremel 3D45, for "
 "instance)<p>Deselect this if you are noticing issues."
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:155
+msgctxt "@label"
+msgid "Advanced GCode Comments"
+msgstr ""
+
+#: Resources/QML/QT6/PluginSettingsDialog.qml:170
+msgctxt "@tooltip"
+msgid ""
+"If enabled, this option allows more comments to be added to the modified "
+"GCode.<p>The use of more comments allows better control of the modifications "
+"made, but increases the size of the final code."
 msgstr ""
 
 #: Resources/QML/QT6/FlowTowerDialog.qml:14
