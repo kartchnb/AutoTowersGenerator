@@ -133,9 +133,14 @@ class SpeedTowerModel(ModelBase):
         else:
             return self._towerTypeIndex
     
-    @pyqtProperty(str, notify=towerTypeIndexChanged)
+    @pyqtProperty(str, notify=presetIndexChanged)
     def towerTypeName(self)->str:
         return self._towerTypesTable[self.towerTypeIndex]['ident']
+
+    @pyqtProperty(str, notify=presetIndexChanged)
+    def towerTypeLabel(self)->str:
+        return self._towerTypesTable[self.towerTypeIndex]['label']
+        
 
     # The starting speed value for the tower
     _startSpeedStr = '20'
