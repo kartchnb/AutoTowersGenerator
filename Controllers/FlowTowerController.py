@@ -61,7 +61,7 @@ class FlowTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, input_gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Determine the post-processing values
@@ -76,7 +76,7 @@ class FlowTowerController(ControllerBase):
 
         # Call the post-processing script
         output_gcode = FlowTower_PostProcessing.execute(
-            gcode=input_gcode, 
+            gcode=gcode, 
             base_height=baseHeight,
             section_height=sectionHeight, 
             initial_layer_height=initialLayerHeight, 
