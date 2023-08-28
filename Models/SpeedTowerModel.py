@@ -189,11 +189,11 @@ class SpeedTowerModel(ModelBase):
 
     speedChangeStrChanged = pyqtSignal()
     
-    def setSpeedChangeStr(self, value)->None:
+    def setSpeedChange(self, value)->None:
         self._speedChangeStr = value
         self.speedChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=speedChangeStrChanged, fset=setSpeedChangeStr)
+    @pyqtProperty(str, notify=speedChangeStrChanged, fset=setSpeedChange)
     def speedChangeStr(self)->str:
         # Allow the preset to override this setting
         if self.presetSelected:
