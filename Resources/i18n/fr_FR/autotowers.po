@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cura Html Doc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 14:33+0000\n"
-"PO-Revision-Date: 2023-08-24 19:38+0200\n"
+"POT-Creation-Date: 2023-08-28 07:38+0000\n"
+"PO-Revision-Date: 2023-08-28 09:40+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Virtaal 0.7.1\n"
 
-#: AutoTowersGenerator.py:306
+#: AutoTowersGenerator.py:304
 msgctxt "@menu"
 msgid "Auto Towers"
 msgstr "Tours Auto"
 
-#: AutoTowersGenerator.py:315
+#: AutoTowersGenerator.py:313
 msgctxt "@menu"
 msgid "Settings"
 msgstr "Réglages"
 
-#: AutoTowersGenerator.py:361
+#: AutoTowersGenerator.py:359
 msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr "Les paramètres suivants ont été rétablis :\n"
 
-#: AutoTowersGenerator.py:456
+#: AutoTowersGenerator.py:454
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr "Les paramètres suivants ont été modifiés :\n"
 
-#: AutoTowersGenerator.py:459
+#: AutoTowersGenerator.py:457
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr "Il est recommandé de modifier les paramètres suivants :\n"
 
-#: AutoTowersGenerator.py:502
+#: AutoTowersGenerator.py:499
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr "L'Auto Tower a été supprimée parce que la machine active a été modifiée"
 
-#: AutoTowersGenerator.py:520
+#: AutoTowersGenerator.py:517
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr "L'Auto Tower a été supprimée parce que l'extrudeur actif a changé"
 
-#: AutoTowersGenerator.py:561
+#: AutoTowersGenerator.py:558
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr "Suppression de l'autotower en raison de la fermeture de Cura"
@@ -232,12 +232,12 @@ msgctxt "@model"
 msgid "Retract Tower - Retract Speed 60-100"
 msgstr "Tour de rétraction - Vitesse de rétraction 60-100"
 
-#: Models/RetractTowerModel.py:36
+#: Models/RetractTowerModel.py:35
 msgctxt "@type"
 msgid "Distance"
 msgstr "Distance"
 
-#: Models/RetractTowerModel.py:37
+#: Models/RetractTowerModel.py:36
 msgctxt "@type"
 msgid "Speed"
 msgstr "Vitesse"

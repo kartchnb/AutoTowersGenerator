@@ -19,7 +19,9 @@
 # Version 3.1 - 2 Feb 2023:
 #   Bugfix to make marlin linear and reprap pressure modes work.
 #   (Contributed by "Hello1024" on Github)
-__version__ = '3.1'
+# Version 3.2 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '3.2'
 
 from UM.Logger import Logger
 
@@ -27,7 +29,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height: float, section_height: float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, tower_type:str, enable_lcd_messages:bool):
+def execute(gcode, base_height: float, section_height: float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, tower_type:str, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
 
     # Log the post-processing settings
     Logger.log('d', f'Beginning Speed Tower ({tower_type.lower()}) post-processing script version {__version__}')
@@ -38,6 +40,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
     Logger.log('d', f'Starting speed = {start_speed} mm/s')
     Logger.log('d', f'Speed change = {speed_change} mm/s')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Speed Tower ({tower_type.lower()}) post-processing script version {__version__}\n'
@@ -48,6 +51,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
     gcode[0] += f'{Common.comment_prefix} Starting speed = {start_speed} mm/s\n'
     gcode[0] += f'{Common.comment_prefix} Speed change = {speed_change} mm/s\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested starting speed
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
@@ -63,31 +67,48 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
     
             # Handle acceleration speed
             if tower_type == 'Acceleration':
-                command_line = f'M204 S{int(current_speed)} {Common.comment_prefix} setting acceleration to {int(current_speed)} mm/s/s for this tower section'
+                if enable_advanced_gcode_comments :
+                    command_line = f'M204 S{int(current_speed)} {Common.comment_prefix} setting acceleration to {int(current_speed)} mm/s/s for this tower section'
+                else:
+                    command_line = f'M204 S{int(current_speed)}'
+                    
                 lcd_line1 = f'M117 ACC S{int(current_speed)} mm/s/s'
                 lcd_line2 = f'{Common.comment_prefix} Displaying "ACC S{int(current_speed)} mm/s/s" on the LCD'
 
             # Handle jerk speed
             elif tower_type=='Jerk':
-                command_line = f'M205 X{int(current_speed)} Y{int(current_speed)} {Common.comment_prefix} setting jerk speed to {int(current_speed)} mm/s for this tower section'
+                if enable_advanced_gcode_comments :
+                    command_line = f'M205 X{int(current_speed)} Y{int(current_speed)} {Common.comment_prefix} setting jerk speed to {int(current_speed)} mm/s for this tower section'
+                else:
+                    command_line = f'M205 X{int(current_speed)} Y{int(current_speed)}'
+                    
                 lcd_line1 = f'M117 JRK X{int(current_speed)} Y{int(current_speed)}'
                 lcd_line2 = f'{Common.comment_prefix} Displaying "JRK X{int(current_speed)} Y{int(current_speed)}" on the LCD'
 
             # Handle junction speed
             elif tower_type=='Junction':
-                command_line = f'M205 J{float(current_speed):.3f} {Common.comment_prefix} setting junction value to {float(current_speed):.3f} for this tower section'
+                if enable_advanced_gcode_comments :
+                    command_line = f'M205 J{float(current_speed):.3f} {Common.comment_prefix} setting junction value to {float(current_speed):.3f} for this tower section'
+                else:
+                    ommand_line = f'M205 J{float(current_speed):.3f}'
                 lcd_line1 = f'M117 JCN J{float(current_speed):.3f}'
                 lcd_line2 = f'{Common.comment_prefix} Displaying "JCN J{float(current_speed):.3f}" on the LCD'
 
             # Handle Marlin linear speed
             elif tower_type=='Marlin Linear':
-                command_line = f'M900 K{float(current_speed):.3f} {Common.comment_prefix} setting Marlin linear value to {float(current_speed):.3f} for this tower section'
+                if enable_advanced_gcode_comments :
+                    command_line = f'M900 K{float(current_speed):.3f} {Common.comment_prefix} setting Marlin linear value to {float(current_speed):.3f} for this tower section'
+                else:
+                    command_line = f'M900 K{float(current_speed):.3f}'
                 lcd_line1 = f'M117 LIN {float(current_speed):.3f}'
                 lcd_line2 = f'{Common.comment_prefix} Displaying "LIN {float(current_speed):.3f}" on the LCD'
 
             # Handle RepRap pressure speed
             elif tower_type=='RepRap Pressure':
-                command_line = f'M572 D0 S{float(current_speed):.3f} {Common.comment_prefix} setting RepRap pressure value to {float(current_speed):.3f} for this tower section'
+                if enable_advanced_gcode_comments :
+                    command_line = f'M572 D0 S{float(current_speed):.3f} {Common.comment_prefix} setting RepRap pressure value to {float(current_speed):.3f} for this tower section'
+                else:
+                    command_line = f'M572 D0 S{float(current_speed):.3f}'
                 lcd_line1 = f'M117 PRS {float(current_speed):.3f}'
                 lcd_line2 = f'{Common.comment_prefix}  Displaying "PRS {float(current_speed):.3f}" on the LCD'
 
@@ -102,7 +123,8 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
             # Display the new speed on the printer's LCD
             if enable_lcd_messages:
                 lines.insert(3, lcd_line1)
-                lines.insert(3, lcd_line2)
+                if enable_advanced_gcode_comments :
+                    lines.insert(3, lcd_line2)
 
     Logger.log('d', f'AutoTowersGenerator completing {tower_type} SpeedTower post-processing')
 
