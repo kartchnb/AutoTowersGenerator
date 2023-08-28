@@ -188,11 +188,11 @@ class RetractTowerModel(ModelBase):
 
     valueChangeStrChanged = pyqtSignal()
 
-    def setValueChange(self, value)->None:
+    def setValueChangeStr(self, value)->None:
         self._valueChangeStr = value
         self.valueChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChange)
+    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChangeStr)
     def valueChangeStr(self)->str:
         # Allow the preset to override this setting
         if self.presetSelected:
