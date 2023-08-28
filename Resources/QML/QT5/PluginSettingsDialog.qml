@@ -108,6 +108,16 @@ UM.Dialog
                 id: enableLcdMessages
                 checked: manager.enableLcdMessagesSetting
             }
+			
+			Label 
+            { 
+                text: "Advanced GCode Comments" 
+            }
+            CheckBox
+            {
+                id: enableAdvancedGcodeComments
+                checked: manager.enableAdvancedGcodeCommentsSetting
+            }
         }
     }
 
@@ -127,6 +137,7 @@ UM.Dialog
     {
         manager.openScadPathSetting = openScadPath.text
         manager.enableLcdMessagesSetting = enableLcdMessages.checked
+		manager.enableAdvancedGcodeCommentsSetting = enableAdvancedGcodeComments.checked
         manager.correctPrintSettings = correctPrintSettings.checked
     }
 }

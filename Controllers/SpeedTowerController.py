@@ -80,7 +80,8 @@ class SpeedTowerController(ControllerBase):
                 start_speed=startSpeed,
                 speed_change=speedChange,
                 reference_speed=currentPrintSpeed,
-                enable_lcd_messages=enableLcdMessages
+                enable_lcd_messages=enableLcdMessages,
+                enable_advanced_gcode_comments=enableAdvancedGcodeComments
                 )
         
         # Call the post-processing script for non print speed towers
@@ -94,7 +95,8 @@ class SpeedTowerController(ControllerBase):
                 start_speed=startSpeed,
                 speed_change=speedChange,
                 tower_type=towerType,
-                enable_lcd_messages=enableLcdMessages
+                enable_lcd_messages=enableLcdMessages,
+                enable_advanced_gcode_comments=enableAdvancedGcodeComments
                 )
 
         return gcode

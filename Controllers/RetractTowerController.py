@@ -57,7 +57,7 @@ class RetractTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, input_gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Gather the post-processing values
@@ -80,7 +80,8 @@ class RetractTowerController(ControllerBase):
                 layer_height=layerHeight, 
                 start_retract_speed=startValue, 
                 retract_speed_change=valueChange, 
-                enable_lcd_messages=enable_lcd_messages
+                enable_lcd_messages=enable_lcd_messages,
+                enable_advanced_gcode_comments = enable_advanced_gcode_comments
                 )
 
         # Call the retract distance post-processing script
@@ -95,7 +96,8 @@ class RetractTowerController(ControllerBase):
                 relative_extrusion=relativeExtrusion,
                 start_retract_distance=startValue, 
                 retract_distance_change=valueChange, 
-                enable_lcd_messages=enable_lcd_messages
+                enable_lcd_messages=enable_lcd_messages,
+                enable_advanced_gcode_comments = enable_advanced_gcode_comments
                 )
         
         # Since I keep messing this up, raise an error if the tower type is unrecognized

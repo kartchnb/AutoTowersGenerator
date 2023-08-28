@@ -61,7 +61,7 @@ class FlowTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, input_gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, input_gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Determine the post-processing values
@@ -85,7 +85,8 @@ class FlowTowerController(ControllerBase):
             start_flow_rate=startFlowPercent, 
             flow_rate_change=flowPercentChange, 
             reference_flow_rate=currentFlowRate,
-            enable_lcd_messages=enable_lcd_messages
+            enable_lcd_messages=enable_lcd_messages,
+            enable_advanced_gcode_comments=enable_advanced_gcode_comments
             )
 
         return output_gcode

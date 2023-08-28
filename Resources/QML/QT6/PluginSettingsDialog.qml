@@ -149,6 +149,27 @@ UM.Dialog
                 text: catalog.i18nc("@tooltip", "Selects whether tower parameter changes (temperature, speed, etc) are displayed to your printer's LCD.<p>Information is displayed using the M117 command, which can cause issues with some printers (The Dremel 3D45, for instance)<p>Deselect this if you are noticing issues.")
                 visible: enable_lcd_messages_mouse_area.containsMouse
             }
+			
+			UM.Label 
+            { 
+                text: catalog.i18nc("@label", "Advanced GCode Comments")
+                MouseArea 
+                {
+                    id: enable_advanced_gcode_comments_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            UM.CheckBox
+            {
+                id: enableAdvancedGcodeComments
+                checked: manager.enableAdvancedGcodeCommentsSetting
+            }
+            UM.ToolTip
+            {
+                text: catalog.i18nc("@tooltip", "If enabled, this option allows more comments to be added to the modified GCode.<p>The use of more comments allows better control of the modifications made, but increases the size of the final code.")
+                visible: enable_advanced_gcode_comments_mouse_area.containsMouse
+            }
         }
     }
 
@@ -170,7 +191,8 @@ UM.Dialog
     {
         manager.openScadPathSetting = openScadPath.text
         manager.enableLcdMessagesSetting = enableLcdMessages.checked
-        manager.correctPrintSettings = correctPrintSettings.checked
+        manager.enableAdvancedGcodeCommentsSetting = enableAdvancedGcodeComments.checked
+		manager.correctPrintSettings = correctPrintSettings.checked
     }
 
 }

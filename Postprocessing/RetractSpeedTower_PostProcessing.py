@@ -22,7 +22,9 @@
 # Version 4.0 - 25 Mar 2023: 
 #   Split this script off from the RetractTower_PostProcessing script
 #   This script has been simplified to focus solely on retraction speed
-__version__ = '4.0'
+# Version 4.1 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '4.1'
 
 import re 
 
@@ -33,7 +35,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_retract_speed:float, retract_speed_change:float, enable_lcd_messages:bool):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_retract_speed:float, retract_speed_change:float, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
     
     # Log the post-processing settings
     Logger.log('d', f'Beginning Retract Tower (speed) post-processing script version {__version__}')
@@ -44,6 +46,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Starting retraction speed = {start_retract_speed}')
     Logger.log('d', f'Retraction speed change = {retract_speed_change}')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Retract Tower (speed) post-processing script version {__version__}\n'
@@ -54,6 +57,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Starting retraction speed = {start_retract_speed}\n'
     gcode[0] += f'{Common.comment_prefix} Retraction speed change = {retract_speed_change}\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested starting retraction value
     current_retract_speed = start_retract_speed - retract_speed_change # The current retract value will be corrected when the first section is encountered
@@ -73,7 +77,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             # Display the new retraction value on the printer's LCD
             if enable_lcd_messages:
                 lines.insert(3, f'M117 SPD {current_retract_speed:.1f} mm/s')
-                lines.insert(3, f'{Common.comment_prefix} Displaying "SPD {current_retract_speed:.1f}" on the LCD')
+                if enable_advanced_gcode_comments :
+                    lines.insert(3, f'{Common.comment_prefix} Displaying "SPD {current_retract_speed:.1f}" on the LCD')
 
         # Handle retraction commands
         # Retraction commands need to be modified to match the requested speed
@@ -86,7 +91,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                 # Update the line with the new retraction speed
                 new_line = line.replace(f'F{original_speed_string}', f'F{int(current_retract_speed * 60)}')
-                new_line += f' {Common.comment_prefix} Changed retraction speed to {current_retract_speed} mm/s ({current_retract_speed * 60} mm/min)' # Speed value must be specified as mm/min for the gcode'
+                if enable_advanced_gcode_comments :
+                    new_line += f' {Common.comment_prefix} Changed retraction speed to {current_retract_speed} mm/s ({current_retract_speed * 60} mm/min)' # Speed value must be specified as mm/min for the gcode'
 
                 # Replace the original line with the post-processed line
                 lines[line_index] = new_line

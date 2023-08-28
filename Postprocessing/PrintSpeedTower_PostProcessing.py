@@ -28,7 +28,9 @@
 #   However, it's not that simple and is going to take a lot more work to figure out how to do this right
 #   So, for now, M220 is used to simulate print speed changes
 #   Unfortunately, this is still not a completely accurate demonstration of the different print speeds
-__version__ = '2.1'
+# Version 2.2 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '2.2'
 
 from UM.Logger import Logger
 
@@ -38,7 +40,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, reference_speed:float, enable_lcd_messages:bool):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_speed:float, speed_change:float, reference_speed:float, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
     ''' Post-process gcode sliced by Cura
         Note that reference_speed is the print speed selection when the gcode was generated 
             This value is used to determine how print speed settings in the
@@ -54,6 +56,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Speed change = {speed_change} mm/s')
     Logger.log('d', f'Reference speed = {reference_speed} mm/s')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Speed Tower (print speed) post-processing script version {__version__}\n'
@@ -65,6 +68,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Speed change = {speed_change} mm/s\n'
     gcode[0] += f'{Common.comment_prefix} Reference speed = {reference_speed} mm/s\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested print speed
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
@@ -84,28 +88,45 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             # Calculate the new feedrate percentage
             feedrate_percentage = current_speed / reference_speed * 100
 
-            # Document the new speed in the gcode
-            lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s')
+            if enable_advanced_gcode_comments :
+                # Document the new speed in the gcode
+                lines.insert(2, f'{Common.comment_prefix} Print speed for this tower section is {current_speed:.1f} mm/s')
 
-            # Command the new feedrate percentage in the gcode
-            lines.insert(3, f'M220 S{feedrate_percentage:.2f} {Common.comment_prefix} Setting the feedrate percentage to {feedrate_percentage:.2f}% to mimic a print speed setting change from {reference_speed}mm/s to {current_speed} mm/s')
+                # Command the new feedrate percentage in the gcode
+                lines.insert(3, f'M220 S{feedrate_percentage:.2f} {Common.comment_prefix} Setting the feedrate percentage to {feedrate_percentage:.2f}% to mimic a print speed setting change from {reference_speed}mm/s to {current_speed} mm/s')
 
-            # Display the new print speed on the printer's LCD
-            if enable_lcd_messages:
-                lines.insert(4, f'M117 SPD {current_speed:.1f} mm/s')
-                lines.insert(4, f'{Common.comment_prefix} Displaying "SPD {current_speed:.1f}" on the LCD')
+                # Display the new print speed on the printer's LCD
+                if enable_lcd_messages:
+                    lines.insert(4, f'M117 SPD {current_speed:.1f} mm/s')
+                    lines.insert(4, f'{Common.comment_prefix} Displaying "SPD {current_speed:.1f}" on the LCD')
+            else:
 
+                # Command the new feedrate percentage in the gcode
+                lines.insert(2, f'M220 S{feedrate_percentage:.2f}')
+
+                # Display the new print speed on the printer's LCD
+                if enable_lcd_messages:
+                    lines.insert(3, f'M117 SPD {current_speed:.1f} mm/s')
+
+                    
             # Handle the first tower section
             if first_section:
                 first_section = False
 
                 # Backup the feedrate percentage
-                lines.insert(1, f'M220 B {Common.comment_prefix} Backing up the current feedrate percentage')
+                if enable_advanced_gcode_comments :
+                    lines.insert(1, f'M220 B {Common.comment_prefix} Backing up the current feedrate percentage')
+                else :
+                    lines.insert(1, f'M220 B')
     
     # Restore the backed-up feedrate percentage
     last_layer_index = len(gcode) - Common.trailing_inserted_layer_count - 1
-    gcode[last_layer_index] += f'M220 S100 {Common.comment_prefix} Setting the feedrate percentage to 100% in case the restore command does not work\n'
-    gcode[last_layer_index] += f'M220 R {Common.comment_prefix} Restoring the backed-up feedrate percentage\n'
+    if enable_advanced_gcode_comments :
+        gcode[last_layer_index] += f'M220 S100 {Common.comment_prefix} Setting the feedrate percentage to 100% in case the restore command does not work\n'
+        gcode[last_layer_index] += f'M220 R {Common.comment_prefix} Restoring the backed-up feedrate percentage\n'
+    else :
+        gcode[last_layer_index] += f'M220 S100\n'
+        gcode[last_layer_index] += f'M220 R\n'        
 
     Logger.log('d', f'AutoTowersGenerator completing SpeedTower post-processing (Print Speed)')
 

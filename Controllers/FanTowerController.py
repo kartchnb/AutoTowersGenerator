@@ -57,7 +57,7 @@ class FanTowerController(ControllerBase):
 
 
 
-    def postProcess(self, gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Determine the post-processing values
@@ -79,7 +79,8 @@ class FanTowerController(ControllerBase):
             start_fan_percent=startFanPercent,
             fan_percent_change=fanPercentChange, 
             maintain_bridge_value=maintainBridgeValue,
-            enable_lcd_messages=enable_lcd_messages
+            enable_lcd_messages=enable_lcd_messages,
+            enable_advanced_gcode_comments=enable_advanced_gcode_comments
             )
 
         return gcode

@@ -22,7 +22,9 @@
 # Version 4.0 - 25 Mar 2023: 
 #   Split this script off from the RetractTower_PostProcessing script
 #   This script has been simplified to focus solely on retraction distance
-__version__ = '4.0'
+# Version 4.1 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '4.1'
 
 import re 
 
@@ -33,7 +35,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_retract_distance:float, retract_distance_change:float, enable_lcd_messages:bool):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_retract_distance:float, retract_distance_change:float, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
 
     # Log the post-processing settings
     Logger.log('d', f'Beginning Retract Tower (distance) post-processing script version {__version__}')
@@ -45,6 +47,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Starting retraction distance = {start_retract_distance}')
     Logger.log('d', f'Retraction distance change = {retract_distance_change}')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Retract Tower (distance) post-processing script version {__version__}\n'
@@ -56,6 +59,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Starting retraction distance = {start_retract_distance}\n'
     gcode[0] += f'{Common.comment_prefix} Retraction distance change = {retract_distance_change}\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested starting retraction value
     current_retract_distance = start_retract_distance - retract_distance_change # The current retract value will be corrected when the first section is encountered
@@ -78,7 +82,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             # Display the new retraction value on the printer's LCD
             if enable_lcd_messages:
                 lines.insert(3, f'M117 DST {current_retract_distance:.1f} mm')
-                lines.insert(3, f'{Common.comment_prefix} Displaying "DST {current_retract_distance:.1f}" on the LCD')
+                if enable_advanced_gcode_comments :
+                    lines.insert(3, f'{Common.comment_prefix} Displaying "DST {current_retract_distance:.1f}" on the LCD')
 
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
@@ -128,14 +133,16 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                             # Update the line with the new retraction distance
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{-current_retract_distance:.5f}')
-                            new_line += f' {Common.comment_prefix} Retracting {-current_retract_distance:.5f} mm of filament using relative positioning'
+                            if enable_advanced_gcode_comments :
+                                new_line += f' {Common.comment_prefix} Retracting {-current_retract_distance:.5f} mm of filament using relative positioning'
 
                         # Update filament extrusion (reversing the previous retraction)
                         else:
 
                             # Update the line with the new retraction distance
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{current_retract_distance:.5f}')
-                            new_line += f' {Common.comment_prefix} Extruding {current_retract_distance:.5f} mm of filament using relative positioning to reverse the previous retraction'
+                            if enable_advanced_gcode_comments :
+                                new_line += f' {Common.comment_prefix} Extruding {current_retract_distance:.5f} mm of filament using relative positioning to reverse the previous retraction'
 
                     # Absolute retraction needs to take into account the current absolute filament position
                     else:
@@ -146,15 +153,19 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                             # Determine the new position given the desired retraction distance for this section
                             updated_extrusion_position = reference_extrusion_position - current_retract_distance
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
-                            new_line += f' {Common.comment_prefix} Retracting {current_retract_distance:.5f} mm of filament using absolute positioning'
+                            if enable_advanced_gcode_comments :
+                                new_line += f' {Common.comment_prefix} Retracting {current_retract_distance:.5f} mm of filament using absolute positioning'
 
                         # Update filament extrusion (reversing the previous retraction)
                         # Since the extrusion is just returning the filament to the previous position, the original line will work unchanged
                         else:
 
                             # Just comment the line for informational purposes
-                            new_line = line + f' {Common.comment_prefix} Extruding {current_retract_distance:.5f} mm of filament using absolute positioning to reverse the previous retraction'
-
+                            if enable_advanced_gcode_comments :
+                                new_line = line + f' {Common.comment_prefix} Extruding {current_retract_distance:.5f} mm of filament using absolute positioning to reverse the previous retraction'
+                            else :
+                                new_line = line
+                                
                     # Replace the original line with the post-processed line
                     lines[line_index] = new_line
 
