@@ -137,28 +137,6 @@ class SpeedTowerModel(ModelBase):
     def towerTypeName(self)->str:
         return self._towerTypesTable[self.towerTypeIndex]['ident']
 
-    @pyqtProperty(str, notify=towerTypeIndexChanged)
-    def towerTypeFilename(self)->str:
-        return self._presetsTable[self._towerTypesTable]['filename']
-
-    @pyqtProperty(str, notify=towerTypeIndexChanged)
-    def towerTypeFilePath(self)->str:
-        return self._buildStlFilePath(self.towerTypeFilename)
-
-    @pyqtProperty(float, notify=towerTypeIndexChanged)
-    def towerTypeStartValue(self)->float:
-        return float(self._presetsTable[self._towerTypesTable]['start value'])
-
-    @pyqtProperty(float, notify=towerTypeIndexChanged)
-    def towerTypeValueChange(self)->float:
-        return float(self._presetsTable[self._towerTypesTable]['value change'])
-
-    @pyqtProperty(str, notify=towerTypeIndexChanged)
-    def towerTypeTowerType(self)->str:
-        return self._presetsTable[self._towerTypesTable]['tower type']
-
-
-
     # The starting speed value for the tower
     _startSpeedStr = '20'
 
