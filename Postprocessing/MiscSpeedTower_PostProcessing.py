@@ -57,7 +57,7 @@ def execute(gcode, base_height: float, section_height: float, initial_layer_heig
     current_speed = start_speed - speed_change # The current speed will be corrected when the first section is encountered
 
     # Iterate over each line in the g-code
-    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height, enable_advanced_gcode_comments):
 
         # Handle each new tower section
         if start_of_new_section:

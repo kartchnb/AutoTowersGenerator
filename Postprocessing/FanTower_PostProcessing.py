@@ -39,6 +39,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Fan speed change = {fan_percent_change}%')
     Logger.log('d', f'Maintain bridge value = {maintain_bridge_value}')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Fan Tower post-processing script version {__version__}\n'
@@ -50,6 +51,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Fan speed change = {fan_percent_change}%\n'
     gcode[0] += f'{Common.comment_prefix} Maintain bridge value = {maintain_bridge_value}\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested starting fan speed %
     current_fan_percent = start_fan_percent - fan_percent_change # The current fan percent will be corrected when the first section is encountered
@@ -58,7 +60,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     after_bridge = False
 
     # Iterate over each line in the g-code
-    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height, enable_advanced_gcode_comments):
 
         # Handle each new tower section
         if start_of_new_section:
