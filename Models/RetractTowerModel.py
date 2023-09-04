@@ -127,7 +127,7 @@ class RetractTowerModel(ModelBase):
     def towerTypeIndex(self)->int:
         # Allow the preset to override this setting
         if self.presetSelected:
-            return next((i for i, item in enumerate(self._towerTypesTable) if item["name"] == self.presetTowerTypeName), None)
+            return next((i for i, item in enumerate(self._towerTypesTable) if item["ident"] == self.presetTowerTypeName), None)
         else:
             return self._towerTypeIndex
     
