@@ -127,7 +127,7 @@ class RetractTowerModel(ModelBase):
     def towerTypeIndex(self)->int:
         # Allow the preset to override this setting
         if self.presetSelected:
-            return next((i for i, item in enumerate(self._towerTypesTable) if item["name"] == self.presetTowerTypeName), None)
+            return next((i for i, item in enumerate(self._towerTypesTable) if item["ident"] == self.presetTowerTypeName), None)
         else:
             return self._towerTypeIndex
     
@@ -188,11 +188,11 @@ class RetractTowerModel(ModelBase):
 
     valueChangeStrChanged = pyqtSignal()
 
-    def setValueChange(self, value)->None:
+    def setValueChangeStr(self, value)->None:
         self._valueChangeStr = value
         self.valueChangeStrChanged.emit()
 
-    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChange)
+    @pyqtProperty(str, notify=valueChangeStrChanged, fset=setValueChangeStr)
     def valueChangeStr(self)->str:
         # Allow the preset to override this setting
         if self.presetSelected:

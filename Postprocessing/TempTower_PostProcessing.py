@@ -14,7 +14,9 @@
 # Version 3.0 - 1 Dec 2022:
 #   Redesigned post-processing to focus on section *height* rather than section *layers*
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
-__version__ = '3.0'
+# Version 3.1 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '3.1'
 
 from UM.Logger import Logger
 
@@ -22,7 +24,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_temp:float, temp_change:float, enable_lcd_messages:bool):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, start_temp:float, temp_change:float, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
     
     # Log the post-processing settings
     Logger.log('d', f'Beginning Temp Tower post-processing script version {__version__}')
@@ -33,6 +35,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Starting temperature = {start_temp} C')
     Logger.log('d', f'Temperature change = {temp_change} C')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Temp Tower post-processing script version {__version__}\n'
@@ -43,12 +46,13 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Starting temperature = {start_temp} C\n'
     gcode[0] += f'{Common.comment_prefix} Temperature change = {temp_change} C\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the selected starting temperature
     current_temp = start_temp - temp_change # The current temp will be incremented when the first section is encountered
 
     # Iterate over each line in the g-code
-    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height, enable_advanced_gcode_comments):
 
         # Handle each new tower section
         if start_of_new_section:
@@ -57,12 +61,16 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             current_temp += temp_change
 
             # Configure the new temperature in the gcode
-            lines.insert(2, f'M109 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section')
+            if enable_advanced_gcode_comments :
+                lines.insert(2, f'M109 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section')
+            else :
+                lines.insert(2, f'M109 S{current_temp}')
 
             # Display the new temperature on the printer's LCD
             if enable_lcd_messages:
                 lines.insert(3, f'M117 TMP {current_temp} C')
-                lines.insert(3, f'{Common.comment_prefix} Displaying "TMP {current_temp} C" on the LCD')
+                if enable_advanced_gcode_comments :
+                    lines.insert(3, f'{Common.comment_prefix} Displaying "TMP {current_temp} C" on the LCD')
 
     Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     

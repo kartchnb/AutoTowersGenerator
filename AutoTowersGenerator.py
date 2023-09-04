@@ -279,6 +279,17 @@ class AutoTowersGenerator(QObject, Extension):
         return self._pluginSettings.GetValue('enable lcd messages', False)
 
 
+    _enableAdvancedGcodeCommentsSetting = True
+
+    _enableAdvancedGcodeCommentsSettingChanged = pyqtSignal()
+
+    def setAdvancedGcodeCommentsSetting(self, value:bool)->None:
+        self._pluginSettings.SetValue('advanced gcode comments', value)
+        self._enableAdvancedGcodeCommentsSettingChanged.emit()
+
+    @pyqtProperty(bool, notify=_enableAdvancedGcodeCommentsSettingChanged, fset=setAdvancedGcodeCommentsSetting)
+    def enableAdvancedGcodeCommentsSetting(self)->bool:
+        return self._pluginSettings.GetValue('advanced gcode comments', True)
 
     @pyqtSlot()
     def removeButtonClicked(self)->None:
@@ -358,7 +369,8 @@ class AutoTowersGenerator(QObject, Extension):
                 message = message + '\n' if not message is None else ''
                 message += catalog.i18nc("@msg", "The following settings were restored :\n")
                 message += '\n'.join([f'{catalog.i18nc("@msg", "Restored")} {entry[0]} {catalog.i18nc("@msg", "to")} {entry[1]}' for entry in restoredSettings])
-            if Message is not None: Message(message, title=self._pluginName, lifetime=5).show()
+            if message is not None: 
+                Message(message, title=self._pluginName, lifetime=5).show()
             self._currentTowerController = None
 
         CuraApplication.getInstance().processEvents()
@@ -604,7 +616,7 @@ class AutoTowersGenerator(QObject, Extension):
 
                 # Call the tower controller post-processing callback to modify the g-code
                 try:
-                    gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting)
+                    gcode = self._towerControllerPostProcessingCallback(gcode, self.enableLcdMessagesSetting, self.enableAdvancedGcodeCommentsSetting)
                 except Exception as e:
                     message = f'{catalog.i18nc("@msg", "An exception occured during post-processing")} : {e}'
                     Message(f'{message}', title=self._pluginName, message_type=Message.MessageType.ERROR).show()

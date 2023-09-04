@@ -15,7 +15,9 @@
 # Version 3.0 - 29 Mar 2023:
 #   Corrected the method of simulating flow rate changes from using the M221 command to 
 #   changing the extrusion distance
-__version__ = '3.0'
+# Version 3.1 - 28 Aug 2023:
+#   Add the option enable_advanced_gcode_comments to reduce the Gcode size
+__version__ = '3.1'
 
 import re
 
@@ -25,7 +27,7 @@ from . import PostProcessingCommon as Common
 
 
 
-def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_flow_rate:float, flow_rate_change:float, reference_flow_rate:float, enable_lcd_messages:bool):
+def execute(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, relative_extrusion:bool, start_flow_rate:float, flow_rate_change:float, reference_flow_rate:float, enable_lcd_messages:bool, enable_advanced_gcode_comments:bool):
 
     # Log the post-processing settings
     Logger.log('d', f'Beginning Flow Tower post-processing script version {__version__}')
@@ -38,6 +40,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     Logger.log('d', f'Flow rate change = {flow_rate_change}%')
     Logger.log('d', f'Reference flow rate = {reference_flow_rate}%')
     Logger.log('d', f'Enable LCD messages = {enable_lcd_messages}')
+    Logger.log('d', f'Advanced Gcode Comments = {enable_advanced_gcode_comments}')
 
     # Document the settings in the g-code
     gcode[0] += f'{Common.comment_prefix} Flow Tower post-processing script version {__version__}\n'
@@ -50,6 +53,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     gcode[0] += f'{Common.comment_prefix} Flow rate change = {flow_rate_change}%\n'
     gcode[0] += f'{Common.comment_prefix} Reference flow rate = {reference_flow_rate}%\n'
     gcode[0] += f'{Common.comment_prefix} Enable LCD messages = {enable_lcd_messages}\n'
+    gcode[0] += f'{Common.comment_prefix} Advanced Gcode comments = {enable_advanced_gcode_comments}\n'
 
     # Start at the requested starting flow value
     current_flow_rate = start_flow_rate - flow_rate_change # The current flow value will be corrected when the first section is encountered
@@ -59,7 +63,7 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     updated_extrusion_position = None
 
     # Iterate over each line in the g-code
-    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height):
+    for line_index, line, lines, start_of_new_section in Common.LayerEnumerate(gcode, base_height, section_height, initial_layer_height, layer_height, enable_advanced_gcode_comments):
 
         # Handle each new tower section
         if start_of_new_section:
@@ -68,13 +72,18 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
             current_flow_rate += flow_rate_change
 
             # Document the new flow rate in the gcode
-            lines.insert(2, f'{Common.comment_prefix} Using flow rate {current_flow_rate}% for this tower section')
+            if enable_advanced_gcode_comments :
+                lines.insert(2, f'{Common.comment_prefix} Using flow rate {current_flow_rate}% for this tower section')
 
-            # Display the new flow rate on the printer's LCD
-            if enable_lcd_messages:
-                lines.insert(3, f'M117 FLOW {current_flow_rate:.1f}%')
-                lines.insert(3, f'{Common.comment_prefix} Displaying "FLOW {current_flow_rate:.1f}% on the LCD')
-
+                # Display the new flow rate on the printer's LCD
+                if enable_lcd_messages:
+                    lines.insert(3, f'M117 FLOW {current_flow_rate:.1f}%')
+                    lines.insert(3, f'{Common.comment_prefix} Displaying "FLOW {current_flow_rate:.1f}% on the LCD')
+            else :
+                # Display the new flow rate on the printer's LCD
+                if enable_lcd_messages:
+                    lines.insert(2, f'M117 FLOW {current_flow_rate:.1f}%')
+                    
         # Record if relative extrusion is now being used
         if Common.IsRelativeInstructionLine(line):
             relative_extrusion = True
@@ -129,10 +138,11 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                         # Update the gcode line
                         new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
-                        if original_extruded_distance < 0:
-                            new_line += f' {Common.comment_prefix} Retracting {-original_extruded_distance:.5f} mm of filament'
-                        else:
-                            new_line += f' {Common.comment_prefix} Extruding {original_extruded_distance:.5f} mm of filament to reverse the last retraction'
+                        if enable_advanced_gcode_comments :
+                            if original_extruded_distance < 0:
+                                new_line += f' {Common.comment_prefix} Retracting {-original_extruded_distance:.5f} mm of filament'
+                            else:
+                                new_line += f' {Common.comment_prefix} Extruding {original_extruded_distance:.5f} mm of filament to reverse the last retraction'
 
                 # Handle extrusion commands
                 elif Common.IsExtrusionLine(line):
@@ -153,7 +163,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                                 # Update the gcode line
                                 new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extruded_distance:.5f}')
-                                new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
+                                if enable_advanced_gcode_comments :
+                                    new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
 
                         # Handle absolute extrusion commands
                         # This is more complicated than relative extrusion since we need to keep track of how much 
@@ -173,7 +184,8 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
                             # Update the gcode line
                             new_line = line.replace(f'E{original_extrusion_position_string}', f'E{updated_extrusion_position:.5f}')
-                            new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
+                            if enable_advanced_gcode_comments :
+                                new_line += f' {Common.comment_prefix} Extruding {updated_extruded_distance:.5f} mm of filament to achieve a {current_flow_rate}% flow rate (originally {original_extruded_distance:.5f} mm at {reference_flow_rate}% flow rate)'
                     
                 # Replace the original line with the post-processing modifications
                 lines[line_index] = new_line

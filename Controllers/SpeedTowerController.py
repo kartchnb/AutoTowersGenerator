@@ -55,7 +55,7 @@ class SpeedTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, enableLcdMessages=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Determine the post-processing values
@@ -80,7 +80,8 @@ class SpeedTowerController(ControllerBase):
                 start_speed=startSpeed,
                 speed_change=speedChange,
                 reference_speed=currentPrintSpeed,
-                enable_lcd_messages=enableLcdMessages
+                enable_lcd_messages=enable_lcd_messages,
+                enable_advanced_gcode_comments=enable_advanced_gcode_comments
                 )
         
         # Call the post-processing script for non print speed towers
@@ -94,7 +95,8 @@ class SpeedTowerController(ControllerBase):
                 start_speed=startSpeed,
                 speed_change=speedChange,
                 tower_type=towerType,
-                enable_lcd_messages=enableLcdMessages
+                enable_lcd_messages=enable_lcd_messages,
+                enable_advanced_gcode_comments=enable_advanced_gcode_comments
                 )
 
         return gcode
