@@ -1,10 +1,10 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the CuraHtmlDoc package.
+# This file is distributed under the same license as the AutoTowersGenerator package.
 # 5axes <5axes@free.fr>, 2023.
 msgid ""
 msgstr ""
-"Project-Id-Version: Cura Html Doc\n"
+"Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-05 08:07+0000\n"
 "PO-Revision-Date: 2023-09-05 11:34+0200\n"
