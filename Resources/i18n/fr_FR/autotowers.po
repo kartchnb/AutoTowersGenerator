@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cura Html Doc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 10:30+0000\n"
-"PO-Revision-Date: 2023-08-28 12:39+0200\n"
+"POT-Creation-Date: 2023-09-05 08:07+0000\n"
+"PO-Revision-Date: 2023-09-05 11:34+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -32,27 +32,27 @@ msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr "Les paramètres suivants ont été rétablis :\n"
 
-#: AutoTowersGenerator.py:465
+#: AutoTowersGenerator.py:466
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr "Les paramètres suivants ont été modifiés :\n"
 
-#: AutoTowersGenerator.py:468
+#: AutoTowersGenerator.py:469
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr "Il est recommandé de modifier les paramètres suivants :\n"
 
-#: AutoTowersGenerator.py:510
+#: AutoTowersGenerator.py:511
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr "L'Auto Tower a été supprimée parce que la machine active a été modifiée"
 
-#: AutoTowersGenerator.py:528
+#: AutoTowersGenerator.py:529
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr "L'Auto Tower a été supprimée parce que l'extrudeur actif a changé"
 
-#: AutoTowersGenerator.py:569
+#: AutoTowersGenerator.py:570
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr "Suppression de l'autotower en raison de la fermeture de Cura"
@@ -75,7 +75,7 @@ msgstr "Tour de vitesse"
 #: Controllers/BedLevelPatternContoller.py:46
 msgctxt "@test"
 msgid "Bed Level Pattern"
-msgstr "Test Mise à niveau plateau"
+msgstr "Mise à niveau plateau"
 
 #: Controllers/FlowTowerController.py:46
 msgctxt "@test"
