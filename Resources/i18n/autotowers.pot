@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 12:54+0000\n"
+"POT-Creation-Date: 2023-09-05 08:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,27 +32,27 @@ msgctxt "@msg"
 msgid "The following settings were restored :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:465
+#: AutoTowersGenerator.py:466
 msgctxt "@msg"
 msgid "The following settings were changed :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:468
+#: AutoTowersGenerator.py:469
 msgctxt "@msg"
 msgid "The following setting changes are recommended :\n"
 msgstr ""
 
-#: AutoTowersGenerator.py:510
+#: AutoTowersGenerator.py:511
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active machine was changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:528
+#: AutoTowersGenerator.py:529
 msgctxt "@msg"
 msgid "The Auto Tower was removed because the active extruder changed"
 msgstr ""
 
-#: AutoTowersGenerator.py:569
+#: AutoTowersGenerator.py:570
 msgctxt "@msg"
 msgid "Removing the autotower because Cura is closing"
 msgstr ""
@@ -876,79 +876,4 @@ msgstr ""
 #: Resources/QML/QT6/RemoveModelsButton.qml:12
 msgctxt "@text"
 msgid "Remove the AutoTower Model"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Found OpenScad version"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "at"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "The OpenScad path"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "is not valid"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Changed"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Restored"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "to"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "from"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgstr ""
-msgstr "Le fichier STL"
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "does not exist"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "The Auto Tower was removed because the Cura setting"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "has changed since the tower was generated"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Failed to generate"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "Command output was"
-msgstr ""
-
-#: AutoTowersGenerator.py
-msgctxt "@msg"
-msgid "An exception occured during post-processing"
 msgstr ""
