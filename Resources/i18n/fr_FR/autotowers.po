@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: AutoTowersGenerator\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-05 08:07+0000\n"
-"PO-Revision-Date: 2023-09-05 11:34+0200\n"
+"PO-Revision-Date: 2023-09-11 09:55+0200\n"
 "Last-Translator: 5axes <5axes@free.fr>\n"
 "Language-Team: 5axes\n"
 "Language: fr\n"
@@ -835,7 +835,7 @@ msgstr ""
 #: Resources/QML/QT6/PluginSettingsDialog.qml:113
 msgctxt "@label"
 msgid "Correct print settings"
-msgstr "Paramètres d'impression corrects"
+msgstr "Correction des Paramètres d'impression"
 
 #: Resources/QML/QT6/PluginSettingsDialog.qml:128
 msgctxt "@tooltip"
