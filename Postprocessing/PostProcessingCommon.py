@@ -1,7 +1,7 @@
 # Code common among multiple post-processing scripts
 
 from decimal import Decimal # Used to prevent floating-point inaccuracies from creeping into calculations
-
+import re
 
 
 # A string to use when commenting added or modified lines
@@ -29,79 +29,84 @@ def LayerEnumerate(gcode, base_height:float, section_height:float, initial_layer
     initial_layer_height = Decimal(str(initial_layer_height))
     layer_height = Decimal(str(layer_height))
 
+    # Keep track of whether a line marks the start of a new layer
+    start_of_new_section = False
+    
     # Keep track of the current print height
     current_print_height = Decimal('0')
 
     # Keep track of where the next section should start
     next_section_start_height = base_height
 
+    # Keep track of the current gcode layer number
+    layer_number = 0
+
+    # The regex to use when searching for new layers
+    layer_regex = re.compile(r';LAYER:(\d+)\s*')
+
     # Keep track of the tower section number
     tower_section_number = 0
 
-    # Determine the number of layers in the gcode
-    layer_count = len(gcode)
-
-    for layer_index, layer in enumerate(gcode):
-
-        # The last layer contains user-specified end gcode, which should not be processed
-        if layer_index >= layer_count - trailing_inserted_layer_count:
-            gcode[layer_index] = f'{comment_prefix} post-processing complete\n' + layer
-            break
-
-        # Ignore Cura's comment layer and the user-specified code layer
-        elif layer_index < initial_inserted_layer_count:
-            continue
-
-        # Increment the print height
-        if current_print_height == 0:
-            current_print_height += initial_layer_height
-        else:
-            current_print_height += layer_height
-
-        # Don't process layers until after the base has been printed
-        if current_print_height <= base_height:
-            continue
+    # Iterate over each "clump" of gcode
+    for clump_index, clump in enumerate(gcode):
 
         # Split the layer into lines
-        lines = layer.split('\n')
-
-        # Determine if this is the start of a new tower section
-        if current_print_height > next_section_start_height:
-            
-            # Indicate this is the start of a new tower section
-            start_of_new_section = True
-
-            # Update the starting height of the next tower section
-            next_section_start_height += section_height
-
-            # Increment the tower section number
-            tower_section_number += 1
-            
-            # Comment the start of the tower section in the gcode
-            cura_layer_number = layer_index - 1
-            if enable_advanced_gcode_comments :
-                lines.insert(1, f'{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which is labeled as layer {layer_index - initial_inserted_layer_count} in this gcode file)')
-            
-        # If this is not the start of a new tower section
-        else:
-
-            # Indicate this is NOT the start of a new tower section
-            start_of_new_section = False
+        lines = clump.split('\n')
 
         # Iterate over each line in the layer
         for line_index, line in enumerate(lines):
 
-            # Don't reprocess lines
-            if not IsAlreadyProcessedLine(line):
-                
-                # Yield the values for this layer
-                yield line_index, line, lines, start_of_new_section
+            # Check if this line marks the end of the gcode that needs to be processed
+            if IsEndOfGcodeLine(line):
+                gcode[clump_index] = f'{comment_prefix} post-processing complete\n' + clump
+                break
+
+            # Check if this line really does mark the start of a new layer in the gcode
+            match = re.match(layer_regex, line)
+            if match:
+                # Extract the layer number
+                layer_number = int(match.group(1))
+
+                # Increment the print height
+                if current_print_height == 0:
+                    current_print_height += initial_layer_height
+                else:
+                    current_print_height += layer_height
+
+                # Don't process layers until after the base has been printed
+                if current_print_height <= base_height:
+                    continue
+
+                # Determine if this is the start of a new tower section
+                if current_print_height > next_section_start_height:
+                    
+                    # Indicate this is the start of a new tower section
+                    start_of_new_section = True
+
+                    # Update the starting height of the next tower section
+                    next_section_start_height += section_height
+
+                    # Increment the tower section number
+                    tower_section_number += 1
+                    
+                    # Comment the start of the tower section in the gcode
+                    cura_layer_number = layer_number + 1
+                    if enable_advanced_gcode_comments :
+                        lines[line_index] = line + f'\n{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which is labeled as layer {layer_number} in this gcode file)'
+                    
+                # If this is not the start of a new tower section
+                else:
+                    # Indicate this is NOT the start of a new tower section
+                    start_of_new_section = False
+
+            # Yield the values for this line
+            yield line_index, line, lines, start_of_new_section
 
             # Once the first line in a new tower section has been processed, remove the new section indicator
             start_of_new_section = False
 
-        # Reassemble the layer
-        gcode[layer_index] = '\n'.join(lines)
+        # Reassemble the clump
+        gcode[clump_index] = '\n'.join(lines)
 
 
 
@@ -114,6 +119,18 @@ def CalculateCuraLayerNumber(layer_index):
 def IsAlreadyProcessedLine(line: str) -> bool:
     ''' Check if the given line has already been processed '''
     return comment_prefix in line
+
+
+
+def IsEndOfGcodeLine(line: str) -> bool:
+    ''' Check if the given line marks the end of the gcode that should be post-processed '''
+    return line.strip().startswith(';TIME_ELAPSED:')
+
+
+
+def IsStartOfNewLayerLine(line: str) -> bool:
+    ''' Check if the given line marks the start of a new layer in the gcode '''
+    return line.strip().startswith(';LAYER:')
 
 
 
