@@ -16,7 +16,9 @@
 #   This is more accurate if the section height cannot be evenly divided by the printing layer height
 # Version 3.1 - 28 Aug 2023:
 #   Add the option enable_advanced_gcode_comments to reduce the Gcode size
-__version__ = '3.1'
+# Version 3.2 - 10 Sep 2023:
+#   Prevent the temperature from being changed within a tower section
+__version__ = '3.2'
 
 from UM.Logger import Logger
 
@@ -71,6 +73,15 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
                 lines.insert(3, f'M117 TMP {current_temp} C')
                 if enable_advanced_gcode_comments :
                     lines.insert(3, f'{Common.comment_prefix} Displaying "TMP {current_temp} C" on the LCD')
+
+        # Handle lines within each section
+        else:
+            if Common.IsTemperatureChangeLine(line):
+                # Comment out the line
+                new_line = f';{line}'
+                if enable_advanced_gcode_comments:
+                    new_line += f' {Common.comment_prefix} preventing a temperature change within the tower section'
+                lines[line_index] = line
 
     Logger.log('d', 'AutoTowersGenerator completing Temp Tower post-processing')
     

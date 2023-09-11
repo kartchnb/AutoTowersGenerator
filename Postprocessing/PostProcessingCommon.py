@@ -7,7 +7,7 @@ from decimal import Decimal # Used to prevent floating-point inaccuracies from c
 # A string to use when commenting added or modified lines
 comment_prefix = ';AutoTowersGenerator:'
 
-# The number of layers that are automatically inserted into the gcode before the actual printed layers
+# The number of layers that are automatically inserted into the gcode by Cura before the actual printed layers
 # Layer index 0 contains comments added by Cura
 # Layer index 1 contains the user-specified start gcode
 # Layer index 2 is the first official layer (Cura calls it "Layer 0" in the gcode)
@@ -168,3 +168,9 @@ def IsAbsoluteInstructionLine(line: str) -> bool:
 def IsResetExtruderLine(line: str) -> bool:
     ''' Check if the given line resets the current position for relative positioning '''
     return line.strip().startswith('G92') and 'E0' in line
+
+
+
+def IsTemperatureChangeLine(line: str) -> bool:
+    ''' Check if the given line changes the printing temperature '''
+    return line.strip().startswith('M104') or line.strip().startswith('M109')
