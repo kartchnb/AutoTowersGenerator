@@ -18,7 +18,7 @@ trailing_inserted_layer_count = 2
 
 
 
-def LayerEnumerate(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float):
+def LayerEnumerate(gcode, base_height:float, section_height:float, initial_layer_height:float, layer_height:float, enable_advanced_gcode_comments:bool):
     ''' Iterates over the lines in the gcode that is passed in 
         skipping Cura's comment layer and the user-specified start gcode 
         and ignoring post-printing layers '''
@@ -79,7 +79,8 @@ def LayerEnumerate(gcode, base_height:float, section_height:float, initial_layer
             
             # Comment the start of the tower section in the gcode
             cura_layer_number = layer_index - 1
-            lines.insert(1, f'{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which is labeled as layer {layer_index - initial_inserted_layer_count} in this gcode file)')
+            if enable_advanced_gcode_comments :
+                lines.insert(1, f'{comment_prefix} Starting tower section number {tower_section_number} at Cura layer number {cura_layer_number} (which is labeled as layer {layer_index - initial_inserted_layer_count} in this gcode file)')
             
         # If this is not the start of a new tower section
         else:

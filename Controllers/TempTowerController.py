@@ -55,7 +55,7 @@ class TempTowerController(ControllerBase):
 
 
     # This function is called by the main script when it's time to post-process the tower model
-    def postProcess(self, gcode, enable_lcd_messages=False)->list:
+    def postProcess(self, gcode, enable_lcd_messages=False, enable_advanced_gcode_comments=True)->list:
         ''' This method is called to post-process the gcode before it is sent to the printer or disk '''
 
         # Collect the post-processing data
@@ -75,7 +75,8 @@ class TempTowerController(ControllerBase):
             layer_height=layerHeight,
             start_temp=startTemp,
             temp_change=tempChange,
-            enable_lcd_messages=enable_lcd_messages
+            enable_lcd_messages=enable_lcd_messages,
+            enable_advanced_gcode_comments = enable_advanced_gcode_comments
             )
 
         return gcode
