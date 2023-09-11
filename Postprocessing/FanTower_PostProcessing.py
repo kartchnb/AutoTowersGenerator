@@ -56,6 +56,9 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
     # Start at the requested starting fan speed %
     current_fan_percent = start_fan_percent - fan_percent_change # The current fan percent will be corrected when the first section is encountered
 
+    # Store the current fan value (0-255)
+    current_fan_value = int((current_fan_percent * 255) / 100)
+
     # Keep track of whether a bridge has been completed
     after_bridge = False
 
