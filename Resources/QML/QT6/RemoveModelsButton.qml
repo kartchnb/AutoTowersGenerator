@@ -17,5 +17,4 @@ Cura.SecondaryButton
     iconSource: Qt.resolvedUrl("../../Images/remove_tower_icon.svg")
     visible: manager.autoTowerGenerated
     fixedWidthMode: false
-	
 }
