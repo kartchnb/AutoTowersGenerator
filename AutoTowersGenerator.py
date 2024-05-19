@@ -532,9 +532,14 @@ class AutoTowersGenerator(QObject, Extension):
             Iniializing here means that Cura is fully ready '''
 
         self._pluginSettings = PluginSettings(self._pluginSettingsFilePath)
+        
         # Init openscad path
         self._openScadInterface.SetOpenScadPath(self._pluginSettings.GetValue('openscad path'))        
         
+        # Make sure the temp directory exists
+        if not os.path.exists(self._tempDir):
+            os.makedirs(self._tempDir)
+
         self._initializeMenu()
 
 
