@@ -190,13 +190,6 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @pyqtProperty(str)
-    def os(self)->str:
-        ''' Return the operating system being used '''
-
-        return platform.system().lower()
-
-
     autoTowerGeneratedChanged = pyqtSignal()
     @pyqtProperty(bool, notify=autoTowerGeneratedChanged)
     def autoTowerGenerated(self)->bool:
@@ -520,13 +513,6 @@ class AutoTowersGenerator(QObject, Extension):
             if self._currentTowerController.settingIsCritical(settingKey):
                 settingLabel = CuraApplication.getInstance().getMachineManager().activeMachine.getProperty(settingKey, 'label')
                 self._removeAutoTower(f'{catalog.i18nc("@msg", "The Auto Tower was removed because the Cura setting")} "{settingLabel}" {catalog.i18nc("@msg", "has changed since the tower was generated")}')
-
-
-
-    def _onActiveExtruderChanged(self)->None:
-        ''' Listen for changes to the active extruder '''
-            
-        self._removeAutoTower(catalog.i18nc("@msg", "The Auto Tower was removed because the active extruder changed"))
 
 
 
