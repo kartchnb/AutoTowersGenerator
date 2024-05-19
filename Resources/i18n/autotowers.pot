@@ -792,6 +792,14 @@ msgid ""
 "made, but increases the size of the final code."
 msgstr ""
 
+#: Resources/QML/QT6/PluginSettingsDialog.qml:191
+msgctxt "@tooltip"
+msgid ""
+"If enabled, gcode will be created with descriptive file names.<p>These file "
+"names may be too long for some printers to handle and can be deselected if "
+"needed."
+msgstr ""
+
 #: Resources/QML/QT6/FlowTowerDialog.qml:14
 msgctxt "@title"
 msgid "Flow Tower"

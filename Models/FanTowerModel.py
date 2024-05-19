@@ -21,7 +21,7 @@ class FanTowerModel(ModelBase):
 
     # The available fan tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Fan Tower - 0-100%") , 'filename': 'Fan Tower - Fan 0-100.stl', 'start percent': '0', 'percent change': '20',}
+        {'name': catalog.i18nc("@model", "Fan Tower - 0-100%") , 'filename': 'Fan Tower - 0-100.stl', 'start percent': '0', 'percent change': '20',}
     ]
 
 

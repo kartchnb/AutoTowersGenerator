@@ -882,6 +882,17 @@ msgstr ""
 "Gcode modifié.<p>L'utilisation de plus de commentaires permet un meilleur "
 "contrôle des modifications apportées, mais augmente la taille du code final."
 
+#: Resources/QML/QT6/PluginSettingsDialog.qml:191
+msgctxt "@tooltip"
+msgid ""
+"If enabled, gcode will be created with descriptive file names.<p>These file "
+"names may be too long for some printers to handle and can be deselected if "
+"needed."
+msgstr ""
+"Si elle est activée, le gcode sera créé avec des noms de fichiers "
+"descriptifs.<p>Ces noms de fichiers peuvent être trop longs à gérer pour "
+"certaines imprimantes et peuvent être désélectionnés si nécessaire."
+
 #: Resources/QML/QT6/FlowTowerDialog.qml:14
 msgctxt "@title"
 msgid "Flow Tower"

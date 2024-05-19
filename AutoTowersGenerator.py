@@ -1,6 +1,6 @@
+from functools import cached_property
 import glob
 import os
-import platform
 import traceback
 
 # Import the correct version of PyQt
@@ -81,7 +81,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @property
+    @cached_property
     def _pluginDir(self)->str:
         ''' Returns the path to the plugin directory '''
 
@@ -89,7 +89,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @property
+    @cached_property
     def _openScadSourcePath(self)->str:
         ''' Returns the path to the OpenSCAD source models'''
 
@@ -97,7 +97,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
     
-    @property
+    @cached_property
     def _qmlDir(self)->str:
         ''' Returns the location of the QML dialog files directory '''
 
@@ -105,7 +105,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @property
+    @cached_property
     def _stlDir(self)->str:
         ''' Returns the directory where STL files are stored '''
 
@@ -113,7 +113,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @property
+    @cached_property
     def _tempDir(self)->str:
         ''' Returns the directory to use for temporary files '''
 
@@ -121,7 +121,7 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    @property
+    @cached_property
     def _pluginSettingsFilePath(self)->str:
         ''' Returns the path to the plugin settings file '''
 
@@ -129,64 +129,57 @@ class AutoTowersGenerator(QObject, Extension):
 
 
 
-    _cachedRemoveModelsButton = None
-
-    @property
+    @cached_property
     def _removeAutoTowerButton(self)->QObject:
         ''' Returns the button used to remove the Auto Tower from the scene '''
 
-        if self._cachedRemoveModelsButton is None:
-            self._cachedRemoveModelsButton = self._createDialog('RemoveModelsButton.qml')
-        return self._cachedRemoveModelsButton
+        return self._createDialog('RemoveModelsButton.qml')
 
 
 
-    _cachedPluginSettingsDialog = None
-
-    @property
+    @cached_property
     def _pluginSettingsDialog(self)->QObject:
         ''' Returns the settings dialog '''
 
-        if self._cachedPluginSettingsDialog is None:
-            self._cachedPluginSettingsDialog = self._createDialog('PluginSettingsDialog.qml')
-        return self._cachedPluginSettingsDialog
+        return self._createDialog('PluginSettingsDialog.qml')
 
 
 
-    _cachedSettingsVerificationDialog = None
-
-    @property
+    @cached_property
     def _settingsVerificationDialog(self)->QObject:
         ''' Returns a dialog asking the user whether they want to continue with incompatible settings '''
 
-        if self._cachedSettingsVerificationDialog is None:
-            self._cachedSettingsVerificationDialog = self._createDialog('SettingsVerificationDialog.qml')
-        return self._cachedSettingsVerificationDialog
+        return self._createDialog('SettingsVerificationDialog.qml')
 
 
 
-
-    _cachedWaitDialog = None
-
-    @property
+    @cached_property
     def _waitDialog(self)->QObject:
         ''' Returns the dialog used to tell the user that generating a model may take a long time '''
 
-        if self._cachedWaitDialog is None:
-            self._cachedWaitDialog = self._createDialog('WaitDialog.qml')
-        return self._cachedWaitDialog
+        return self._createDialog('WaitDialog.qml')
 
 
 
-    _cachedOpenScadInterface = None
-    @property
+    @cached_property
     def _openScadInterface(self)->OpenScadInterface:
         ''' Provides lazy instantiation of the OpenScad interface '''
 
-        if self._cachedOpenScadInterface is None:
-            self._cachedOpenScadInterface = OpenScadInterface(self._pluginName, self._tempDir)
+        return OpenScadInterface(self._pluginName, self._tempDir)
 
-        return self._cachedOpenScadInterface
+
+
+    @cached_property
+    def _gcodeProcessedMarker(self)->str:
+        return f';{self._pluginName}: Post-processed by {self._pluginName} version {self.pluginVersion}'
+
+
+
+    @cached_property
+    def _pluginName(self)->str:
+        ''' Just a useless wrapper around getPluginId '''
+
+        return self.getPluginId()
 
 
 
@@ -196,14 +189,6 @@ class AutoTowersGenerator(QObject, Extension):
         ''' Used to show or hide the button for removing the generated Auto Tower '''
 
         return not self._autoTowerOperation is None
-
-
-
-    @property
-    def _pluginName(self)->str:
-        ''' Returns the plugin's name '''
-
-        return self.getPluginId()
     
 
 
@@ -232,6 +217,8 @@ class AutoTowersGenerator(QObject, Extension):
             Message(message, title=self._pluginName, message_type=Message.MessageType.POSITIVE, lifetime=8).show()
 
         self._openScadPathSettingChanged.emit()
+
+
 
     @pyqtProperty(str, notify=_openScadPathSettingChanged, fset=setOpenScadPathSetting)
     def openScadPathSetting(self)->str:
@@ -272,6 +259,7 @@ class AutoTowersGenerator(QObject, Extension):
         return self._pluginSettings.GetValue('enable lcd messages', False)
 
 
+
     _enableAdvancedGcodeCommentsSetting = True
 
     _enableAdvancedGcodeCommentsSettingChanged = pyqtSignal()
@@ -283,6 +271,21 @@ class AutoTowersGenerator(QObject, Extension):
     @pyqtProperty(bool, notify=_enableAdvancedGcodeCommentsSettingChanged, fset=setAdvancedGcodeCommentsSetting)
     def enableAdvancedGcodeCommentsSetting(self)->bool:
         return self._pluginSettings.GetValue('advanced gcode comments', True)
+
+
+    _enableDescriptiveFileNamesSetting = True
+
+    _enableDescriptiveFileNamesSettingChanged = pyqtSignal()
+
+    def setEnableDescriptiveFileNamesSetting(self, value:bool)->None:
+        self._pluginSettings.SetValue('descriptive file names', value)
+        self._enableDescriptiveFileNamesSettingChanged.emit()
+
+    @pyqtProperty(bool, notify=_enableDescriptiveFileNamesSettingChanged, fset=setEnableDescriptiveFileNamesSetting)
+    def enableDescriptiveFileNamesSetting(self)->bool:
+        return self._pluginSettings.GetValue('descriptive file names', True)
+
+
 
     @pyqtSlot()
     def removeButtonClicked(self)->None:
@@ -472,6 +475,25 @@ class AutoTowersGenerator(QObject, Extension):
         # The dialog is no longer needed
         self._waitDialog.hide()
 
+        # Some printers cannot handle long, descriptive file names
+        # If descriptive file names have been disabled, truncate the tower name
+        # Google suggests 20 characters to be a safe limit
+        # Ideally, truncation should happen when the tower name is first 
+        # generated by the tower controller, but that involves a lot of changes
+        # This is lazy but effective
+        if self.enableDescriptiveFileNamesSetting == False:
+            towerName = towerName.replace('Preset ', '')
+            towerName = towerName.replace('Custom', '')
+            towerName = towerName.replace('Tower', '')
+            towerName = towerName.replace('Bed Level Pattern', 'LVL')
+            towerName = towerName.replace('Distance', 'DST')
+            towerName = towerName.replace('Flow', 'FLW')
+            towerName = towerName.replace('Retraction', 'RT')
+            towerName = towerName.replace('Speed', 'SPD')
+            towerName = towerName.replace('Temp', 'TMP')
+            towerName = towerName.replace(' ', '')
+            towerName = towerName[:20]
+
         # Rename the print job
         CuraApplication.getInstance().getPrintInformation().setJobName(towerName)
 
@@ -596,14 +618,12 @@ class AutoTowersGenerator(QObject, Extension):
             # If there is no g-code for the current build plate, there's nothing more to do
             return
 
-        try:
-            gcodeProcessedMarker = f';{self._pluginName}: Post-processed by {self._pluginName} version {self.pluginVersion}'
-
+        try:      
             # Proceed if the g-code has not already been post-processed
-            if gcodeProcessedMarker not in gcode[0]:
+            if self._gcodeProcessedMarker not in gcode[0]:
 
                 # Mark the g-code as having been post-processed
-                gcode[0] += gcodeProcessedMarker + '\n'
+                gcode[0] += self._gcodeProcessedMarker + '\n'
 
                 # Call the tower controller post-processing callback to modify the g-code
                 try:

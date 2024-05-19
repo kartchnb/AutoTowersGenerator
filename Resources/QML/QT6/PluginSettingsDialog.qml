@@ -170,6 +170,27 @@ UM.Dialog
                 text: catalog.i18nc("@tooltip", "If enabled, this option allows more comments to be added to the modified GCode.<p>The use of more comments allows better control of the modifications made, but increases the size of the final code.")
                 visible: enable_advanced_gcode_comments_mouse_area.containsMouse
             }
+			
+			UM.Label 
+            { 
+                text: catalog.i18nc("@label", "Descriptive File Names")
+                MouseArea 
+                {
+                    id: enable_descriptive_file_names_mouse_area
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+            }
+            UM.CheckBox
+            {
+                id: enableDescriptiveFileNames
+                checked: manager.enableDescriptiveFileNamesSetting
+            }
+            UM.ToolTip
+            {
+                text: catalog.i18nc("@tooltip", "If enabled, gcode will be created with descriptive file names.<p>These file names may be too long for some printers to handle and can be deselected if needed.")
+                visible: enable_descriptive_file_names_mouse_area.containsMouse
+            }
         }
     }
 
@@ -192,6 +213,7 @@ UM.Dialog
         manager.openScadPathSetting = openScadPath.text
         manager.enableLcdMessagesSetting = enableLcdMessages.checked
         manager.enableAdvancedGcodeCommentsSetting = enableAdvancedGcodeComments.checked
+        manager.enableDescriptiveFileNamesSetting = enableDescriptiveFileNames.checked
 		manager.correctPrintSettings = correctPrintSettings.checked
     }
 

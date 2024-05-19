@@ -126,7 +126,7 @@ class FanTowerController(ControllerBase):
         }
 
         # Determine the tower name
-        towerName = f'Custom Fan Tower - Fan Speed {startFanPercent}-{endFanPercent}x{fanPercentChange}'
+        towerName = f'Custom Fan Tower - Speed {startFanPercent}-{endFanPercent}x{fanPercentChange}'
 
         # Send the filename and parameters to the STL generation callback
         self._generateStlCallback(self, towerName, openScadFilename, openScadParameters, self.postProcess)

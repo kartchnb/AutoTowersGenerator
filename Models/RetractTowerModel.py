@@ -21,14 +21,14 @@ class RetractTowerModel(ModelBase):
 
     # The available retract tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 0.4-1.2") , 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'start value': '0.4', 'value change': '0.1', 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1.2-2.0") , 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'start value': '1.2', 'value change': '0.1', 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 1-6") , 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'start value': '1', 'value change': '1', 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 4-9") , 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'start value': '4', 'value change': '1', 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Distance 7-12") , 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'start value': '7', 'value change': '1', 'tower type': 'Distance'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 10-50") , 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'start value': '10', 'value change': '10', 'tower type': 'Speed'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 35-75") , 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'start value': '35', 'value change': '10', 'tower type': 'Speed'},
-        {'name': catalog.i18nc("@model", "Retract Tower - Retract Speed 60-100") , 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'start value': '60', 'value change': '10', 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Distance 0.4-1.2") , 'filename': 'Retract Tower - Retract Distance 0.4-1.2.stl', 'start value': '0.4', 'value change': '0.1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Distance 1.2-2.0") , 'filename': 'Retract Tower - Retract Distance 1.2-2.0.stl', 'start value': '1.2', 'value change': '0.1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Distance 1-6") , 'filename': 'Retract Tower - Retract Distance 1-6.stl', 'start value': '1', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Distance 4-9") , 'filename': 'Retract Tower - Retract Distance 4-9.stl', 'start value': '4', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Distance 7-12") , 'filename': 'Retract Tower - Retract Distance 7-12.stl', 'start value': '7', 'value change': '1', 'tower type': 'Distance'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Speed 10-50") , 'filename': 'Retract Tower - Retract Speed 10-50.stl', 'start value': '10', 'value change': '10', 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Speed 35-75") , 'filename': 'Retract Tower - Retract Speed 35-75.stl', 'start value': '35', 'value change': '10', 'tower type': 'Speed'},
+        {'name': catalog.i18nc("@model", "Retract Tower - Speed 60-100") , 'filename': 'Retract Tower - Retract Speed 60-100.stl', 'start value': '60', 'value change': '10', 'tower type': 'Speed'},
     ]
  
     _towerTypesTable = [

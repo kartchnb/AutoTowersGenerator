@@ -118,6 +118,16 @@ UM.Dialog
                 id: enableAdvancedGcodeComments
                 checked: manager.enableAdvancedGcodeCommentsSetting
             }
+			
+			Label 
+            { 
+                text: "Descriptive File Names" 
+            }
+            CheckBox
+            {
+                id: enableDescriptiveFileNames
+                checked: manager.enableDescriptiveFileNamesSetting
+            }
         }
     }
 
@@ -138,6 +148,7 @@ UM.Dialog
         manager.openScadPathSetting = openScadPath.text
         manager.enableLcdMessagesSetting = enableLcdMessages.checked
 		manager.enableAdvancedGcodeCommentsSetting = enableAdvancedGcodeComments.checked
+        manager.enableDescriptiveFileNamesSetting = enableDescriptiveFileNames.checked
         manager.correctPrintSettings = correctPrintSettings.checked
     }
 }

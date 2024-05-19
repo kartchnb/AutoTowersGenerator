@@ -21,9 +21,9 @@ class SpeedTowerModel(ModelBase):
 
     # The available speed tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 20-100"), 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': '20', 'speed change': '20', 'tower type': 'Print Speed'},
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 50-150"), 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': '50', 'speed change': '20', 'tower type': 'Print Speed'},
-        {'name': catalog.i18nc("@model", "Speed Tower - Print Speed 100-200"), 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': '100', 'speed change': '20', 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - 20-100"), 'filename': 'Speed Tower - Print Speed 20-100.stl', 'start speed': '20', 'speed change': '20', 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - 50-150"), 'filename': 'Speed Tower - Print Speed 50-150.stl', 'start speed': '50', 'speed change': '20', 'tower type': 'Print Speed'},
+        {'name': catalog.i18nc("@model", "Speed Tower - 100-200"), 'filename': 'Speed Tower - Print Speed 100-200.stl', 'start speed': '100', 'speed change': '20', 'tower type': 'Print Speed'},
     ]
 
     # The speed tower types that can been created
