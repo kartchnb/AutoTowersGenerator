@@ -21,8 +21,8 @@ class FlowTowerModel(ModelBase):
 
     # The available flow tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Flow Tower - Flow 115-85") , 'filename': 'Flow Tower - 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Standard'},
-        {'name': catalog.i18nc("@model", "Flow Tower (Spiral) - 115-85") , 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Spiral'},
+        {'name': catalog.i18nc("@model", "Flow Tower - Flow 115-85") , 'filename': 'Flow Tower - Flow 115-85.stl', 'icon': 'flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Standard'},
+        {'name': catalog.i18nc("@model", "Flow Tower (Spiral) - Flow 115-85") , 'filename': 'Flow Tower Spiral - Flow 115-85.stl', 'icon': 'spiral_flowtower_icon.png', 'start flow': '115', 'flow change': '-5', 'tower design': 'Spiral'},
     ]
 
     # The available flow tower designs
