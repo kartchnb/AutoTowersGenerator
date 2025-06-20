@@ -154,8 +154,8 @@ msgstr "Pression RepRap"
 
 #: Models/TempTowerModel.py:24
 msgctxt "@model"
-msgid "Temperature Tower - ABA"
-msgstr "Tour de température - ABA"
+msgid "Temperature Tower - ASA"
+msgstr "Tour de température - ASA"
 
 #: Models/TempTowerModel.py:25
 msgctxt "@model"

@@ -154,7 +154,7 @@ msgstr ""
 
 #: Models/TempTowerModel.py:24
 msgctxt "@model"
-msgid "Temperature Tower - ABA"
+msgid "Temperature Tower - ASA"
 msgstr ""
 
 #: Models/TempTowerModel.py:25

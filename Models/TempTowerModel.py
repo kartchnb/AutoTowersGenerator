@@ -21,7 +21,7 @@ class TempTowerModel(ModelBase):
 
     # The available temp tower presets
     _presetsTable = [
-        {'name': catalog.i18nc("@model", "Temperature Tower - ABA") , 'filename': 'Temperature Tower - ABA.stl', 'start temp': '260', 'temp change': '-5'},
+        {'name': catalog.i18nc("@model", "Temperature Tower - ASA") , 'filename': 'Temperature Tower - ASA.stl', 'start temp': '260', 'temp change': '-5'},
         {'name': catalog.i18nc("@model", "Temperature Tower - ABS") , 'filename': 'Temperature Tower - ABS.stl', 'start temp': '250', 'temp change': '-5'},
         {'name': catalog.i18nc("@model", "Temperature Tower - Nylon") , 'filename': 'Temperature Tower - Nylon.stl', 'start temp': '260', 'temp change': '-5'},
         {'name': catalog.i18nc("@model", "Temperature Tower - PC") , 'filename': 'Temperature Tower - PC.stl', 'start temp': '310', 'temp change': '-5'},

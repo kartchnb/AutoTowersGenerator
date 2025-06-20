@@ -52,9 +52,9 @@
             "Value_Change": "-5",
             "Wall_Thickness": "0.6"
         },
-        "Temperature Tower - ABA": {
+        "Temperature Tower - ASA": {
             "Base_Height": "0.84",
-            "Column_Label": "ABA",
+            "Column_Label": "ASA",
             "Column_Label_Height_Multiplier": "0.3",
             "Ending_Value": "240",
             "Font": "Arial:style=Bold",
