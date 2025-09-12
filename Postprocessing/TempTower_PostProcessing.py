@@ -64,11 +64,9 @@ def execute(gcode, base_height:float, section_height:float, initial_layer_height
 
             # Configure the new temperature in the gcode
             if enable_advanced_gcode_comments :
-                lines.insert(2, f'M109 S{current_temp} {Common.comment_prefix} Wait for the temperature to be reached')
-                lines.insert(2, f'M104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section')
+                lines.insert(2, f'G91\nG1 Z10\nM104 S{current_temp} {Common.comment_prefix} setting temperature to {current_temp} C for this tower section\nM109 S{current_temp} {Common.comment_prefix} Wait for the temperature to be reached\nG1 Z-10\nG90')
             else :
-                lines.insert(2, f'M109 S{current_temp}')
-                lines.insert(2, f'M104 S{current_temp}')
+                lines.insert(2, f'G91\nG1 Z10\nM104 S{current_temp}\nM109 S{current_temp}\nG1 Z-10\nG90')
 
             # Display the new temperature on the printer's LCD
             if enable_lcd_messages:
